@@ -61,6 +61,37 @@ Tasks should **only** be blocked when they genuinely need human input — a deci
 
 Code issues, bugs, failing tests, missing features, or incomplete work from another agent are **not** reasons to block a task. Instead, the agent should **create a new task** assigned to the appropriate profile to resolve the issue, and add it as a dependency.
 
+## Git Worktree Isolation
+
+Every code-changing task runs in its own **git worktree** — a fully isolated working directory branched from `main`. This is enforced structurally, not procedurally.
+
+```
+main (QA tests HERE)          worktree: fix-login          worktree: fix-api-500
+     │                              │                            │
+     ├── stable, tested             ├── isolated changes         ├── isolated changes
+     ├── QA never sees WIP          ├── merged when done         ├── merged when done
+     └── ONLY merged fixes land     └── never touches main       └── never touches main
+```
+
+### How It Works
+
+1. **`main` is the source of truth.** QA always tests against `main` (or a deployed build from `main`). Nothing lands on `main` until it's reviewed and merged.
+2. **Every dev task spawns with `hermes -w`.** The kanban dispatcher passes `--worktree` when spawning worker profiles. The agent gets its own worktree at `.worktrees/<task-id>/` — a full copy of the repo, isolated from every other agent.
+3. **Changes never leak.** Worktree A cannot see worktree B's uncommitted changes. QA cannot see unfinished fixes. This is a git-level guarantee, not a hope that agents "follow the rules."
+4. **Merge gate.** A fix task only completes by committing to its worktree, pushing the branch, and merging to `main`. Until the merge happens, `main` is untouched.
+5. **QA re-tests on updated `main`.** After fixes merge, the follow-up QA task runs against the new `main` — which now includes the fixes.
+
+### Why Worktrees
+
+| Without worktrees | With worktrees |
+|---|---|
+| QA tests dev's half-finished changes → false failures | QA only sees merged, committed code |
+| Two devs edit the same file → merge conflict chaos | Each dev has their own working tree |
+| "Please don't touch X while I test" — hope-based | Git-enforced isolation — impossible to interfere |
+| Reviewer runs out of iterations because devs keep changing things | Reviewer has a stable target; devs work in parallel |
+
+The kanban dispatcher handles worktree creation automatically when `--worktree` is set on the task.
+
 ## QA Workflow (Reviewer → Fix → Reviewer)
 
 The reviewer profile **does not write code**. Its sole job is to test and verify.
