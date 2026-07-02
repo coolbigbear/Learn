@@ -1,15 +1,23 @@
 import { useState, useEffect } from 'react';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
 import LessonCard from '../components/LessonCard.jsx';
 import * as api from '../api/client.js';
 
 export default function Lessons() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
+    if (authLoading) return;
+
+    if (!isAuthenticated) {
+      setLoading(false);
+      return;
+    }
+
     async function fetchLessons() {
       try {
         const data = await api.getLessons();
@@ -21,14 +29,18 @@ export default function Lessons() {
       }
     }
     fetchLessons();
-  }, []);
+  }, [isAuthenticated, authLoading]);
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-gray-500 text-lg">Loading lessons...</div>
       </div>
     );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
   }
 
   if (error) {
@@ -43,11 +55,7 @@ export default function Lessons() {
     <div>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Python Tutorials</h1>
-        <p className="mt-2 text-gray-500">
-          {isAuthenticated
-            ? 'Continue your learning journey through these interactive lessons.'
-            : 'Sign in to track your progress as you work through the lessons.'}
-        </p>
+        <p className="mt-2 text-gray-500">Continue your learning journey through these interactive lessons.</p>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {lessons.map((lesson) => (
