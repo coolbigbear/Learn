@@ -1,0 +1,62 @@
+[
+  {
+    "slug": "func-greet",
+    "title": "Write a greet function",
+    "instruction": "Define a function called `greet` that takes one parameter `name` and prints a greeting. Then call it with \"Alice\".",
+    "starter_code": "# Define the greet function and call it with \"Alice\"\n",
+    "solution_code": "def greet(name):\n    print(f\"Hello, {name}!\")\n\ngreet(\"Alice\")",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "Hello, Alice!\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 1
+  },
+  {
+    "slug": "func-add",
+    "title": "Addition function with return",
+    "instruction": "Define a function `add(a, b)` that **returns** the sum of a and b. Call it with 7 and 12, store the result, and print it.",
+    "starter_code": "# Define add function and use it\n",
+    "solution_code": "def add(a, b):\n    return a + b\n\nresult = add(7, 12)\nprint(result)",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "19\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 2
+  },
+  {
+    "slug": "func-is-even",
+    "title": "Even number checker",
+    "instruction": "Define a function `is_even(n)` that returns `True` if n is even and `False` otherwise. Call it with 7 and 10, printing the results on separate lines.",
+    "starter_code": "# Define is_even and test with 7 and 10\n",
+    "solution_code": "def is_even(n):\n    return n % 2 == 0\n\nprint(is_even(7))\nprint(is_even(10))",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "False\nTrue\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 3
+  },
+  {
+    "slug": "func-convert-temp",
+    "title": "Temperature converter",
+    "instruction": "Define a function `celsius_to_fahrenheit(celsius)` that converts Celsius to Fahrenheit using the formula (celsius * 9/5) + 32 and **returns** the result. Call it with 30 and print the result.",
+    "starter_code": "# Define the converter and call it with 30\n",
+    "solution_code": "def celsius_to_fahrenheit(celsius):\n    return (celsius * 9/5) + 32\n\nprint(celsius_to_fahrenheit(30))",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "86.0\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 4
+  }
+]

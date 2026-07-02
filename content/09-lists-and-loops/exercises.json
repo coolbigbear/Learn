@@ -1,0 +1,62 @@
+[
+  {
+    "slug": "list-create-print",
+    "title": "Create a list and print items",
+    "instruction": "Create a list called `animals` containing \"cat\", \"dog\", and \"rabbit\". Use a `for` loop to print each animal on its own line.",
+    "starter_code": "# Create the list and print each item\n",
+    "solution_code": "animals = [\"cat\", \"dog\", \"rabbit\"]\nfor animal in animals:\n    print(animal)",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "cat\ndog\nrabbit\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 1
+  },
+  {
+    "slug": "list-sum-loop",
+    "title": "Sum numbers with a loop",
+    "instruction": "Given the list `nums`, use a `for` loop to calculate the sum of all numbers. Print the total.",
+    "starter_code": "nums = [12, 7, 9, 22, 15]\n# Calculate and print the sum\n",
+    "solution_code": "nums = [12, 7, 9, 22, 15]\ntotal = 0\nfor n in nums:\n    total += n\nprint(total)",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "65\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 2
+  },
+  {
+    "slug": "list-even-filter",
+    "title": "Filter even numbers",
+    "instruction": "Given `numbers`, create a new list `evens` containing only the even numbers. Print `evens`.",
+    "starter_code": "numbers = [3, 8, 12, 7, 10, 5, 18]\n# Create a list of only the even numbers\n",
+    "solution_code": "numbers = [3, 8, 12, 7, 10, 5, 18]\nevens = []\nfor n in numbers:\n    if n % 2 == 0:\n        evens.append(n)\nprint(evens)",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "[8, 12, 10, 18]\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 3
+  },
+  {
+    "slug": "list-grocery",
+    "title": "Build a grocery list",
+    "instruction": "Start with an empty list called `grocery_list`. Use `.append()` to add \"milk\", \"bread\", \"eggs\", and \"apples\". Then use a `for` loop with `enumerate()` to print each item with its index number (starting from 1, not 0).",
+    "starter_code": "# Build a grocery list and print with numbered items\n",
+    "solution_code": "grocery_list = []\ngrocery_list.append(\"milk\")\ngrocery_list.append(\"bread\")\ngrocery_list.append(\"eggs\")\ngrocery_list.append(\"apples\")\nfor i, item in enumerate(grocery_list):\n    print(f\"{i+1}. {item}\")",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "1. milk\n2. bread\n3. eggs\n4. apples\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 4
+  }
+]
