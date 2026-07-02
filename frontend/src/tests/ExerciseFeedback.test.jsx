@@ -149,4 +149,44 @@ describe('ExerciseFeedback', () => {
     );
     expect(screen.getByText('Expected 2.5 but got 0')).toBeInTheDocument();
   });
+
+  it('shows "(empty)" label when actual_output is empty', () => {
+    render(
+      <ExerciseFeedback
+        result={{
+          passed: false,
+          test_results: [
+            {
+              passed: false,
+              name: 'No output test',
+              expected_output: 'hello',
+              actual_output: '',
+            },
+          ],
+        }}
+      />
+    );
+    expect(screen.getByText('(empty)')).toBeInTheDocument();
+    expect(screen.getByText('hello')).toBeInTheDocument();
+  });
+
+  it('shows "non-empty output" label when expected_output is empty', () => {
+    render(
+      <ExerciseFeedback
+        result={{
+          passed: false,
+          test_results: [
+            {
+              passed: false,
+              name: 'Print something',
+              expected_output: '',
+              actual_output: '',
+            },
+          ],
+        }}
+      />
+    );
+    expect(screen.getByText('non-empty output')).toBeInTheDocument();
+    expect(screen.getByText('(empty)')).toBeInTheDocument();
+  });
 });

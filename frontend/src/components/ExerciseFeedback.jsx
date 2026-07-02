@@ -74,18 +74,25 @@ export default function ExerciseFeedback({ result }) {
                   {tr.message && (
                     <div className="text-gray-600">{tr.message}</div>
                   )}
-                  {tr.expected_output !== undefined && (
-                    <div className="flex gap-4">
-                      <div>
-                        <span className="text-gray-500">Expected: </span>
+                  {/* Show Expected vs Got for failed tests */}
+                  <div className="flex gap-4">
+                    <div>
+                      <span className="text-gray-500">Expected: </span>
+                      {tr.expected_output && tr.expected_output.trim() ? (
                         <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-mono">{tr.expected_output}</code>
-                      </div>
-                      <div>
-                        <span className="text-gray-500">Got: </span>
-                        <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-mono">{tr.actual_output}</code>
-                      </div>
+                      ) : (
+                        <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-mono text-gray-400 italic">non-empty output</code>
+                      )}
                     </div>
-                  )}
+                    <div>
+                      <span className="text-gray-500">Got: </span>
+                      {tr.actual_output && tr.actual_output.trim() ? (
+                        <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-mono">{tr.actual_output}</code>
+                      ) : (
+                        <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-mono text-gray-400 italic">(empty)</code>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
