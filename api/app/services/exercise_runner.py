@@ -41,7 +41,7 @@ _USER_CODE = {user_code!r}
 # Test cases
 _TEST_CASES = {test_cases!r}
 
-def _run_single(input_data, expected, comparison):
+def _run_single(input_data, expected, comparison, test_name=None):
     '''Run user code with given stdin and compare output.'''
     old_stdin = sys.stdin
     old_stdout = sys.stdout
@@ -61,28 +61,57 @@ def _run_single(input_data, expected, comparison):
         err = sys.stderr.getvalue()
         if comparison == 'exact':
             passed = (actual == expected)
+            if not passed:
+                msg = f'Expected: {{expected!r}}, but got: {{actual!r}}'
+            else:
+                msg = None
         elif comparison == 'regex':
             import re
             passed = bool(re.match(expected, actual))
+            if not passed:
+                msg = f'Output does not match pattern: {{expected}}'
+            else:
+                msg = None
         elif comparison == 'non_empty':
             passed = bool(actual.strip())
+            if not passed:
+                msg = 'Expected some output, but your code produced nothing'
+            else:
+                msg = None
         elif comparison == 'contains':
             passed = expected in actual
+            if not passed:
+                msg = f'Expected output to contain: {{expected!r}}'
+            else:
+                msg = None
         elif comparison == 'whitelist':
             import json as _json
             try:
                 allowed = _json.loads(expected)
                 passed = actual.strip() in allowed
+                if not passed:
+                    msg = f'Output must be one of: {{", ".join(repr(v) for v in allowed)}}'
+                else:
+                    msg = None
             except (_json.JSONDecodeError, TypeError):
                 passed = False
+                msg = 'Invalid test case (expected JSON list)'
         elif comparison == 'comment':
             passed = '#' in _USER_CODE
+            if not passed:
+                msg = 'Your code should include a comment (using #)'
+            else:
+                msg = None
         else:
             passed = (actual == expected)
-        return {{'passed': passed, 'actual_output': actual, 'expected_output': expected, 'errors': err or None}}
+            if not passed:
+                msg = f'Expected: {{expected!r}}, but got: {{actual!r}}'
+            else:
+                msg = None
+        return {{'passed': passed, 'actual_output': actual, 'expected_output': expected, 'errors': err or None, 'name': test_name, 'message': msg}}
     except Exception as e:
         actual = sys.stdout.getvalue()
-        return {{'passed': False, 'actual_output': actual, 'expected_output': expected, 'errors': f'{{type(e).__name__}}: {{e}}'}}
+        return {{'passed': False, 'actual_output': actual, 'expected_output': expected, 'errors': f'{{type(e).__name__}}: {{e}}', 'name': test_name, 'message': f'Runtime error: {{type(e).__name__}}'}}
     finally:
         sys.stdin = old_stdin
         sys.stdout = old_stdout
@@ -91,7 +120,7 @@ def _run_single(input_data, expected, comparison):
 results = []
 all_passed = True
 for i, tc in enumerate(_TEST_CASES):
-    r = _run_single(tc.get('input', ''), tc.get('expected_output', ''), tc.get('comparison_type', 'exact'))
+    r = _run_single(tc.get('input', ''), tc.get('expected_output', ''), tc.get('comparison_type', 'exact'), test_name=tc.get('name'))
     r['test_index'] = i
     if not r['passed']:
         all_passed = False

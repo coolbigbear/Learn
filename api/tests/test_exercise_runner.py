@@ -208,3 +208,94 @@ class TestFallbackType:
             {"input": "", "expected_output": "hello\n", "comparison_type": "unknown_fallback"},
         ])
         assert result["passed"] is True
+
+
+class TestNamePropagation:
+    """Test that the 'name' field is propagated from test cases to results."""
+
+    async def test_name_propagated_when_provided(self):
+        result = await run_code('print("hello")', [
+            {"input": "", "expected_output": "hello\n", "comparison_type": "exact", "name": "Print greeting"},
+        ])
+        assert result["test_results"][0]["name"] == "Print greeting"
+
+    async def test_name_is_none_when_not_provided(self):
+        result = await run_code('print("hello")', [
+            {"input": "", "expected_output": "hello\n", "comparison_type": "exact"},
+        ])
+        assert result["test_results"][0]["name"] is None
+
+    async def test_name_propagated_on_error(self):
+        result = await run_code('raise ValueError("boom")', [
+            {"input": "", "expected_output": "hello\n", "comparison_type": "exact", "name": "Bad code"},
+        ])
+        assert result["test_results"][0]["name"] == "Bad code"
+
+
+class TestFailureMessages:
+    """Test that descriptive failure messages are generated for each comparison type."""
+
+    async def test_exact_failure_message(self):
+        result = await run_code('print("hello")', [
+            {"input": "", "expected_output": "world\n", "comparison_type": "exact"},
+        ])
+        msg = result["test_results"][0]["message"]
+        assert msg is not None
+        assert "Expected:" in msg
+        assert "hello" in msg
+        assert "world" in msg
+
+    async def test_regex_failure_message(self):
+        result = await run_code('print("goodbye")', [
+            {"input": "", "expected_output": r"hello", "comparison_type": "regex"},
+        ])
+        msg = result["test_results"][0]["message"]
+        assert msg is not None
+        assert "pattern" in msg.lower()
+
+    async def test_non_empty_failure_message(self):
+        result = await run_code('pass', [
+            {"input": "", "expected_output": "", "comparison_type": "non_empty"},
+        ])
+        msg = result["test_results"][0]["message"]
+        assert msg is not None
+        assert "nothing" in msg.lower()
+
+    async def test_contains_failure_message(self):
+        result = await run_code('print("goodbye")', [
+            {"input": "", "expected_output": "hello", "comparison_type": "contains"},
+        ])
+        msg = result["test_results"][0]["message"]
+        assert msg is not None
+        assert "contain" in msg.lower()
+
+    async def test_whitelist_failure_message(self):
+        result = await run_code('print("unknown")', [
+            {"input": "", "expected_output": '["a", "b"]', "comparison_type": "whitelist"},
+        ])
+        msg = result["test_results"][0]["message"]
+        assert msg is not None
+        assert "one of" in msg.lower()
+
+    async def test_comment_failure_message(self):
+        result = await run_code('print("hello")', [
+            {"input": "", "expected_output": "", "comparison_type": "comment"},
+        ])
+        msg = result["test_results"][0]["message"]
+        assert msg is not None
+        assert "comment" in msg.lower()
+
+    async def test_runtime_error_message(self):
+        result = await run_code('raise ValueError("boom")', [
+            {"input": "", "expected_output": "hello\n", "comparison_type": "exact"},
+        ])
+        msg = result["test_results"][0]["message"]
+        assert msg is not None
+        assert "Runtime error" in msg
+
+    async def test_no_message_on_success(self):
+        result = await run_code('print("hello")', [
+            {"input": "", "expected_output": "hello\n", "comparison_type": "exact"},
+        ])
+        msg = result["test_results"][0]["message"]
+        assert msg is None

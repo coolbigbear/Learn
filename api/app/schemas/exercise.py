@@ -13,6 +13,8 @@ class TestResult(BaseModel):
     actual_output: str
     expected_output: str
     errors: str | None = None
+    name: str | None = None
+    message: str | None = None
 
 
 class RunResult(BaseModel):
