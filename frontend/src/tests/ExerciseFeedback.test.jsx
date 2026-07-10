@@ -259,4 +259,81 @@ describe('ExerciseFeedback', () => {
     // The box Got shows "some output" so only 1 "(empty)" total
     expect(screen.getAllByText('(empty)').length).toBe(1);
   });
+
+  it('shows "(empty)" in Got box when actual_output is empty string (comment-only submission)', () => {
+    render(
+      <ExerciseFeedback
+        result={{
+          passed: false,
+          expected_output: 'Hello, World!\n',
+          actual_output: '',
+          test_results: [
+            {
+              passed: false,
+              name: 'Print Hello World',
+              expected_output: 'Hello, World!\n',
+              actual_output: '',
+              message: "Expected: 'Hello, World!\\n', but got: ''",
+            },
+          ],
+        }}
+      />
+    );
+    // Dedicated Output Comparison boxes
+    expect(screen.getByText('Output Comparison')).toBeInTheDocument();
+    // "Hello, World!" appears in both inline code and dedicated box
+    expect(screen.getAllByText('Hello, World!').length).toBe(2);
+    // "(empty)" appears in the Got box (once), and the inline Got also shows "(empty)"
+    expect(screen.getAllByText('(empty)').length).toBe(2);
+  });
+
+  it('shows "(empty)" in both dedicated boxes when both top-level outputs are empty', () => {
+    render(
+      <ExerciseFeedback
+        result={{
+          passed: false,
+          expected_output: '',
+          actual_output: '',
+          test_results: [
+            {
+              passed: false,
+              name: 'Both empty test',
+              expected_output: '',
+              actual_output: '',
+            },
+          ],
+        }}
+      />
+    );
+    expect(screen.getByText('Output Comparison')).toBeInTheDocument();
+    // The dedicated boxes: both show "(empty)"
+    // The inline display shows "non-empty output" for expected and "(empty)" for Got
+    // total: 2 from boxes + 1 from inline Got = 3
+    expect(screen.getAllByText('(empty)').length).toBe(3);
+    expect(screen.getByText('non-empty output')).toBeInTheDocument();
+  });
+
+  it('shows Output Comparison when top-level outputs are provided but test_results missing', () => {
+    render(
+      <ExerciseFeedback
+        result={{
+          passed: false,
+          expected_output: 'expected value',
+          actual_output: 'actual value',
+          test_results: [
+            {
+              passed: false,
+              name: 'Fallback test',
+              expected_output: 'expected value',
+              actual_output: 'actual value',
+            },
+          ],
+        }}
+      />
+    );
+    expect(screen.getByText('Output Comparison')).toBeInTheDocument();
+    // Text appears in both inline code and dedicated box
+    expect(screen.getAllByText('expected value').length).toBe(2);
+    expect(screen.getAllByText('actual value').length).toBe(2);
+  });
 });
