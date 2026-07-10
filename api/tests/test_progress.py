@@ -75,9 +75,14 @@ class TestListProgress:
         body = resp.json()
         assert "progress" in body
         assert "summary" in body
+        assert "lesson_totals" in body
         # Should have progress for ex1
         exercise_ids = [p["exercise_id"] for p in body["progress"]]
         assert pytest.progress_ex1_id in exercise_ids
+        # Lesson totals should include test lesson with 2 exercises
+        lesson_slug = pytest.progress_lesson_slug
+        assert lesson_slug in body["lesson_totals"]
+        assert body["lesson_totals"][lesson_slug] >= 2
         # Summary
         assert body["summary"]["total_exercises"] >= 2
         assert body["summary"]["completed_exercises"] >= 1

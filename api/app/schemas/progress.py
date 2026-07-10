@@ -23,6 +23,7 @@ class ProgressSummary(BaseModel):
 class ProgressResponse(BaseModel):
     progress: list[ProgressItem]
     summary: ProgressSummary
+    lesson_totals: dict[str, int]  # lesson_slug -> total_exercises
 
 
 class LessonProgressItem(BaseModel):

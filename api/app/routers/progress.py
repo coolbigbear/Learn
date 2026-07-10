@@ -17,8 +17,8 @@ async def list_progress(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    items, summary = await get_user_progress(db, user)
-    return ProgressResponse(progress=items, summary=summary)
+    items, summary, lesson_totals = await get_user_progress(db, user)
+    return ProgressResponse(progress=items, summary=summary, lesson_totals=lesson_totals)
 
 
 @router.get("/{lesson_slug}", response_model=LessonProgressResponse)

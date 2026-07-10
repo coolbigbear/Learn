@@ -9,14 +9,25 @@ from app.models.progress import UserProgress
 from app.models.user import User
 
 
-async def get_user_progress(db: AsyncSession, user: User) -> tuple[list[dict], dict]:
+async def get_user_progress(db: AsyncSession, user: User) -> tuple[list[dict], dict, dict]:
     """Get full progress for a user across all exercises.
 
-    Returns (progress_items, summary_dict).
+    Returns (progress_items, summary_dict, lesson_totals_dict).
     """
     # Total exercises count
     total_result = await db.execute(select(func.count(Exercise.id)))
     total_exercises = total_result.scalar() or 0
+
+    # Per-lesson exercise totals
+    lesson_totals_result = await db.execute(
+        select(
+            Lesson.slug,
+            func.count(Exercise.id).label("total"),
+        )
+        .join(Exercise, Exercise.lesson_id == Lesson.id)
+        .group_by(Lesson.slug)
+    )
+    lesson_totals = dict(lesson_totals_result.all())
 
     # User's progress
     stmt = (
@@ -53,7 +64,7 @@ async def get_user_progress(db: AsyncSession, user: User) -> tuple[list[dict], d
         "percentage": percentage,
     }
 
-    return progress_items, summary
+    return progress_items, summary, lesson_totals
 
 
 async def get_lesson_progress(db: AsyncSession, user: User, lesson_slug: str) -> dict | None:

@@ -39,10 +39,10 @@ export default function Progress() {
 
   // Group progress by lesson slug
   const byLesson = {};
+  const lessonTotals = progress?.lesson_totals || {};
   progress?.progress?.forEach((p) => {
     const slug = p.lesson_slug;
-    if (!byLesson[slug]) byLesson[slug] = { total: 0, completed: 0 };
-    byLesson[slug].total++;
+    if (!byLesson[slug]) byLesson[slug] = { completed: 0 };
     if (p.completed) byLesson[slug].completed++;
   });
 
@@ -81,10 +81,10 @@ export default function Progress() {
                 {slug.replace(/^\d+-/, '').replace(/-/g, ' ')}
               </h3>
               <span className="text-sm text-gray-500">
-                {data.completed}/{data.total} exercises
+                {data.completed}/{lessonTotals[slug] || 0} exercises
               </span>
             </div>
-            <ProgressBar completed={data.completed} total={data.total} />
+            <ProgressBar completed={data.completed} total={lessonTotals[slug] || 0} />
           </div>
         ))}
 
