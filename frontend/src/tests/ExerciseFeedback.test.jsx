@@ -189,4 +189,74 @@ describe('ExerciseFeedback', () => {
     expect(screen.getByText('non-empty output')).toBeInTheDocument();
     expect(screen.getByText('(empty)')).toBeInTheDocument();
   });
+
+  it('renders dedicated Expected/Got display boxes with top-level outputs', () => {
+    render(
+      <ExerciseFeedback
+        result={{
+          passed: false,
+          expected_output: 'Hello, World!\n',
+          actual_output: 'Hellow World\n',
+          test_results: [
+            {
+              passed: false,
+              name: 'Print Hello World',
+              expected_output: 'Hello, World!\n',
+              actual_output: 'Hellow World\n',
+              message: "Expected: 'Hello, World!\\n', but got: 'Hellow World\\n'",
+            },
+          ],
+        }}
+      />
+    );
+    expect(screen.getByText('Output Comparison')).toBeInTheDocument();
+    // "Expected:" label is the uppercase heading for the box
+    const expectedLabels = screen.getAllByText('Expected:');
+    expect(expectedLabels.length).toBe(2); // one in inline, one in box
+    const gotLabels = screen.getAllByText('Got:');
+    expect(gotLabels.length).toBe(2); // one in inline, one in box
+    // Content appears in both inline code and box pre
+    expect(screen.getAllByText('Hello, World!').length).toBe(2);
+    expect(screen.getAllByText('Hellow World').length).toBe(2);
+  });
+
+  it('does not show Output Comparison section when tests pass', () => {
+    render(
+      <ExerciseFeedback
+        result={{
+          passed: true,
+          expected_output: 'Hello, World!\n',
+          actual_output: 'Hello, World!\n',
+          test_results: [
+            { passed: true, name: 'Print Hello World' },
+          ],
+        }}
+      />
+    );
+    expect(screen.queryByText('Output Comparison')).not.toBeInTheDocument();
+  });
+
+  it('shows "(empty)" in Expected box when top-level expected_output is empty for failed test', () => {
+    render(
+      <ExerciseFeedback
+        result={{
+          passed: false,
+          expected_output: '',
+          actual_output: 'some output',
+          test_results: [
+            {
+              passed: false,
+              name: 'Non-empty test',
+              expected_output: '',
+              actual_output: 'some output',
+            },
+          ],
+        }}
+      />
+    );
+    expect(screen.getByText('Output Comparison')).toBeInTheDocument();
+    // The inline Expected shows "non-empty output" while the box shows "(empty)"
+    // The box Got shows "some output" so only 1 "(empty)" total
+    expect(screen.getAllByText('(empty)').length).toBe(1);
+  });
 });
