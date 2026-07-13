@@ -11,6 +11,7 @@ On timeout, the container is force-killed to prevent dangling resources.
 
 import asyncio
 import json
+import logging
 import os
 import shutil
 import tempfile
@@ -24,6 +25,9 @@ from app.config import (
     DOCKER_LANGUAGES_CONFIG,
     MAX_OUTPUT_CHARS,
 )
+
+
+logger = logging.getLogger(__name__)
 
 
 class DockerUnavailableError(Exception):
@@ -102,8 +106,24 @@ class DockerRunner:
                 self._client = docker.from_env()
                 # Test connection
                 self._client.ping()
+                # Check if memory limits are actually supported.
+                # On Raspberry Pi the 'memory' cgroup controller is often
+                # unavailable, so mem_limit is silently ignored.
+                info = self._client.info()
+                if not info.get("MemoryLimit", True):
+                    logger.warning(
+                        "Docker memory limit support is NOT available on this host. "
+                        "The 'memory' cgroup controller is missing from the cgroup v2 "
+                        "hierarchy. The mem_limit setting will be silently ignored. "
+                        "CPU and PIDs limits are unaffected."
+                    )
             except Exception as e:
                 self._client = None
+                logger.warning(
+                    "Docker daemon unreachable: %s. "
+                    "Falling back to subprocess-based runner.",
+                    e,
+                )
                 raise DockerUnavailableError(
                     f"Docker daemon unreachable: {e}"
                 ) from e

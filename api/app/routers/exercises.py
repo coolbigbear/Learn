@@ -32,6 +32,7 @@ async def get_exercise(
         title=exercise.title,
         instruction=exercise.instruction,
         starter_code=exercise.starter_code,
+        language=exercise.language,
         order=exercise.order,
         lesson_id=exercise.lesson_id,
     )

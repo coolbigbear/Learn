@@ -117,8 +117,8 @@ Each language image follows the same pattern:
 | **Writable /tmp** | `tmpfs=/tmp:size=10M,noexec,nosuid,uid=1001,gid=1001` | Temp storage for user code without giving write access to rootfs |
 | **No network** | `network_disabled=True` | Prevents data exfiltration, network attacks, external calls |
 | **Non-root user** | `user="sandbox"` (UID 1001) | Container processes can't escalate to root |
-| **Memory limit** | `mem_limit="128m"` | cgroup memory.max — OOM-kills runaway processes |
-| **CPU limit** | `nano_cpus=500_000_000` (0.5 CPU) | Prevents CPU-starving the host |
+|| **Memory limit** | `mem_limit="128m"` | cgroup memory.max — OOM-kills runaway processes. **NOTE:** Not enforced on Raspberry Pi — see §4.2. |
+|| **CPU limit** | `nano_cpus=500_000_000` (0.5 CPU) | Prevents CPU-starving the host |
 | **Process limit** | `pids_limit=50` | Prevents fork bombs |
 | **Seccomp** | Docker default profile (auto) | Blocks ~44 dangerous syscalls (no `mount`, `ptrace`, `bpf`, etc.) |
 | **No privileged** | `privileged=False` (default) | Container cannot access host devices |
@@ -141,6 +141,33 @@ deferred to a hardening phase:
   container escape is demonstrated in penetration testing.
 - **User namespaces** (`--userns-remap`): Maps container root to unprivileged
   host UID. Significantly harder to debug; defer to production hardening.
+
+### 4.2 Platform Limitations — Raspberry Pi
+
+The Raspberry Pi kernel and Debian Trixie userland on this system **do not** include
+the `memory` cgroup controller in the cgroup v2 hierarchy:
+
+```
+$ cat /sys/fs/cgroup/cgroup.controllers
+cpuset cpu io pids
+```
+
+This means:
+- `--memory` / `mem_limit` flags are silently ignored by Docker
+- The `docker info` output reports `MemoryLimit: false` and `WARNING: No memory limit support`
+- Containers can allocate unlimited host memory (OOM-killer will not fire on the container)
+- The `mem_limit` fields in `languages.json` and `config.py` are **decorative** on this platform
+
+**What still works:**
+- CPU limits (`nano_cpus`) — enforced via `cpu` cgroup controller ✅
+- PIDs limits (`pids_limit`) — enforced via `pids` cgroup controller ✅
+- Read-only rootfs, no-network, non-root user, seccomp, capability drops — all
+  independent of cgroup memory controller ✅
+- Container timeout and force-kill — enforced at the Docker SDK level ✅
+
+The Docker sandbox is fully functional for educational use on RPi. The only
+missing control is RAM capping, which is acceptable for a learning platform
+where student code is trusted and short-lived.
 
 ## 5. Language Configuration
 
@@ -429,7 +456,7 @@ must pass all of these tests unchanged.
 - [x] Read-only root filesystem
 - [x] Writable /tmp via tmpfs (noexec, nosuid)
 - [x] Network disabled
-- [x] Memory cgroup limit
+- [~] Memory cgroup limit (not enforced on RPi — see §4.2)
 - [x] CPU cgroup limit
 - [x] PIDs cgroup limit
 - [x] Seccomp default profile

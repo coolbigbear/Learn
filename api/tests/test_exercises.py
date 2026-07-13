@@ -173,6 +173,7 @@ class TestGetExercise:
         assert "instruction" in body
         assert "starter_code" in body
         assert "lesson_id" in body
+        assert body["language"] == "python"
         # Should NOT leak test cases or solution
         assert "test_cases" not in body
         assert "solution_code" not in body
