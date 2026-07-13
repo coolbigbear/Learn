@@ -2,11 +2,12 @@
 
 ## Learning Objectives
 
-- Understand what a web API is and how it works
-- Install and run a FastAPI server
-- Create GET and POST endpoints
-- Use path parameters and query parameters
-- Test your API with the interactive docs
+> **By the end of this lesson, you will be able to:**
+> - Understand what a web API is and how it works
+> - Install and run a FastAPI server
+> - Create GET and POST endpoints
+> - Use path parameters and query parameters
+> - Test your API with the interactive docs
 
 ---
 

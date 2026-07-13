@@ -1,0 +1,100 @@
+"""Tests for lesson endpoints."""
+
+import pytest
+from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.models.exercise import Exercise
+from app.models.lesson import Lesson
+
+
+@pytest.fixture(autouse=True)
+async def seed_lessons(db_session: AsyncSession):
+    """Seed test data: two lessons with exercises."""
+    lesson1 = Lesson(
+        slug="01-test-lesson",
+        title="Test Lesson One",
+        content="# Test\n\nContent here.",
+        order=1,
+    )
+    lesson2 = Lesson(
+        slug="02-test-lesson",
+        title="Test Lesson Two",
+        content="# Test Two\n\nMore content.",
+        order=2,
+    )
+    db_session.add_all([lesson1, lesson2])
+    await db_session.flush()
+
+    ex1 = Exercise(
+        lesson_id=lesson1.id,
+        slug="test-ex-1",
+        title="First Exercise",
+        instruction="Write code",
+        starter_code="# Write here\n",
+        solution_code="print('ok')",
+        test_cases=[{"input": "", "expected_output": "ok\n", "comparison_type": "exact"}],
+        order=1,
+    )
+    ex2 = Exercise(
+        lesson_id=lesson1.id,
+        slug="test-ex-2",
+        title="Second Exercise",
+        instruction="Do something",
+        starter_code="# Do it\n",
+        solution_code="print('done')",
+        test_cases=[{"input": "", "expected_output": "done\n", "comparison_type": "exact"}],
+        order=2,
+    )
+    db_session.add_all([ex1, ex2])
+    await db_session.flush()
+    yield
+
+
+class TestListLessons:
+    async def test_list_lessons(self, client: AsyncClient, auth_headers: dict):
+        resp = await client.get("/api/lessons", headers=auth_headers)
+        assert resp.status_code == 200
+        body = resp.json()
+        assert "lessons" in body
+        assert len(body["lessons"]) == 2
+        # First lesson should have exercise_count = 2
+        assert body["lessons"][0]["exercise_count"] == 2
+        assert body["lessons"][1]["exercise_count"] == 0
+
+    async def test_lessons_ordered(self, client: AsyncClient, auth_headers: dict):
+        resp = await client.get("/api/lessons", headers=auth_headers)
+        lessons = resp.json()["lessons"]
+        assert lessons[0]["slug"] == "01-test-lesson"
+        assert lessons[1]["slug"] == "02-test-lesson"
+
+    async def test_lessons_require_auth(self, client: AsyncClient):
+        resp = await client.get("/api/lessons")
+        assert resp.status_code == 401
+
+
+class TestGetLesson:
+    async def test_get_lesson_success(self, client: AsyncClient, auth_headers: dict):
+        resp = await client.get("/api/lessons/01-test-lesson", headers=auth_headers)
+        assert resp.status_code == 200
+        body = resp.json()
+        assert body["slug"] == "01-test-lesson"
+        assert body["title"] == "Test Lesson One"
+        assert "exercises" in body
+        assert len(body["exercises"]) == 2
+
+    async def test_get_lesson_returns_public_fields(self, client: AsyncClient, auth_headers: dict):
+        """Ensure solution_code and test_cases are NOT returned."""
+        resp = await client.get("/api/lessons/01-test-lesson", headers=auth_headers)
+        ex = resp.json()["exercises"][0]
+        assert "solution_code" not in ex
+        assert "test_cases" not in ex
+        assert "starter_code" in ex  # starter code IS public
+
+    async def test_get_lesson_not_found(self, client: AsyncClient, auth_headers: dict):
+        resp = await client.get("/api/lessons/nonexistent", headers=auth_headers)
+        assert resp.status_code == 404
+
+    async def test_get_lesson_requires_auth(self, client: AsyncClient):
+        resp = await client.get("/api/lessons/01-test-lesson")
+        assert resp.status_code == 401

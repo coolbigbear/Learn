@@ -2,11 +2,12 @@
 
 ## Learning Objectives
 
-- Create and modify lists
-- Access individual elements by index
-- Iterate over lists with `for` loops
-- Use `range()` to repeat a set number of times
-- Use `.append()` to grow a list
+> **By the end of this lesson, you will be able to:**
+> - Create and modify lists
+> - Access individual elements by index
+> - Iterate over lists with `for` loops
+> - Use `range()` to repeat a set number of times
+> - Use `.append()` to grow a list
 
 ---
 
@@ -202,7 +203,3 @@ for i, color in enumerate(colors):
 - `.append()` adds items, `.remove()` removes them
 - `for` loops iterate over each item in a list
 - `range()` generates sequences of numbers for counting loops
-
-## What's Next
-
-Now let's explore **dictionaries and tuples** — two more ways to organize data (Lesson 10).

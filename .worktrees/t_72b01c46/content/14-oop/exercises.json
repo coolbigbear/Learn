@@ -1,0 +1,47 @@
+[
+  {
+    "slug": "oop-student-class",
+    "title": "Create a Student class",
+    "instruction": "Create a `Student` class with `__init__` that takes `name` and `grade`. Add an `introduce()` method that returns `\"Hi, I'm [name] and I'm in grade [grade].\"`",
+    "starter_code": "class Student:\n    # Your code here\n    pass\n\n# Test it\ns = Student(\"Alice\", 10)\nprint(s.introduce())\n",
+    "solution_code": "class Student:\n    def __init__(self, name, grade):\n        self.name = name\n        self.grade = grade\n\n    def introduce(self):\n        return f\"Hi, I'm {self.name} and I'm in grade {self.grade}.\"\n\ns = Student(\"Alice\", 10)\nprint(s.introduce())\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "Hi, I'm Alice and I'm in grade 10.\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 1
+  },
+  {
+    "slug": "oop-repr-str",
+    "title": "Add __str__ to Student",
+    "instruction": "Add a `__str__` method to your `Student` class so that `print(student)` displays `\"Student: [name], Grade: [grade]\"`.",
+    "starter_code": "class Student:\n    def __init__(self, name, grade):\n        self.name = name\n        self.grade = grade\n\n    # Add __str__ method here\n\n# Test it\ns = Student(\"Bob\", 11)\nprint(s)\n",
+    "solution_code": "class Student:\n    def __init__(self, name, grade):\n        self.name = name\n        self.grade = grade\n\n    def __str__(self):\n        return f\"Student: {self.name}, Grade: {self.grade}\"\n\ns = Student(\"Bob\", 11)\nprint(s)\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "Student: Bob, Grade: 11\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 2
+  },
+  {
+    "slug": "oop-inheritance",
+    "title": "Inherit from Student",
+    "instruction": "Create a `GraduateStudent` class that inherits from `Student`. Add a `thesis_topic` attribute to `__init__` and override `introduce()` to include the thesis topic.",
+    "starter_code": "class Student:\n    def __init__(self, name, grade):\n        self.name = name\n        self.grade = grade\n\n    def introduce(self):\n        return f\"Hi, I'm {self.name}, grade {self.grade}.\"\n\n# Create GraduateStudent here\n\n# Test it\ngs = GraduateStudent(\"Diana\", 12, \"AI in Healthcare\")\nprint(gs.introduce())\n",
+    "solution_code": "class Student:\n    def __init__(self, name, grade):\n        self.name = name\n        self.grade = grade\n\n    def introduce(self):\n        return f\"Hi, I'm {self.name}, grade {self.grade}.\"\n\nclass GraduateStudent(Student):\n    def __init__(self, name, grade, thesis_topic):\n        super().__init__(name, grade)\n        self.thesis_topic = thesis_topic\n\n    def introduce(self):\n        return f\"Hi, I'm {self.name}, grade {self.grade}. My thesis is on {self.thesis_topic}.\"\n\ngs = GraduateStudent(\"Diana\", 12, \"AI in Healthcare\")\nprint(gs.introduce())\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "Hi, I'm Diana, grade 12. My thesis is on AI in Healthcare.\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 3
+  }
+]

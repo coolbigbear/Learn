@@ -170,7 +170,7 @@ export default function LessonView() {
               <div className="prose prose-indigo max-w-none">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
-                  rehypePlugins={[[rehypeHighlight, { detect: true, plainText: ['text'] }]]}
+                  rehypePlugins={[rehypeHighlight]}
                 >
                   {lesson.content}
                 </ReactMarkdown>
@@ -207,7 +207,7 @@ export default function LessonView() {
                     <div className="mb-4 text-sm text-gray-700 prose prose-sm max-w-none">
                       <ReactMarkdown
                         remarkPlugins={[remarkGfm]}
-                        rehypePlugins={[[rehypeHighlight, { detect: true }]]}
+                        rehypePlugins={[rehypeHighlight]}
                       >
                         {activeExercise.instruction}
                       </ReactMarkdown>
@@ -304,30 +304,6 @@ export default function LessonView() {
                 </div>
               )}
 
-              {/* What's Next — positioned BELOW the exercises */}
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-4">
-                  <h3 className="text-sm font-semibold text-indigo-800 uppercase tracking-wider mb-1">
-                    What's Next?
-                  </h3>
-                  <p className="text-sm text-indigo-700">
-                    {activeExercise && feedback?.passed
-                      ? 'Great work completing this exercise! Ready for more challenges?'
-                      : 'Keep practicing with the exercises above. When you\'re ready, explore more lessons to continue your Python journey.'}
-                  </p>
-                  <div className="mt-3">
-                    <Link
-                      to="/lessons"
-                      className="text-sm font-medium text-indigo-600 hover:text-indigo-500 inline-flex items-center gap-1"
-                    >
-                      Browse all lessons
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -360,7 +336,7 @@ export default function LessonView() {
         <div className="prose prose-indigo max-w-none mb-8">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
-            rehypePlugins={[[rehypeHighlight, { detect: true, plainText: ['text'] }]]}
+            rehypePlugins={[rehypeHighlight]}
           >
             {lesson.content}
           </ReactMarkdown>
@@ -394,7 +370,7 @@ export default function LessonView() {
                 <div className="mb-4 text-sm text-gray-700 prose prose-sm max-w-none">
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
-                    rehypePlugins={[[rehypeHighlight, { detect: true }]]}
+                    rehypePlugins={[rehypeHighlight]}
                   >
                     {activeExercise.instruction}
                   </ReactMarkdown>
@@ -491,30 +467,6 @@ export default function LessonView() {
             </div>
           )}
 
-          {/* What's Next — positioned BELOW the exercises on mobile too */}
-          <div className="mt-6 pt-6 border-t border-gray-200 mb-8">
-            <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-4">
-              <h3 className="text-sm font-semibold text-indigo-800 uppercase tracking-wider mb-1">
-                What's Next?
-              </h3>
-              <p className="text-sm text-indigo-700">
-                {activeExercise && feedback?.passed
-                  ? 'Great work completing this exercise! Ready for more challenges?'
-                  : 'Keep practicing with the exercises above. When you\'re ready, explore more lessons to continue your Python journey.'}
-              </p>
-              <div className="mt-3">
-                <Link
-                  to="/lessons"
-                  className="text-sm font-medium text-indigo-600 hover:text-indigo-500 inline-flex items-center gap-1"
-                >
-                  Browse all lessons
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </Link>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </>

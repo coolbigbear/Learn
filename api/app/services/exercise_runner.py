@@ -114,10 +114,10 @@ def _run_single(input_data, expected, comparison, test_name=None):
                 msg = f'Expected: {{expected!r}}, but got: {{actual!r}}'
             else:
                 msg = None
-        return {{'passed': passed, 'actual_output': actual, 'expected_output': expected, 'errors': err or None, 'name': test_name, 'message': msg}}
+        return {{'passed': passed, 'actual_output': actual, 'expected_output': expected, 'errors': err or None, 'name': test_name, 'message': msg, 'comparison_type': comparison}}
     except Exception as e:
         actual = sys.stdout.getvalue()
-        return {{'passed': False, 'actual_output': actual, 'expected_output': expected, 'errors': f'{{type(e).__name__}}: {{e}}', 'name': test_name, 'message': f'Runtime error: {{type(e).__name__}}'}}
+        return {{'passed': False, 'actual_output': actual, 'expected_output': expected, 'errors': f'{{type(e).__name__}}: {{e}}', 'name': test_name, 'message': f'Runtime error: {{type(e).__name__}}', 'comparison_type': comparison}}
     finally:
         sys.stdin = old_stdin
         sys.stdout = old_stdout

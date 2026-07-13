@@ -2,10 +2,11 @@
 
 ## Learning Objectives
 
-- Use comparison operators: `==`, `!=`, `<`, `>`, `<=`, `>=`
-- Write `if`/`elif`/`else` statements to make decisions
-- Combine conditions with `and`, `or`, and `not`
-- Understand truthy and falsy values
+> **By the end of this lesson, you will be able to:**
+> - Use comparison operators: `==`, `!=`, `<`, `>`, `<=`, `>=`
+> - Write `if`/`elif`/`else` statements to make decisions
+> - Combine conditions with `and`, `or`, and `not`
+> - Understand truthy and falsy values
 
 ---
 
@@ -170,7 +171,3 @@ else:
 - `if`/`elif`/`else` lets your code make decisions
 - `and`, `or`, `not` combine or flip conditions
 - Empty and zero values are "falsy" — they act like `False` in conditions
-
-## What's Next
-
-Now that you can make decisions, let's learn about **lists and loops** — working with collections of data and repeating actions (Lesson 9).

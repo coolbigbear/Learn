@@ -2,9 +2,10 @@
 
 ## Learning Objectives
 
-- Use the `print()` function to display text
-- Create strings with double quotes `"..."` and single quotes `'...'`
-- Understand that print() puts each result on its own line
+> **By the end of this lesson, you will be able to:**
+> - Use the `print()` function to display text
+> - Create strings with double quotes `"..."` and single quotes `'...'`
+> - Understand that print() puts each result on its own line
 
 ---
 
@@ -113,7 +114,3 @@ Always wrap text in quotes when you want to print it as-is.
 - Use either `"double quotes"` or `'single quotes'` — just make them match
 - Each `print()` starts a new line automatically
 - Forgetting quotes around text causes an error
-
-## What's Next
-
-Now that you can print a single string, let's learn how to **print multiple items on one line** using commas.

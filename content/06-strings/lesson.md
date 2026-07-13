@@ -2,10 +2,11 @@
 
 ## Learning Objectives
 
-- Create strings with single, double, and triple quotes
-- Combine strings with concatenation
-- Embed variables in strings with f-strings
-- Use string methods like `.upper()`, `.lower()`, and `len()`
+> **By the end of this lesson, you will be able to:**
+> - Create strings with single, double, and triple quotes
+> - Combine strings with concatenation
+> - Embed variables in strings with f-strings
+> - Use string methods like `.upper()`, `.lower()`, and `len()`
 
 ---
 
@@ -167,7 +168,3 @@ print("slow" in sentence)    # False
 - Methods like `.upper()`, `.lower()`, `.strip()` transform strings
 - `len()` gives the character count
 - The `in` operator checks for substrings
-
-## What's Next
-
-Now let's look at **numbers and math** — arithmetic operators, type conversion, and common math tricks (Lesson 7).

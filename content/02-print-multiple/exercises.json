@@ -32,14 +32,14 @@
   {
     "slug": "print-favorite-things",
     "title": "Print your favorite things",
-    "instruction": "Print your **favorite food** and your **favorite color** in a single `print()` statement, separated by a comma. You can use any food and any color.",
+    "instruction": "Print your **favorite food** and your **favorite color** in a single `print()` statement, separated by a comma. You can use any food and any color — your output should have both items separated by a space.",
     "starter_code": "# Print favorite food and color\n",
     "solution_code": "print(\"Pizza\", \"Blue\")",
     "test_cases": [
       {
         "input": "",
-        "expected_output": "",
-        "comparison_type": "non_empty"
+        "expected_output": ".+ .+\\n",
+        "comparison_type": "regex"
       }
     ],
     "order": 3
@@ -47,14 +47,14 @@
   {
     "slug": "print-first-last",
     "title": "Print first and last name",
-    "instruction": "Print your **first name** and **last name** on the same line using a single `print()` with two items separated by a comma.",
+    "instruction": "Print your **first name** and **last name** on the same line using a single `print()` with two items separated by a comma.  The output must have a space between the two names.",
     "starter_code": "# Print first and last name\n",
     "solution_code": "print(\"Ada\", \"Lovelace\")",
     "test_cases": [
       {
         "input": "",
-        "expected_output": "",
-        "comparison_type": "non_empty"
+        "expected_output": ".+ .+\\n",
+        "comparison_type": "regex"
       }
     ],
     "order": 4
@@ -62,14 +62,14 @@
   {
     "slug": "print-mixed-types",
     "title": "Mix text and a number",
-    "instruction": "Use a single `print()` to output: **I am** followed by your age (as a number, no quotes) followed by **years old**.",
+    "instruction": "Use a single `print()` to output: **I am** followed by your age (as a number, no quotes) followed by **years old**.  For example: `I am 30 years old`.",
     "starter_code": "# Print: I am [age] years old\n",
     "solution_code": "print(\"I am\", 30, \"years old\")",
     "test_cases": [
       {
         "input": "",
-        "expected_output": "",
-        "comparison_type": "non_empty"
+        "expected_output": "I am \\d+ years old\\n",
+        "comparison_type": "regex"
       }
     ],
     "order": 5

@@ -2,11 +2,12 @@
 
 ## Learning Objectives
 
-- Understand what exceptions are and why they occur
-- Catch and handle exceptions with `try` / `except`
-- Use `else` and `finally` for fine-grained control
-- Raise your own exceptions with `raise`
-- Handle multiple exception types
+> **By the end of this lesson, you will be able to:**
+> - Understand what exceptions are and why they occur
+> - Catch and handle exceptions with `try` / `except`
+> - Use `else` and `finally` for fine-grained control
+> - Raise your own exceptions with `raise`
+> - Handle multiple exception types
 
 ---
 
@@ -201,7 +202,3 @@ def withdraw(balance, amount):
 - Catch specific exceptions instead of using bare `except:`
 - `raise` lets you signal errors in your own code
 - Custom exception classes make error handling clearer
-
-## What's Next
-
-Now that you can handle errors gracefully, let's shift gears to **Object-Oriented Programming (OOP)** (Lesson 14) — a powerful way to organize your code using classes and objects.

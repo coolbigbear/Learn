@@ -1,0 +1,15 @@
+[Unit]
+Description=Python Tutorials — Cloudflare Tunnel
+After=python-tutorials-api.service
+BindsTo=python-tutorials-api.service
+
+[Service]
+Type=simple
+ExecStart=/opt/data/home/bin/cloudflared tunnel --url http://localhost:8080
+Restart=on-failure
+RestartSec=5
+StandardOutput=append:/opt/data/projects/python-tutorials/logs/tunnel.log
+StandardError=append:/opt/data/projects/python-tutorials/logs/tunnel.log
+
+[Install]
+WantedBy=default.target

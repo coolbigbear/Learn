@@ -1,0 +1,47 @@
+[
+  {
+    "slug": "project-create-crud",
+    "title": "Create task list endpoint",
+    "instruction": "Write a FastAPI app with an in-memory list `items` and a GET endpoint at `/items` that returns the list. Start with two initial items: 'Learn Python' and 'Build API'.",
+    "starter_code": "from fastapi import FastAPI\n\napp = FastAPI()\nitems = [\"Learn Python\", \"Build API\"]\n\n# Your code here\n",
+    "solution_code": "from fastapi import FastAPI\n\napp = FastAPI()\nitems = [\"Learn Python\", \"Build API\"]\n\n@app.get(\"/items\")\nasync def list_items():\n    return {\"items\": items}\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 1
+  },
+  {
+    "slug": "project-add-item",
+    "title": "Add POST to create items",
+    "instruction": "Extend the previous app by adding a POST endpoint at `/items` that accepts a JSON body with an `item` field and appends it to the list. Return the updated list with status 201.",
+    "starter_code": "from fastapi import FastAPI\nfrom pydantic import BaseModel\n\napp = FastAPI()\nitems = [\"Learn Python\", \"Build API\"]\n\nclass NewItem(BaseModel):\n    item: str\n\n# Add POST endpoint here\n",
+    "solution_code": "from fastapi import FastAPI\nfrom pydantic import BaseModel\n\napp = FastAPI()\nitems = [\"Learn Python\", \"Build API\"]\n\nclass NewItem(BaseModel):\n    item: str\n\n@app.post(\"/items\", status_code=201)\nasync def add_item(body: NewItem):\n    items.append(body.item)\n    return {\"items\": items}\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 2
+  },
+  {
+    "slug": "project-delete-item",
+    "title": "Add DELETE endpoint",
+    "instruction": "Extend the app with a DELETE endpoint at `/items/{index}` that removes an item by its list index. Return a 404 if the index is out of range.",
+    "starter_code": "from fastapi import FastAPI, HTTPException\n\napp = FastAPI()\nitems = [\"Learn Python\", \"Build API\", \"Deploy\"]\n\n# Add DELETE endpoint here\n",
+    "solution_code": "from fastapi import FastAPI, HTTPException\n\napp = FastAPI()\nitems = [\"Learn Python\", \"Build API\", \"Deploy\"]\n\n@app.delete(\"/items/{index}\")\nasync def delete_item(index: int):\n    if index < 0 or index >= len(items):\n        raise HTTPException(status_code=404, detail=\"Index out of range\")\n    removed = items.pop(index)\n    return {\"removed\": removed, \"items\": items}\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 3
+  }
+]

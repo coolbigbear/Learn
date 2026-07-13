@@ -20,7 +20,59 @@ export default {
           900: '#312e81',
         },
       },
+      typography: {
+        DEFAULT: {
+          css: {
+            maxWidth: 'none',
+            h2: {
+              marginTop: '2.25em',
+              marginBottom: '0.8em',
+            },
+            h3: {
+              marginTop: '1.5em',
+              marginBottom: '0.6em',
+            },
+            h4: {
+              marginTop: '1.25em',
+              marginBottom: '0.5em',
+            },
+            p: {
+              marginTop: 0,
+              marginBottom: '1.75em',
+              lineHeight: '1.75',
+            },
+            'p + ul, p + ol': {
+              marginTop: '0.25em',
+            },
+            hr: {
+              marginTop: '2.5em',
+              marginBottom: '2.5em',
+            },
+            'li > p': {
+              marginBottom: '0.5em',
+            },
+          },
+        },
+        sm: {
+          css: {
+            h2: {
+              marginTop: '1.75em',
+              marginBottom: '0.8em',
+            },
+            h3: {
+              marginTop: '1.25em',
+              marginBottom: '0.5em',
+            },
+            h4: {
+              marginTop: '1em',
+              marginBottom: '0.4em',
+            },
+          },
+        },
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
 }

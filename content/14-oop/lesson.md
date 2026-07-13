@@ -2,11 +2,12 @@
 
 ## Learning Objectives
 
-- Understand the difference between a class and an object
-- Define your own classes with `class`
-- Create instance attributes and methods
-- Use `__init__` to initialize objects
-- Understand basic inheritance
+> **By the end of this lesson, you will be able to:**
+> - Understand the difference between a class and an object
+> - Define your own classes with `class`
+> - Create instance attributes and methods
+> - Use `__init__` to initialize objects
+> - Understand basic inheritance
 
 ---
 
@@ -235,7 +236,3 @@ Attributes starting with `__` get **name-mangled** to discourage direct access â
 - **Class attributes** are shared; **instance attributes** belong to one object
 - **Dunder methods** (`__str__`, `__len__`, etc.) hook into Python's built-in behavior
 - **Inheritance** lets one class reuse and extend another
-
-## What's Next
-
-Now you know how to organize code with classes. Next, we'll look at **modules and packages** (Lesson 15) â€” how to split your Python code across multiple files and use the vast Python ecosystem.

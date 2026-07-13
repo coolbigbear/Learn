@@ -2,11 +2,12 @@
 
 ## Learning Objectives
 
-- Import and use Python's built-in modules
-- Create your own modules to organize code
-- Understand packages and the `__init__.py` file
-- Install third-party packages with `pip`
-- Use `if __name__ == "__main__"` correctly
+> **By the end of this lesson, you will be able to:**
+> - Import and use Python's built-in modules
+> - Create your own modules to organize code
+> - Understand packages and the `__init__.py` file
+> - Install third-party packages with `pip`
+> - Use `if __name__ == "__main__"` correctly
 
 ---
 
@@ -246,7 +247,3 @@ print(response.status_code)
 - Create your own modules by writing `.py` files with functions and classes
 - `if __name__ == "__main__"` prevents test code from running on import
 - `pip install` adds third-party packages to your Python environment
-
-## What's Next
-
-Now that you can use modules and packages, let's apply that to **data processing** (Lesson 16) — reading CSV files, working with JSON, and making your first API calls.

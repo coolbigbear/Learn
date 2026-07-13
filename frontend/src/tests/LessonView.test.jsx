@@ -133,20 +133,6 @@ describe('LessonView', () => {
     expect(headings.length).toBe(2);
   });
 
-  it('shows "What\'s Next?" section below exercises', async () => {
-    renderLessonView();
-    // Appears twice: desktop and mobile
-    const sections = await screen.findAllByText("What's Next?", {}, { timeout: 3000 });
-    expect(sections.length).toBe(2);
-  });
-
-  it('shows "Browse all lessons" link in What\'s Next section', async () => {
-    renderLessonView();
-    // Appears twice: desktop and mobile
-    const links = await screen.findAllByText('Browse all lessons', {}, { timeout: 3000 });
-    expect(links.length).toBe(2);
-  });
-
   it('renders desktop split layout container with fixed positioning', async () => {
     renderLessonView();
     await screen.findAllByText('Python Basics', {}, { timeout: 3000 });

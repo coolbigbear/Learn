@@ -2,10 +2,11 @@
 
 ## Learning Objectives
 
-- Print numbers directly without quotes
-- Print whole numbers (integers) and decimal numbers (floats)
-- Print multiple numbers in one statement
-- Understand that numbers are not strings — no quotes needed
+> **By the end of this lesson, you will be able to:**
+> - Print numbers directly without quotes
+> - Print whole numbers (integers) and decimal numbers (floats)
+> - Print multiple numbers in one statement
+> - Understand that numbers are not strings — no quotes needed
 
 ---
 
@@ -122,7 +123,3 @@ The answer is 42
 - Decimal numbers are called **floats** (e.g., `3.14`, `-0.5`)
 - Print multiple numbers with commas to get spaces between them
 - You can mix strings and numbers in the same `print()`
-
-## What's Next
-
-Now you can print both text and numbers! Up next: **variables** — storing values in named containers so you can reuse them.

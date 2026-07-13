@@ -74,25 +74,46 @@ export default function ExerciseFeedback({ result }) {
                   {tr.message && (
                     <div className="text-gray-600">{tr.message}</div>
                   )}
-                  {/* Show Expected vs Got for failed tests */}
-                  <div className="flex gap-4">
-                    <div>
-                      <span className="text-gray-500">Expected: </span>
-                      {tr.expected_output && tr.expected_output.trim() ? (
-                        <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-mono">{tr.expected_output}</code>
-                      ) : (
-                        <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-mono text-gray-400 italic">non-empty output</code>
-                      )}
+                  {tr.comparison_type === "code_contains" ? (
+                    /* code_contains: show expected value in code, not program output */
+                    <div className="flex gap-4">
+                      <div>
+                        <span className="text-gray-500">Expected in code: </span>
+                        {tr.expected_output && tr.expected_output.trim() ? (
+                          <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-mono">{tr.expected_output}</code>
+                        ) : (
+                          <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-mono text-gray-400 italic">character</code>
+                        )}
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Got in code: </span>
+                        <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-mono text-gray-400 italic">not found</code>
+                      </div>
                     </div>
-                    <div>
-                      <span className="text-gray-500">Got: </span>
-                      {tr.actual_output && tr.actual_output.trim() ? (
-                        <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-mono">{tr.actual_output}</code>
-                      ) : (
-                        <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-mono text-gray-400 italic">(empty)</code>
-                      )}
+                  ) : tr.comparison_type === "comment" ? (
+                    /* comment: message field already says enough, no Expected/Got needed */
+                    null
+                  ) : (
+                    /* Standard: Show Expected vs Got for output-based tests */
+                    <div className="flex gap-4">
+                      <div>
+                        <span className="text-gray-500">Expected: </span>
+                        {tr.expected_output && tr.expected_output.trim() ? (
+                          <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-mono">{tr.expected_output}</code>
+                        ) : (
+                          <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-mono text-gray-400 italic">non-empty output</code>
+                        )}
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Got: </span>
+                        {tr.actual_output && tr.actual_output.trim() ? (
+                          <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-mono">{tr.actual_output}</code>
+                        ) : (
+                          <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-mono text-gray-400 italic">(empty)</code>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               )}
             </div>

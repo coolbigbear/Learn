@@ -1,0 +1,14 @@
+Read brief.md and TEAM.md.
+Decompose into the team graph defined in TEAM.md.
+Produce the architecture spec (system design doc + API spec).
+All child tasks MUST use:
+  workspace_kind="dir"
+  workspace_path="/opt/data/projects/python-tutorials"
+  tenant="interactive-python-tutorials"
+
+Once the spec is done, create kanban tasks for:
+- T2 (backend): FastAPI skeleton + exercise engine
+- T3 (frontend): React app skeleton
+- T7 (content): Lessons 1-8
+
+Review outputs as they come in before approving next phases.

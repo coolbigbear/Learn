@@ -24,15 +24,12 @@ code {
   overflow-x: auto;
 }
 
-.prose code {
-  font-size: 0.875em;
-}
-
-.prose pre code {
-  background: none;
-  padding: 0;
+/* Override highlight.js light-theme background — let the pre background show through */
+.prose pre code.hljs {
+  background: transparent !important;
+  padding: 0 !important;
   font-size: 0.8125em;
-  color: inherit;
+  color: #24292e;
 }
 
 /* Inline code styling */
@@ -42,6 +39,129 @@ code {
   border-radius: 0.25rem;
   font-weight: 500;
   color: #4f46e5;
+}
+
+/* Defend against highlight.js styling bleeding into inline code */
+.prose :not(pre) > code.hljs {
+  background-color: #f3f4f6 !important;
+  padding: 0.125rem 0.375rem !important;
+  color: #4f46e5 !important;
+}
+
+/* Suppress Tailwind typography backtick pseudo-elements on inline code.
+   The typography plugin adds ::before and ::after with content: "`"
+   which makes inline code render as `print()` instead of print().
+   We remove them so inline code renders cleanly without delimiters. */
+.prose :not(pre) > code::before,
+.prose :not(pre) > code::after {
+  content: none;
+}
+
+/* Fix contrast: untagged code blocks (output examples without hljs class)
+   inherit the typography plugin's --tw-prose-pre-code color (#e5e7eb),
+   which is designed for dark backgrounds. Our light background needs dark text. */
+.prose pre code:not(.hljs) {
+  color: #374151;
+}
+
+/* ── Prose vertical rhythm & section breathing room ── */
+
+/*
+ * Explicit h2/h3/h4 margin overrides inside prose containers.
+ * The Tailwind typography plugin config in tailwind.config.js provides the
+ * primary values; these CSS rules are a belt-and-suspenders safety net that
+ * also adds responsive tuning for smaller screens.
+ *
+ * Acceptance criteria (minimums, per task spec):
+ *   h2: >= 1.5em margin-top, >= 0.75em margin-bottom
+ *   h3: >= 1.0em margin-top, >= 0.5em  margin-bottom
+ */
+.prose h2 {
+  margin-top: 2.25em;
+  margin-bottom: 0.8em;
+}
+
+.prose h3 {
+  margin-top: 1.5em;
+  margin-bottom: 0.6em;
+}
+
+.prose h4 {
+  margin-top: 1.25em;
+  margin-bottom: 0.5em;
+}
+
+/* prose-sm: slightly tighter but still with clear visual breaks */
+.prose-sm h2 {
+  margin-top: 1.75em;
+  margin-bottom: 0.8em;
+}
+
+.prose-sm h3 {
+  margin-top: 1.25em;
+  margin-bottom: 0.5em;
+}
+
+.prose-sm h4 {
+  margin-top: 1em;
+  margin-bottom: 0.4em;
+}
+
+/* Mobile (< 768px): slightly reduced vertical rhythm but still meeting minimums */
+@media (max-width: 767px) {
+  .prose h2 {
+    margin-top: 1.75em;
+    margin-bottom: 0.75em;
+  }
+
+  .prose h3 {
+    margin-top: 1.25em;
+    margin-bottom: 0.5em;
+  }
+
+  .prose h4 {
+    margin-top: 1em;
+    margin-bottom: 0.4em;
+  }
+}
+
+/* Horizontal rules: generous vertical space + a subtle gradient line */
+.prose hr {
+  border: 0;
+  height: 2px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(99, 102, 241, 0.35) 20%,
+    rgba(99, 102, 241, 0.35) 80%,
+    transparent 100%
+  );
+  margin: 2.5em 0;
+}
+
+/* Give lists a bit more room above/below */
+.prose ul,
+.prose ol {
+  margin-top: 0.5em;
+  margin-bottom: 1.25em;
+}
+
+/* Blockquotes (e.g. callouts / learning objectives) */
+.prose blockquote {
+  border-left-color: #818cf8;
+  background-color: #eef2ff;
+  padding: 1em 1.25em;
+  margin: 1.75em 0;
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.prose blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* Make strong text inside blockquote pop a bit more */
+.prose blockquote strong {
+  color: #4338ca;
 }
 
 /* CodeMirror dark-editor spacing inside exercise area */

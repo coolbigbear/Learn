@@ -9,6 +9,7 @@
 | `frontend` | UI builder | kanban, terminal, file, web | React app, interactive code editor, lesson viewer, progress UI |
 | `content` | Tutorial author | kanban, file | 15 Python lessons, exercises, quizzes, sample code |
 | `reviewer` | QA/integration | kanban, terminal, file, browser, web | Integration tests, code review, smoke tests, QA report |
+| `user` | Learner-simulator QA | kanban, browser, terminal | Exercises the app as a real beginner — 3-pass testing, bug reports, UX feedback |
 
 ## Task Graph
 
@@ -47,9 +48,10 @@ The human sets the direction. The team figures out how to get there — together
 ## Key Rules
 
 1. **Shared workspace.** Every task uses workspace_kind="dir" with workspace_path="/opt/data/projects/python-tutorials" and tenant="interactive-python-tutorials".
-2. **Dependencies.** A task's parents must be completed before it can start.
-3. **Review gates.** T9 and T10 are mandatory — nothing ships without review.
-4. **Heartbeats.** Long-running tasks (>5min) should emit kanban_heartbeat with progress.
+2. **QA tickets are UNASSIGNED.** The `user` (learner-simulator QA) profile must never assign tickets to itself. When the user profile finds a bug or missing feature, it creates a ticket with `assignee: null` (no assignee) and leaves assignment to the orchestrator/dispatcher. This applies to ALL tickets involving code changes, content edits, or UI work — only QA/testing tickets ever get assigned to `user`.
+3. **Dependencies.** A task's parents must be completed before it can start.
+4. **Review gates.** T9 and T10 are mandatory — nothing ships without review.
+5. **Heartbeats.** Long-running tasks (>5min) should emit kanban_heartbeat with progress.
 
 ## Blocking Policy
 
@@ -177,3 +179,4 @@ Each profile stays in its lane. No profile oversteps into another's domain:
 | `frontend` | React components, styling, client-side logic | Backend APIs, lesson content, database changes |
 | `content` | Lesson markdown, exercises, quizzes | Code changes (frontend or backend) |
 | `reviewer` | Testing, verification, QA reports, bug tickets | Writing or modifying any code or content |
+| `user` | Testing the app as a beginner, reporting bugs and UX issues | Writing code, fixing bugs, researching solutions, writing content |

@@ -17,6 +17,7 @@
     "@codemirror/state": "^6.7.0",
     "@codemirror/theme-one-dark": "^6.1.2",
     "@codemirror/view": "^6.43.4",
+    "@tailwindcss/typography": "^0.5.20",
     "@uiw/react-codemirror": "^4.25.10",
     "autoprefixer": "^10.5.2",
     "postcss": "^8.5.16",

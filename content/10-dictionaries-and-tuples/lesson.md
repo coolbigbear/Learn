@@ -2,10 +2,11 @@
 
 ## Learning Objectives
 
-- Create and work with dictionaries (key-value pairs)
-- Access, add, and modify dictionary entries
-- Understand tuples and their immutability
-- Use the `in` operator with dictionaries and tuples
+> **By the end of this lesson, you will be able to:**
+> - Create and work with dictionaries (key-value pairs)
+> - Access, add, and modify dictionary entries
+> - Understand tuples and their immutability
+> - Use the `in` operator with dictionaries and tuples
 
 ---
 
@@ -205,7 +206,3 @@ This also works with lists and is often used with functions that return multiple
 - Tuples are immutable sequences — once created, they can't change
 - Tuple unpacking assigns each element to a variable
 - `in` checks for key existence in dictionaries and membership in sequences
-
-## What's Next
-
-Now let's put it all together with **functions** — reusable blocks of code with parameters and return values (Lesson 11).

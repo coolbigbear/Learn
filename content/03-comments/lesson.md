@@ -2,10 +2,11 @@
 
 ## Learning Objectives
 
-- Write single-line comments with the `#` symbol
-- Add comments on their own line
-- Add comments at the end of a line of code
-- Understand how comments help you and others read code
+> **By the end of this lesson, you will be able to:**
+> - Write single-line comments with the `#` symbol
+> - Add comments on their own line
+> - Add comments at the end of a line of code
+> - Understand how comments help you and others read code
 
 ---
 
@@ -116,7 +117,3 @@ Write comments that add **value** — explain the "why", not the "what".
 - Put inline comments at the end of a line of code
 - Use comments to explain your thinking, leave reminders, or temporarily disable code
 - Don't state the obvious — add value with your comments
-
-## What's Next
-
-Now you know how to annotate your code with comments. Next up: **printing numbers** — how to display numbers without quotes.

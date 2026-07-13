@@ -2,11 +2,12 @@
 
 ## Learning Objectives
 
-- Define your own functions with `def`
-- Return values with `return`
-- Pass data into functions with parameters
-- Understand variable scope (local vs. global)
-- Document functions with docstrings
+> **By the end of this lesson, you will be able to:**
+> - Define your own functions with `def`
+> - Return values with `return`
+> - Pass data into functions with parameters
+> - Understand variable scope (local vs. global)
+> - Document functions with docstrings
 
 ---
 
@@ -154,11 +155,11 @@ A **docstring** is a multi-line string right after the `def` line that explains 
 ```python
 def calculate_area(length, width):
     """Calculate the area of a rectangle.
-    
+
     Args:
         length: The rectangle's length.
         width: The rectangle's width.
-    
+
     Returns:
         The area as a float or int.
     """
@@ -210,7 +211,3 @@ print(f"{temp_c}°C is {temp_f}°F")
 - `return` sends a value back to the caller
 - Variables inside functions are local (scope matters)
 - Docstrings document what a function does
-
-## What's Next
-
-You've covered the fundamentals of Python! Up next: **file input and output** (Lesson 12) — reading and writing files on your computer.

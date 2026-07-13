@@ -2,10 +2,11 @@
 
 ## Learning Objectives
 
-- Store data in variables
-- Follow Python's variable naming rules
-- Work with integers, floats, strings, and booleans
-- Check the type of any value with `type()`
+> **By the end of this lesson, you will be able to:**
+> - Store data in variables
+> - Follow Python's variable naming rules
+> - Work with integers, floats, strings, and booleans
+> - Check the type of any value with `type()`
 
 ---
 
@@ -166,7 +167,3 @@ The old value is replaced. You can also use the current value to compute a new o
 - Python has four basic types: `int`, `float`, `str`, `bool`
 - Use `type()` to check what type something is
 - Variables can be reassigned to new values
-
-## What's Next
-
-Now that you can store data, let's explore **strings** — how to combine, slice, and transform text (Lesson 6).

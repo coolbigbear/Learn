@@ -17,13 +17,13 @@
   {
     "slug": "print-your-name",
     "title": "Print your name",
-    "instruction": "Write a `print()` statement that outputs **your name** to the screen. You can use any name you like.",
+    "instruction": "Write a `print()` statement that outputs **your name** to the screen. You can use any name you like — just make sure the output isn't empty!",
     "starter_code": "# Print your name\n",
     "solution_code": "print(\"Alex\")",
     "test_cases": [
       {
         "input": "",
-        "expected_output": "",
+        "expected_output": "Any non-empty text (your name)",
         "comparison_type": "non_empty"
       }
     ],
@@ -32,7 +32,7 @@
   {
     "slug": "print-with-single-quotes",
     "title": "Print with single quotes",
-    "instruction": "Use **single quotes** to print the greeting **Greetings, Earthling!** to the screen.",
+    "instruction": "Use **single quotes** to print the greeting **Greetings, Earthling!** to the screen.  Remember: single quotes look like `'this'`, not `\"this\"`.",
     "starter_code": "# Use single quotes for the string\n",
     "solution_code": "print('Greetings, Earthling!')",
     "test_cases": [
@@ -40,6 +40,11 @@
         "input": "",
         "expected_output": "Greetings, Earthling!\n",
         "comparison_type": "exact"
+      },
+      {
+        "input": "",
+        "expected_output": "'",
+        "comparison_type": "code_contains"
       }
     ],
     "order": 3
@@ -47,14 +52,14 @@
   {
     "slug": "print-two-lines",
     "title": "Print two separate lines",
-    "instruction": "Use two `print()` statements to output your **first name** on the first line and your **last name** on the second line.",
+    "instruction": "Use **two separate `print()` statements** to output your **first name** on the first line and your **last name** on the second line.  Each `print()` call creates its own line of output.",
     "starter_code": "# Print first name\n# Print last name\n",
     "solution_code": "print(\"Jane\")\nprint(\"Smith\")",
     "test_cases": [
       {
         "input": "",
-        "expected_output": "",
-        "comparison_type": "non_empty"
+        "expected_output": ".+\\n.+",
+        "comparison_type": "regex"
       }
     ],
     "order": 4
@@ -62,14 +67,14 @@
   {
     "slug": "print-favorite-color",
     "title": "Print your favorite color",
-    "instruction": "Print your favorite color by writing it as a string inside `print()`. Use either double or single quotes — your choice.",
-    "starter_code": "# Print your favorite color\n",
+    "instruction": "Print your **favorite color** from this list: **Red, Blue, Green, Yellow, Purple, Orange, Pink, Black**.  Pick exactly one color and print it as a string.  Use either double or single quotes — your choice.",
+    "starter_code": "# Pick a color from the list and print it\n",
     "solution_code": "print(\"Purple\")",
     "test_cases": [
       {
         "input": "",
-        "expected_output": "",
-        "comparison_type": "non_empty"
+        "expected_output": "[\"Red\",\"Blue\",\"Green\",\"Yellow\",\"Purple\",\"Orange\",\"Pink\",\"Black\"]",
+        "comparison_type": "whitelist"
       }
     ],
     "order": 5

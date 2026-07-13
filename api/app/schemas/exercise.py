@@ -15,6 +15,7 @@ class TestResult(BaseModel):
     errors: str | None = None
     name: str | None = None
     message: str | None = None
+    comparison_type: str = "exact"
 
 
 class RunResult(BaseModel):

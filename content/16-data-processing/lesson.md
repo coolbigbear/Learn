@@ -2,10 +2,11 @@
 
 ## Learning Objectives
 
-- Read and write CSV files using Python's `csv` module
-- Work with JSON data — serialize and deserialize
-- Make HTTP requests to web APIs with the `requests` library
-- Parse API responses and extract useful information
+> **By the end of this lesson, you will be able to:**
+> - Read and write CSV files using Python's `csv` module
+> - Work with JSON data — serialize and deserialize
+> - Make HTTP requests to web APIs with the `requests` library
+> - Parse API responses and extract useful information
 
 ---
 
@@ -198,7 +199,7 @@ Common status codes: 200 (OK), 201 (Created), 400 (Bad Request), 404 (Not Found)
 import requests
 
 # Get public info about Python Issues (simplified example)
-response = requests.get("https://api.github.com/search/repositories", 
+response = requests.get("https://api.github.com/search/repositories",
                         params={"q": "language:python", "sort": "stars"})
 
 if response.status_code == 200:
@@ -260,7 +261,3 @@ with open("users.json", "w") as f:
 - **APIs** let you talk to other services; use `requests.get()` and `requests.post()`
 - Always check `response.status_code` before using API data
 - Install third-party libraries with `pip install`
-
-## What's Next
-
-Now you can process CSV and JSON data and talk to web APIs. Let's build our **own** API using FastAPI (Lesson 17)!

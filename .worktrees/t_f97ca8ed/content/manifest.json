@@ -1,0 +1,20 @@
+[
+  {"slug": "01-print-strings", "title": "Print Strings", "order": 1},
+  {"slug": "02-print-multiple", "title": "Print Multiple Items", "order": 2},
+  {"slug": "03-comments", "title": "Comments", "order": 3},
+  {"slug": "04-print-numbers", "title": "Print Numbers", "order": 4},
+  {"slug": "05-variables", "title": "Variables and Data Types", "order": 5},
+  {"slug": "06-strings", "title": "Strings", "order": 6},
+  {"slug": "07-numbers-and-math", "title": "Numbers and Math", "order": 7},
+  {"slug": "08-booleans-and-conditionals", "title": "Booleans and Conditionals", "order": 8},
+  {"slug": "09-lists-and-loops", "title": "Lists and Loops", "order": 9},
+  {"slug": "10-dictionaries-and-tuples", "title": "Dictionaries and Tuples", "order": 10},
+  {"slug": "11-functions", "title": "Functions", "order": 11},
+  {"slug": "12-file-io", "title": "File Input / Output", "order": 12},
+  {"slug": "13-error-handling", "title": "Error Handling and Exceptions", "order": 13},
+  {"slug": "14-oop", "title": "Object-Oriented Programming", "order": 14},
+  {"slug": "15-modules", "title": "Modules and Packages", "order": 15},
+  {"slug": "16-data-processing", "title": "Data Processing \u2014 CSV, JSON, and APIs", "order": 16},
+  {"slug": "17-fastapi-intro", "title": "Introduction to FastAPI", "order": 17},
+  {"slug": "18-mini-api-project", "title": "Mini API Project", "order": 18}
+]

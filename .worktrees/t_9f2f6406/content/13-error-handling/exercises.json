@@ -1,0 +1,57 @@
+[
+  {
+    "slug": "error-safe-division",
+    "title": "Safe division with error handling",
+    "instruction": "Write a program that asks the user for two numbers (numerator and denominator) and prints the result of dividing them. Handle `ValueError` (non-number input) and `ZeroDivisionError` (divide by zero) separately.",
+    "starter_code": "# Ask for two numbers and divide them safely\nnum1 = input(\"Enter numerator: \")\nnum2 = input(\"Enter denominator: \")\n# Your code here\n",
+    "solution_code": "num1 = input(\"Enter numerator: \")\nnum2 = input(\"Enter denominator: \")\ntry:\n    result = int(num1) / int(num2)\n    print(f\"Result: {result}\")\nexcept ValueError:\n    print(\"Please enter valid numbers!\")\nexcept ZeroDivisionError:\n    print(\"Cannot divide by zero!\")\n",
+    "test_cases": [
+      {
+        "input": "10\n2\n",
+        "expected_output": "Result: 5.0\n",
+        "comparison_type": "exact"
+      },
+      {
+        "input": "10\n0\n",
+        "expected_output": "Cannot divide by zero!\n",
+        "comparison_type": "exact"
+      },
+      {
+        "input": "hello\n5\n",
+        "expected_output": "Please enter valid numbers!\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 1
+  },
+  {
+    "slug": "error-raise-custom",
+    "title": "Raise a custom exception",
+    "instruction": "Write a function `check_age(age)` that raises a `ValueError` with the message `\"Age must be 0-150\"` if the age is outside that range. Otherwise, print `\"Age is valid\"`.",
+    "starter_code": "def check_age(age):\n    # Your code here\n    pass\n\n# Test it\ntry:\n    check_age(200)\nexcept ValueError as e:\n    print(e)\n",
+    "solution_code": "def check_age(age):\n    if age < 0 or age > 150:\n        raise ValueError(\"Age must be 0-150\")\n    print(\"Age is valid\")\n\ntry:\n    check_age(200)\nexcept ValueError as e:\n    print(e)\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "Age must be 0-150\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 2
+  },
+  {
+    "slug": "error-file-handling",
+    "title": "Graceful file reading",
+    "instruction": "Write a program that tries to read a file called `data.txt`. If the file doesn't exist, print `\"File not found, creating it...\"` and create the file with the content `\"New file!\"`.",
+    "starter_code": "filename = \"data.txt\"\n# Your code here\n",
+    "solution_code": "filename = \"data.txt\"\ntry:\n    with open(filename, \"r\") as f:\n        print(f.read())\nexcept FileNotFoundError:\n    print(\"File not found, creating it...\")\n    with open(filename, \"w\") as f:\n        f.write(\"New file!\")\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "File not found, creating it...\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 3
+  }
+]

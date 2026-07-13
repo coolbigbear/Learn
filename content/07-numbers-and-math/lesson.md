@@ -2,10 +2,11 @@
 
 ## Learning Objectives
 
-- Use Python's arithmetic operators: `+`, `-`, `*`, `/`, `//`, `%`, `**`
-- Understand the difference between integers and floats
-- Convert between types with `int()` and `float()`
-- Handle common math pitfalls
+> **By the end of this lesson, you will be able to:**
+> - Use Python's arithmetic operators: `+`, `-`, `*`, `/`, `//`, `%`, `**`
+> - Understand the difference between integers and floats
+> - Convert between types with `int()` and `float()`
+> - Handle common math pitfalls
 
 ---
 
@@ -210,7 +211,3 @@ print(f"{hours}h {remaining}m")  # 2h 25m
 - Division `/` always returns a `float`
 - Parentheses control order of operations
 - Use `int()` and `float()` to convert between types
-
-## What's Next
-
-Now that you can calculate, let's learn about **booleans and conditionals** — making decisions in your code (Lesson 8).

@@ -2,11 +2,12 @@
 
 ## Learning Objectives
 
-- Open and read text files with Python
-- Write and append data to files
-- Use `with` statements (context managers) for safe file handling
-- Understand file modes: read, write, append
-- Handle different file encodings
+> **By the end of this lesson, you will be able to:**
+> - Open and read text files with Python
+> - Write and append data to files
+> - Use `with` statements (context managers) for safe file handling
+> - Understand file modes: read, write, append
+> - Handle different file encodings
 
 ---
 
@@ -215,7 +216,3 @@ else:
 - Write with `.write()` or `.writelines()`
 - Append with `"a"` mode to preserve existing content
 - `pathlib.Path` provides a cleaner, cross-platform way to handle file paths
-
-## What's Next
-
-Now that you can read and write files, let's talk about **error handling** (Lesson 13) — what happens when things go wrong and how to handle them gracefully.

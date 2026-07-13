@@ -1,0 +1,97 @@
+[
+  {
+    "slug": "comment-on-own-line",
+    "title": "Add a comment on its own line",
+    "instruction": "Add a comment on the **first line** that says **# This program prints numbers**. The code below should still print 10 and 20 as before.",
+    "starter_code": "# Add a comment on this line\nprint(10)\nprint(20)\n",
+    "solution_code": "# This program prints numbers\nprint(10)\nprint(20)\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "10\n20\n",
+        "comparison_type": "exact"
+      },
+      {
+        "input": "",
+        "expected_output": "",
+        "comparison_type": "comment"
+      }
+    ],
+    "order": 1
+  },
+  {
+    "slug": "comment-inline",
+    "title": "Add an inline comment",
+    "instruction": "Add an **inline comment** at the end of the print statement. The comment should explain that this prints a greeting.",
+    "starter_code": "print(\"Hi there!\")\n",
+    "solution_code": "print(\"Hi there!\")  # Prints a greeting",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "Hi there!\n",
+        "comparison_type": "exact"
+      },
+      {
+        "input": "",
+        "expected_output": "",
+        "comparison_type": "comment"
+      }
+    ],
+    "order": 2
+  },
+  {
+    "slug": "comment-out-a-line",
+    "title": "Comment out a line",
+    "instruction": "The code below has two print statements. **Comment out the first one** so only the second line runs.",
+    "starter_code": "print(\"This should not run\")\nprint(\"This should run\")\n",
+    "solution_code": "# print(\"This should not run\")\nprint(\"This should run\")\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "This should run\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 3
+  },
+  {
+    "slug": "comment-explain-code",
+    "title": "Explain your code with a comment",
+    "instruction": "Write a print statement that prints **Learning Python is fun!** and add a comment on the line above that explains the purpose of the code.",
+    "starter_code": "# Write your comment here\n",
+    "solution_code": "# Tell the user Python is fun\nprint(\"Learning Python is fun!\")",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "Learning Python is fun!\n",
+        "comparison_type": "exact"
+      },
+      {
+        "input": "",
+        "expected_output": "",
+        "comparison_type": "comment"
+      }
+    ],
+    "order": 4
+  },
+  {
+    "slug": "comment-todo-reminder",
+    "title": "Add a TODO comment",
+    "instruction": "Write a comment that says **TODO: Add more features later** on a line above a print that says **Hello, world!**.",
+    "starter_code": "# Add a TODO comment\n",
+    "solution_code": "# TODO: Add more features later\nprint(\"Hello, world!\")",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "Hello, world!\n",
+        "comparison_type": "exact"
+      },
+      {
+        "input": "",
+        "expected_output": "",
+        "comparison_type": "comment"
+      }
+    ],
+    "order": 5
+  }
+]

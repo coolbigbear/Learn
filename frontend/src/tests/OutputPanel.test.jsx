@@ -57,14 +57,14 @@ describe('OutputPanel', () => {
 
   it('applies green styling to output text', () => {
     const { container } = render(<OutputPanel output="Success" />);
-    const span = container.querySelector('span.text-green-400');
+    const span = container.querySelector('span.text-green-700');
     expect(span).toBeTruthy();
     expect(span.textContent).toBe('Success');
   });
 
   it('applies red styling to error text', () => {
     const { container } = render(<OutputPanel error="Error message" />);
-    const span = container.querySelector('span.text-red-400');
+    const span = container.querySelector('span.text-red-700');
     expect(span).toBeTruthy();
     expect(span.textContent).toBe('Error message');
   });

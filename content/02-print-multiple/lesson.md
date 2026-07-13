@@ -2,10 +2,11 @@
 
 ## Learning Objectives
 
-- Print multiple items in a single `print()` statement
-- Use commas to separate items
-- Understand how Python adds spaces between items
-- Combine strings and numbers in one print statement
+> **By the end of this lesson, you will be able to:**
+> - Print multiple items in a single `print()` statement
+> - Use commas to separate items
+> - Understand how Python adds spaces between items
+> - Combine strings and numbers in one print statement
 
 ---
 
@@ -107,7 +108,3 @@ Python doesn't care which quote style you use for each item — they all work th
 - Python adds a space between each item automatically
 - You can mix strings and numbers in the same print statement
 - Each item can use either single or double quotes independently
-
-## What's Next
-
-Great job! Up next, we'll learn about **comments** — how to leave notes in your code that Python ignores.

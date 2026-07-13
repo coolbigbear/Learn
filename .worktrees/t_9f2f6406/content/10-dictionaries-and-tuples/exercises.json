@@ -1,0 +1,47 @@
+[
+  {
+    "slug": "dict-create-book",
+    "title": "Create a book dictionary",
+    "instruction": "Create a dictionary called `book` with keys `title` and `author`. Set title to \"1984\" and author to \"George Orwell\". Then print the value of the `author` key.",
+    "starter_code": "# Create the book dictionary and print the author\n",
+    "solution_code": "book = {\"title\": \"1984\", \"author\": \"George Orwell\"}\nprint(book[\"author\"])",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "George Orwell\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 1
+  },
+  {
+    "slug": "dict-update-stats",
+    "title": "Update player stats",
+    "instruction": "Given the `player` dictionary, add a new key `\"level\"` with value 5, then update `\"score\"` to 1200. Print the final dictionary.",
+    "starter_code": "player = {\"name\": \"Hero\", \"score\": 950, \"health\": 100}\n# Add level, update score, then print\n",
+    "solution_code": "player = {\"name\": \"Hero\", \"score\": 950, \"health\": 100}\nplayer[\"level\"] = 5\nplayer[\"score\"] = 1200\nprint(player)",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "{'name': 'Hero', 'score': 1200, 'health': 100, 'level': 5}\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 2
+  },
+  {
+    "slug": "tuple-unpack",
+    "title": "Tuple unpacking",
+    "instruction": "You have a tuple `rgb = (255, 128, 0)`. Unpack it into variables `red`, `green`, `blue` and print each on a separate line.",
+    "starter_code": "rgb = (255, 128, 0)\n# Unpack and print each value\n",
+    "solution_code": "rgb = (255, 128, 0)\nred, green, blue = rgb\nprint(red)\nprint(green)\nprint(blue)",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "255\n128\n0\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 3
+  }
+]

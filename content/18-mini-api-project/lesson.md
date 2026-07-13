@@ -2,11 +2,12 @@
 
 ## Learning Objectives
 
-- Build a complete CRUD API from scratch
-- Create an in-memory data store
-- Handle all four HTTP methods: GET, POST, PUT, DELETE
-- Use path and query parameters together
-- Return proper HTTP status codes
+> **By the end of this lesson, you will be able to:**
+> - Build a complete CRUD API from scratch
+> - Create an in-memory data store
+> - Handle all four HTTP methods: GET, POST, PUT, DELETE
+> - Use path and query parameters together
+> - Return proper HTTP status codes
 
 ---
 

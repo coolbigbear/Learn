@@ -1,0 +1,17 @@
+[Unit]
+Description=Python Tutorials — Production API Server
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/data/projects/python-tutorials/api
+Environment=PRODUCTION=1
+Environment=PORT=8080
+ExecStart=/opt/data/projects/python-tutorials/api/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8080 --log-level info
+Restart=on-failure
+RestartSec=5
+StandardOutput=append:/opt/data/projects/python-tutorials/logs/server.log
+StandardError=append:/opt/data/projects/python-tutorials/logs/server.log
+
+[Install]
+WantedBy=default.target
