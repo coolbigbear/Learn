@@ -1,0 +1,182 @@
+# Harness: wraps user code, runs test cases, outputs JSON results.
+# This script runs inside the Docker container sandbox.
+
+import io
+import json
+import sys
+
+# Capture original builtins for user-code exec
+_builtins = __builtins__ if isinstance(__builtins__, dict) else __builtins__.__dict__
+
+# User code
+_USER_CODE = {user_code!r}
+
+# Test cases
+_TEST_CASES = {test_cases!r}
+
+
+def _run_single(input_data, expected, comparison, test_name=None):
+    """Run user code with given stdin and compare output."""
+    old_stdin = sys.stdin
+    old_stdout = sys.stdout
+    old_stderr = sys.stderr
+    sys.stdin = io.StringIO(input_data or "")
+    sys.stdout = io.StringIO()
+    sys.stderr = io.StringIO()
+
+    # Build restricted builtins for user code
+    user_builtins = dict(_builtins)
+    for _name in ("__import__", "exec", "eval", "compile", "open"):
+        user_builtins.pop(_name, None)
+
+    try:
+        exec(_USER_CODE, {"__builtins__": user_builtins})
+        actual = sys.stdout.getvalue()
+        err = sys.stderr.getvalue()
+        if comparison == "exact":
+            passed = actual == expected
+            if not passed:
+                msg = f"Expected: {expected!r}, but got: {actual!r}"
+            else:
+                msg = None
+        elif comparison == "regex":
+            import re
+
+            passed = bool(re.match(expected, actual))
+            if not passed:
+                msg = f"Output does not match pattern: {expected}"
+            else:
+                msg = None
+        elif comparison == "non_empty":
+            passed = bool(actual.strip())
+            if not passed:
+                msg = "Expected some output, but your code produced nothing"
+            else:
+                msg = None
+        elif comparison == "contains":
+            passed = expected in actual
+            if not passed:
+                msg = f"Expected output to contain: {expected!r}"
+            else:
+                msg = None
+        elif comparison == "whitelist":
+            import json as _json
+
+            try:
+                allowed = _json.loads(expected)
+                passed = actual.strip() in allowed
+                if not passed:
+                    msg = f"Output must be one of: {', '.join(repr(v) for v in allowed)}"
+                else:
+                    msg = None
+            except (_json.JSONDecodeError, TypeError):
+                passed = False
+                msg = "Invalid test case (expected JSON list)"
+        elif comparison == "comment":
+            passed = "#" in _USER_CODE
+            if not passed:
+                msg = "Your code should include a comment (using #)"
+            else:
+                msg = None
+        elif comparison == "code_contains":
+            passed = expected in _USER_CODE
+            if not passed:
+                msg = f"Your code should contain: {expected!r}"
+            else:
+                msg = None
+        else:
+            passed = actual == expected
+            if not passed:
+                msg = f"Expected: {expected!r}, but got: {actual!r}"
+            else:
+                msg = None
+        return {
+            "passed": passed,
+            "actual_output": actual,
+            "expected_output": expected,
+            "errors": err or None,
+            "name": test_name,
+            "message": msg,
+            "comparison_type": comparison,
+        }
+    except Exception as e:
+        actual = sys.stdout.getvalue()
+        return {
+            "passed": False,
+            "actual_output": actual,
+            "expected_output": expected,
+            "errors": f"{type(e).__name__}: {e}",
+            "name": test_name,
+            "message": f"Runtime error: {type(e).__name__}",
+            "comparison_type": comparison,
+        }
+    finally:
+        sys.stdin = old_stdin
+        sys.stdout = old_stdout
+        sys.stderr = old_stderr
+
+
+results = []
+all_passed = True
+for i, tc in enumerate(_TEST_CASES):
+    r = _run_single(
+        tc.get("input", ""),
+        tc.get("expected_output", ""),
+        tc.get("comparison_type", "exact"),
+        test_name=tc.get("name"),
+    )
+    r["test_index"] = i
+    if not r["passed"]:
+        all_passed = False
+    results.append(r)
+
+# Aggregate
+if results:
+    first = results[0]
+    print(
+        json.dumps(
+            {
+                "passed": all_passed,
+                "actual_output": first["actual_output"],
+                "expected_output": _TEST_CASES[0].get("expected_output", "") if _TEST_CASES else "",
+                "errors": first["errors"],
+                "test_results": results,
+            }
+        )
+    )
+else:
+    # No test cases -- just run the code
+    user_builtins = dict(_builtins)
+    for _name in ("__import__", "exec", "eval", "compile", "open"):
+        user_builtins.pop(_name, None)
+    old_stdout = sys.stdout
+    sys.stdout = io.StringIO()
+    try:
+        exec(_USER_CODE, {"__builtins__": user_builtins})
+        actual = sys.stdout.getvalue()
+        print(
+            json.dumps(
+                {
+                    "passed": True,
+                    "actual_output": actual,
+                    "expected_output": "",
+                    "errors": None,
+                    "test_results": [],
+                }
+            )
+        )
+    except Exception as e:
+        actual = sys.stdout.getvalue()
+        print(
+            json.dumps(
+                {
+                    "passed": False,
+                    "actual_output": actual,
+                    "expected_output": "",
+                    "errors": f"{type(e).__name__}: {e}",
+                    "test_results": [],
+                }
+            )
+        )
+    finally:
+        sys.stdout = old_stdout
