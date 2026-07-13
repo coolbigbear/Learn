@@ -4,6 +4,10 @@ Runs user-submitted Python code in a subprocess with strict resource limits.
 Uses `resource.setrlimit` for CPU time and memory caps, and SIGALRM for
 wall-clock timeout.  Each execution happens in a fresh subprocess so the
 parent (the API server) is never corrupted.
+
+When DOCKER_ENABLED is True (in config.py), the `run_code_with_docker_fallback`
+function tries the Docker sandbox first and falls back to the subprocess if
+Docker is unavailable.
 """
 
 import json
@@ -15,6 +19,7 @@ import textwrap
 from pathlib import Path
 
 from app.config import (
+    DOCKER_ENABLED,
     MAX_CPU_SECONDS,
     MAX_MEMORY_MB,
     MAX_OUTPUT_CHARS,
@@ -158,7 +163,7 @@ else:
             'expected_output': '',
             'errors': None,
             'test_results': []
-        }}))
+        }}), file=old_stdout)
     except Exception as e:
         actual = sys.stdout.getvalue()
         print(json.dumps({{
@@ -167,7 +172,7 @@ else:
             'expected_output': '',
             'errors': f'{{type(e).__name__}}: {{e}}',
             'test_results': []
-        }}))
+        }}), file=old_stdout)
     finally:
         sys.stdout = old_stdout
 """
@@ -269,3 +274,32 @@ async def run_code(user_code: str, test_cases: list[dict]) -> dict:
             "errors": stderr_text or "No output produced",
             "test_results": [],
         }
+
+
+async def run_code_with_docker_fallback(
+    user_code: str,
+    test_cases: list[dict],
+    language: str = "python",
+) -> dict:
+    """Run user code using Docker with fallback to subprocess.
+
+    Tries the Docker sandbox first (when DOCKER_ENABLED is True). If Docker
+    is unavailable, falls back gracefully to the subprocess runner.
+
+    Returns the same dict schema as run_code().
+    """
+    if DOCKER_ENABLED:
+        try:
+            from app.services.docker_runner import run_code_in_docker
+
+            return await run_code_in_docker(user_code, test_cases, language)
+        except ImportError:
+            # docker package not installed — fall through
+            pass
+        except Exception:
+            # Docker unavailable or error — fall through to subprocess
+            pass
+
+    # Fallback: use the subprocess runner (language parameter is not used
+    # by the subprocess runner since it only supports Python)
+    return await run_code(user_code, test_cases)

@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 
 class CodeSubmission(BaseModel):
     code: str = Field(..., min_length=1)
+    language: str = Field(default="python", max_length=20)
 
 
 class TestResult(BaseModel):
@@ -32,5 +33,6 @@ class ExerciseDetail(BaseModel):
     title: str
     instruction: str
     starter_code: str
+    language: str = "python"
     order: int
     lesson_id: int

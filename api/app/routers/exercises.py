@@ -8,7 +8,7 @@ from app.dependencies import get_current_user
 from app.models.exercise import Exercise
 from app.models.user import User
 from app.schemas.exercise import CodeSubmission, ExerciseDetail, RunResult
-from app.services.exercise_runner import run_code
+from app.services.exercise_runner import run_code, run_code_with_docker_fallback
 from app.services.lesson import get_exercise_by_id
 from app.services.progress import get_or_create_progress
 
@@ -48,7 +48,7 @@ async def run_exercise(
     if exercise is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Exercise not found")
 
-    result = await run_code(body.code, exercise.test_cases or [])
+    result = await run_code_with_docker_fallback(body.code, exercise.test_cases or [], language=body.language)
     return RunResult(**result)
 
 
@@ -63,7 +63,7 @@ async def submit_exercise(
     if exercise is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Exercise not found")
 
-    result = await run_code(body.code, exercise.test_cases or [])
+    result = await run_code_with_docker_fallback(body.code, exercise.test_cases or [], language=body.language)
 
     progress = await get_or_create_progress(db, user, exercise_id)
     if progress is None:

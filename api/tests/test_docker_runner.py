@@ -9,37 +9,30 @@ and the tutorial-runner-python:latest image to be built.
 
 import pytest
 
-from app.services.docker_runner import run_code_in_docker, DockerUnavailableError
+from app.services.docker_runner import DockerRunner, DockerUnavailableError
 
 
-pytestmark = [
-    pytest.mark.skipif(
-        True,  # We will handle Docker-unavailable gracefully within each test
-        reason="Docker runner is under active development",
-    ),
-]
+# Module-level DockerRunner singleton for tests
+_test_runner: DockerRunner | None = None
 
 
-@pytest.fixture(scope="module")
-def runner_available():
-    """Check if the Docker runner is working at module level."""
+def _get_test_runner() -> DockerRunner:
+    """Get or create a DockerRunner for tests, or skip if Docker unavailable."""
+    global _test_runner
+    if _test_runner is not None:
+        return _test_runner
     try:
-        import docker
-
-        client = docker.from_env()
-        client.ping()
-        # Check the image exists
-        client.images.get("tutorial-runner-python:latest")
-        return True
-    except Exception:
-        return False
+        _test_runner = DockerRunner()
+        return _test_runner
+    except (DockerUnavailableError, ImportError, FileNotFoundError) as e:
+        pytest.skip(f"Docker runner unavailable: {e}")
 
 
-# We define a helper that skips tests gracefully when Docker is not available
 async def _run_or_skip(user_code, test_cases):
     """Run code in Docker, or skip the test if Docker is unavailable."""
+    runner = _get_test_runner()
     try:
-        return await run_code_in_docker(user_code, test_cases)
+        return await runner.run_code(user_code, test_cases)
     except DockerUnavailableError:
         pytest.skip("Docker is not available on this system")
 

@@ -1,5 +1,10 @@
 # Harness: wraps user code, runs test cases, outputs JSON results.
-# This script runs inside the Docker container sandbox.
+# This script runs inside the Docker sandbox container.  It has full
+# stdlib access (no restricted builtins — the container provides
+# isolation instead).
+#
+# Rendered with {user_code!r} and {test_cases!r} via str.format()
+# before being mounted into the container.
 
 import io
 import json
@@ -66,7 +71,7 @@ def _run_single(input_data, expected, comparison, test_name=None):
                 allowed = _json.loads(expected)
                 passed = actual.strip() in allowed
                 if not passed:
-                    msg = f"Output must be one of: {', '.join(repr(v) for v in allowed)}"
+                    msg = f'Output must be one of: {", ".join(repr(v) for v in allowed)}'
                 else:
                     msg = None
             except (_json.JSONDecodeError, TypeError):
@@ -81,7 +86,7 @@ def _run_single(input_data, expected, comparison, test_name=None):
         elif comparison == "code_contains":
             passed = expected in _USER_CODE
             if not passed:
-                msg = f"Your code should contain: {expected!r}"
+                msg = f'Your code should contain: {expected!r}'
             else:
                 msg = None
         else:
@@ -138,14 +143,16 @@ if results:
             {
                 "passed": all_passed,
                 "actual_output": first["actual_output"],
-                "expected_output": _TEST_CASES[0].get("expected_output", "") if _TEST_CASES else "",
+                "expected_output": _TEST_CASES[0].get("expected_output", "")
+                if _TEST_CASES
+                else "",
                 "errors": first["errors"],
                 "test_results": results,
             }
         )
     )
 else:
-    # No test cases -- just run the code
+    # No test cases — just run the code
     user_builtins = dict(_builtins)
     for _name in ("__import__", "exec", "eval", "compile", "open"):
         user_builtins.pop(_name, None)
@@ -163,7 +170,8 @@ else:
                     "errors": None,
                     "test_results": [],
                 }
-            )
+            ),
+            file=old_stdout,
         )
     except Exception as e:
         actual = sys.stdout.getvalue()
@@ -176,7 +184,8 @@ else:
                     "errors": f"{type(e).__name__}: {e}",
                     "test_results": [],
                 }
-            )
+            ),
+            file=old_stdout,
         )
     finally:
         sys.stdout = old_stdout

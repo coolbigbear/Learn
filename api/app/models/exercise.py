@@ -18,6 +18,7 @@ class Exercise(Base):
     starter_code = Column(Text, nullable=False, default="# Write your code here\n")
     solution_code = Column(Text, nullable=False, default="")
     test_cases = Column(JSON, nullable=False, default=list)
+    language = Column(String(20), nullable=False, default="python")
     order = Column(Integer, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
