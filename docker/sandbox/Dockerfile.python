@@ -1,0 +1,32 @@
+# syntax=docker/dockerfile:1
+# =============================================================================
+# Python Sandbox Runner — Python 3.13 slim
+#
+# Minimal image for running untrusted Python code in a sandboxed container.
+# No pip packages — user code uses only stdlib (matching the restriction of the
+# subprocess runner).  The actual harness script is mounted at runtime so the
+# image does not need rebuilding when harness logic changes.
+# =============================================================================
+
+FROM python:3.13-slim@sha256:eb43ff125d8d58d7449dcba7d336c23bcac412f526d861db493b9994d8010280
+
+# ── Security: create non-root sandbox user ──────────────────────────────────
+RUN addgroup --system --gid 1001 sandbox \
+    && adduser --system --uid 1001 --ingroup sandbox --disabled-password --no-create-home sandbox
+
+# ── Environment hardening ───────────────────────────────────────────────────
+# Nobody (non-root, no permissions) owns rootfs files so the container cannot
+# modify them, even accidentally.
+# No entrypoint / CMD — command is supplied at runtime by the DockerRunner.
+
+USER sandbox
+WORKDIR /home/sandbox
+
+# Verify the container never runs as root
+RUN python3 -c "import os; assert os.geteuid() != 0, 'Container must not run as root'"
+
+# ── Image metadata ──────────────────────────────────────────────────────────
+LABEL org.opencontainers.image.title="Python Sandbox Runner"
+LABEL org.opencontainers.image.description="Sandboxed Python 3.13 execution environment for untrusted user code"
+LABEL org.opencontainers.image.base.name="docker.io/library/python:3.13-slim"
+LABEL org.opencontainers.image.version="1.0.0"

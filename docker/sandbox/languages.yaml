@@ -1,0 +1,60 @@
+# =============================================================================
+# Language Configuration Registry
+#
+# Each entry defines everything the DockerRunner needs to execute user code
+# in a sandboxed container for that language.
+#
+# Adding a new language:
+#   1. Create images/<lang>/Dockerfile
+#   2. Add an entry here with image tag, extension, run command, and limits
+#   3. Create a harness template or script at harnesses/<lang>_harness.*
+#   4. Build the image: ./build.sh
+# =============================================================================
+
+python:
+  display_name: "Python"
+  image: "tutorial-runner-python:latest"
+  extension: ".py"
+  run_command: ["python3", "/tmp/runner/harness.py"]
+  memory_limit: "256m"
+  cpu_limit: 1                       # CPUs (Docker nano_cpus = int(cpu_limit * 1e9))
+  pids_limit: 50
+  timeout_seconds: 10
+  capabilities: []                   # All capabilities dropped
+  network_disabled: true
+  read_only_rootfs: true
+  tmpfs:
+    "/tmp": "size=10M,noexec,nosuid,nodev,uid=1001"
+
+# ── Future languages (not yet implemented) ──────────────────────────────────
+# Uncomment and fill in once the Dockerfile and harness exist.
+
+# javascript:
+#   display_name: "JavaScript"
+#   image: "tutorial-runner-node:latest"
+#   extension: ".js"
+#   run_command: ["node", "/tmp/runner/harness.js"]
+#   memory_limit: "256m"
+#   cpu_limit: 1
+#   pids_limit: 50
+#   timeout_seconds: 10
+#   capabilities: []
+#   network_disabled: true
+#   read_only_rootfs: true
+#   tmpfs:
+#     "/tmp": "size=10M,noexec,nosuid,nodev,uid=1001"
+
+# go:
+#   display_name: "Go"
+#   image: "tutorial-runner-go:latest"
+#   extension: ".go"
+#   run_command: ["go", "run", "/tmp/runner/main.go"]
+#   memory_limit: "256m"
+#   cpu_limit: 1
+#   pids_limit: 50
+#   timeout_seconds: 10
+#   capabilities: []
+#   network_disabled: true
+#   read_only_rootfs: true
+#   tmpfs:
+#     "/tmp": "size=10M,noexec,nosuid,nodev,uid=1001"
