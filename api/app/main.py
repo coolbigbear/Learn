@@ -24,8 +24,17 @@ FRONTEND_DIST = Path(__file__).resolve().parent.parent.parent / "frontend" / "di
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Create tables on startup."""
+    """Create tables on startup, seed dev users (non-prod only)."""
     await create_tables()
+
+    if not PRODUCTION:
+        from app.services.seed import ensure_profile_users
+
+        created = await ensure_profile_users()
+        if created:
+            usernames = [u.username for u in created]
+            print(f"[seed] Created profile users: {', '.join(usernames)}")
+
     yield
 
 
