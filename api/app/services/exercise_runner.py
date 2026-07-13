@@ -102,6 +102,12 @@ def _run_single(input_data, expected, comparison, test_name=None):
                 msg = 'Your code should include a comment (using #)'
             else:
                 msg = None
+        elif comparison == 'code_contains':
+            passed = expected in _USER_CODE
+            if not passed:
+                msg = f'Your code should contain: {{expected!r}}'
+            else:
+                msg = None
         else:
             passed = (actual == expected)
             if not passed:

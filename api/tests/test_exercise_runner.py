@@ -174,6 +174,55 @@ class TestCommentComparison:
         assert result["passed"] is True
 
 
+class TestCodeContainsComparison:
+    """code_contains: passes if user code contains the expected substring."""
+
+    async def test_passes_when_code_contains_single_quote(self):
+        """Exercise 3-style: check that submitted code uses a single quote."""
+        result = await run_code("print('Greetings, Earthling!')", [
+            {"input": "", "expected_output": "'", "comparison_type": "code_contains"},
+        ])
+        assert result["passed"] is True
+        assert result["test_results"][0]["passed"] is True
+
+    async def test_passes_when_code_contains_double_quote(self):
+        """Specifically looks for double quotes in the code."""
+        result = await run_code('print("Hello")', [
+            {"input": "", "expected_output": '"', "comparison_type": "code_contains"},
+        ])
+        assert result["passed"] is True
+        assert result["test_results"][0]["passed"] is True
+
+    async def test_fails_when_code_does_not_contain_expected(self):
+        result = await run_code('print("no singles here")', [
+            {"input": "", "expected_output": "'", "comparison_type": "code_contains"},
+        ])
+        assert result["passed"] is False
+        assert result["test_results"][0]["passed"] is False
+
+    async def test_passes_with_single_quote_and_double_quotes_both_present(self):
+        """Mixed quotes — code contains the expected ' character."""
+        result = await run_code("print('hello \"world\"')", [
+            {"input": "", "expected_output": "'", "comparison_type": "code_contains"},
+        ])
+        assert result["passed"] is True
+
+    async def test_failure_message(self):
+        result = await run_code('print("hello")', [
+            {"input": "", "expected_output": "'", "comparison_type": "code_contains"},
+        ])
+        msg = result["test_results"][0]["message"]
+        assert msg is not None
+        assert "contain" in msg.lower()
+
+    async def test_no_message_on_success(self):
+        result = await run_code("print('hello')", [
+            {"input": "", "expected_output": "'", "comparison_type": "code_contains"},
+        ])
+        msg = result["test_results"][0]["message"]
+        assert msg is None
+
+
 class TestMixedTestCases:
     """Multiple test cases with different comparison types."""
 
