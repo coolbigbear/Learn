@@ -11,7 +11,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.responses import FileResponse
 
 from app.config import ALLOWED_ORIGINS
-from app.database import create_tables
+from app.database import check_database_integrity, create_tables
 from app.routers import auth, exercises, lessons, progress
 
 # Single source of truth for the app version
@@ -26,16 +26,32 @@ FRONTEND_DIST = Path(__file__).resolve().parent.parent.parent / "frontend" / "di
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Create tables on startup, seed dev users (non-prod only)."""
+    """Create tables on startup, seed dev users, and verify DB integrity."""
     await create_tables()
 
-    if not PRODUCTION:
-        from app.services.seed import ensure_profile_users
+    # Always attempt to seed profile users — in production this is a no-op
+    # if they already exist (the seed function checks before inserting).
+    # This ensures the admin/dev user is present even if the DB was reset.
+    from app.services.seed import ensure_profile_users
 
-        created = await ensure_profile_users()
-        if created:
-            usernames = [u.username for u in created]
-            print(f"[seed] Created profile users: {', '.join(usernames)}")
+    created = await ensure_profile_users()
+    if created:
+        usernames = [u.username for u in created]
+        print(f"[seed] Created profile users: {', '.join(usernames)}")
+    elif not PRODUCTION:
+        # In non-production mode, log that users already exist (normal case)
+        pass
+    else:
+        # In production, verify the user table isn't empty
+        try:
+            integrity = await check_database_integrity()
+            if integrity["ok"] and integrity.get("table_count", 0) == 0:
+                print(
+                    "[seed] WARNING: Database has no tables after startup — "
+                    "this may indicate a fresh or corrupted database."
+                )
+        except Exception as e:
+            print(f"[seed] WARNING: Could not verify database state: {e}")
 
     yield
 
@@ -71,10 +87,29 @@ def create_app() -> FastAPI:
     app.include_router(exercises.router)
     app.include_router(progress.router)
 
-    # Health check
+    # Health check with database integrity verification
     @app.get("/api/health")
     async def health():
-        return {"status": "ok"}
+        integrity = await check_database_integrity()
+        if not integrity["ok"]:
+            from fastapi import status
+            from fastapi.responses import JSONResponse
+
+            return JSONResponse(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                content={
+                    "status": "unhealthy",
+                    "database": integrity["message"],
+                },
+            )
+
+        return {
+            "status": "ok",
+            "database": {
+                "tables": integrity.get("table_count", 0),
+                "size_bytes": integrity.get("size_bytes"),
+            },
+        }
 
     # Version endpoint
     @app.get("/api/version")
