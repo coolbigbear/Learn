@@ -75,6 +75,10 @@ export function getLessons() {
   return request('/lessons', { auth: true });
 }
 
+export function getLessonsByPath() {
+  return request('/lessons/by-path', { auth: true });
+}
+
 export function getLesson(slug) {
   return request(`/lessons/${slug}`, { auth: true });
 }

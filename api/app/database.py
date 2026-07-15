@@ -2,6 +2,7 @@
 
 import os
 
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
@@ -49,3 +50,12 @@ async def create_tables():
         # Import models so they register with Base.metadata
         import app.models  # noqa: F401
         await conn.run_sync(Base.metadata.create_all)
+
+        # Migrate: add `path` column to lessons table if it doesn't exist
+        # SQLite doesn't support IF NOT EXISTS for ALTER TABLE, so we catch the error
+        try:
+            await conn.execute(
+                text("ALTER TABLE lessons ADD COLUMN path VARCHAR(50) NOT NULL DEFAULT 'core'")
+            )
+        except Exception:
+            pass  # Column already exists

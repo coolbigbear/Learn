@@ -61,21 +61,24 @@ async def list_lessons_by_path(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    """Return lessons grouped by learning path with path metadata."""
+    """Return lessons grouped by learning path.
+
+    Returns an ordered list of paths with their lessons and metadata.
+    """
     grouped = await get_lessons_grouped_by_path(db)
 
+    path_order = ["core", "data-processing", "api", "machine-learning"]
+
     paths = []
-    # Ensure a consistent order: core first, then data-processing, api, machine-learning
-    for path_key in ["core", "data-processing", "api", "machine-learning"]:
-        meta = PATH_META.get(path_key, {"display_name": path_key, "description": "", "color": "gray"})
-        lessons = grouped.get(path_key, [])
+    for path_key in path_order:
+        meta = PATH_META[path_key]
         paths.append(
             PathGroup(
                 path=path_key,
                 display_name=meta["display_name"],
                 description=meta["description"],
                 color=meta["color"],
-                lessons=lessons,
+                lessons=grouped.get(path_key, []),
             )
         )
 
