@@ -145,10 +145,15 @@ def create_app() -> FastAPI:
             # SPA catch-all — serve real files from dist/ directly
             # (favicon.svg, icons.svg, etc.) and fall back to index.html
             # for client-side routes (/lessons, /progress, /login, /).
+            # Note: we use @app.route (Starlette) with a catch-all pattern,
+            # but get the path from request.url.path because the route
+            # parameter {path:path} is not reliably populated by FastAPI.
             @app.route("/{path:path}", methods=["GET"])
-            async def serve_spa(request, path: str = ""):
+            async def serve_spa(request):
+                path = request.url.path.lstrip("/")
+
                 # Let API paths fall through to their normal 404 handler
-                if path.startswith("api/"):
+                if path.startswith("api/") or path == "api":
                     raise StarletteHTTPException(status_code=404)
 
                 # If the path matches a real file under dist, serve it
