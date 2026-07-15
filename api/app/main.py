@@ -20,8 +20,20 @@ __version__ = "0.1.0"
 # Whether we are in production mode
 PRODUCTION = os.environ.get("PRODUCTION", "").lower() in ("1", "true", "yes")
 
-# Path to the built frontend (relative to the api/ directory)
-FRONTEND_DIST = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
+# Path to the built frontend dist directory.
+# 1. FRONTEND_DIST env var takes precedence (set in docker-compose.yml).
+# 2. Fallback: calculate relative to this file.
+#    Local dev: api/app/main.py -> 3 parents -> <project>/frontend/dist
+#    Docker:    /app/app/main.py -> 2 parents -> /app/frontend/dist
+_env_dist = os.environ.get("FRONTEND_DIST", "")
+if _env_dist and Path(_env_dist).is_dir():
+    FRONTEND_DIST = Path(_env_dist)
+else:
+    _candidate = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
+    if _candidate.is_dir():
+        FRONTEND_DIST = _candidate
+    else:
+        FRONTEND_DIST = Path(__file__).resolve().parent.parent / "frontend" / "dist"
 
 
 @asynccontextmanager

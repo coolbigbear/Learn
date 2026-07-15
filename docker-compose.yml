@@ -3,7 +3,13 @@
 #
 # Two services sharing the same image, separated by host port and DB volume:
 #   qa   → port 8081 (configurable via $QA_PORT)
-#   prod → port 8080 (configurable via $PROD_PORT)
+#   prod → port 8082 (configurable via $PROD_PORT)
+#
+# ╔══════════════════════════════════════════════════════════════════════╗
+# ║  NOTE: Port 8080 on this host is taken by a searxng service. The  ║
+# ║  prod default is 8082 to avoid the conflict. Override with         ║
+# ║  PROD_PORT env var if you need a different port.                   ║
+# ╚══════════════════════════════════════════════════════════════════════╝
 # =============================================================================
 
 services:
@@ -19,6 +25,8 @@ services:
     environment:
       - PRODUCTION=1
       - DATABASE_URL=sqlite+aiosqlite:///./data/tutorials.db
+      - ROOT_DIR=/app
+      - FRONTEND_DIST=/app/frontend/dist
     volumes:
       - qa-db:/app/data
       - /var/run/docker.sock:/var/run/docker.sock
@@ -32,10 +40,12 @@ services:
     image: python-tutorials:latest
     container_name: python-tutorials-prod
     ports:
-      - "${PROD_PORT:-8080}:8080"
+      - "${PROD_PORT:-8082}:8080"
     environment:
       - PRODUCTION=1
       - DATABASE_URL=sqlite+aiosqlite:///./data/tutorials.db
+      - ROOT_DIR=/app
+      - FRONTEND_DIST=/app/frontend/dist
     volumes:
       - prod-db:/app/data
       - /var/run/docker.sock:/var/run/docker.sock

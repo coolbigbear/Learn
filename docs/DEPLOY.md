@@ -20,8 +20,23 @@ built frontend (static files + SPA fallback).
 | Environment | URL | Notes |
 |---|---|---|
 | **Production** | `https://randy-meetup-filed-ahead.trycloudflare.com` | Ephemeral — changes on tunnel restart |
-| **Local (server)** | `http://localhost:8080` | Always available on this machine |
+| **Local (server)** | `http://localhost:8082` | Native server uses `$PORT` env var (default 8080 via deploy.sh) |
 | **Dev (Vite HMR)** | `http://localhost:5173` | Hot-reload dev server |
+
+## Docker Compose Ports
+
+Both services in `docker-compose.yml` map the internal container port 8080 to a
+configurable host port. The defaults are:
+
+| Service | Host Port | Override |
+|---|---|---|
+| `qa` | 8081 | `QA_PORT` env var |
+| `prod` | 8082 | `PROD_PORT` env var |
+
+> **⚠ Port 8080 conflict:** On this host, port 8080 is occupied by a `searxng`
+> service. The `prod` default was therefore changed from 8080 → 8082. If
+> deploying on a different host where 8080 is available, set `PROD_PORT=8080`
+> to restore the original convention:
 
 > **⚠ Tunnel URL note:** The Cloudflare quick tunnel URL is **ephemeral** —
 > every time the tunnel process restarts you get a new random
