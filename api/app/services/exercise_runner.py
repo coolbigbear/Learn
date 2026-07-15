@@ -46,7 +46,7 @@ _USER_CODE = {user_code!r}
 # Test cases
 _TEST_CASES = {test_cases!r}
 
-def _run_single(input_data, expected, comparison, test_name=None):
+def _run_single(input_data, expected, comparison, test_name=None, message=None):
     '''Run user code with given stdin and compare output.'''
     old_stdin = sys.stdin
     old_stdout = sys.stdout
@@ -107,10 +107,40 @@ def _run_single(input_data, expected, comparison, test_name=None):
                 msg = 'Your code should include a comment (using #)'
             else:
                 msg = None
+        elif comparison == 'comment_contains':
+            # Extract comment text from lines, handling both pure comment lines
+            # and inline comments while ignoring # inside string literals
+            import re as _re
+            comment_lines = []
+            for _l in _USER_CODE.split('\\n'):
+                _s = _l.strip()
+                if not _s:
+                    continue
+                # Remove string contents to avoid false positives on # inside strings
+                _no_strings = _re.sub(r"'[^']*'", '""', _re.sub(r'"[^"]*"', '""', _s))
+                if '#' in _no_strings:
+                    idx = _no_strings.index('#')
+                    comment_lines.append(_s[idx:])
+            if not comment_lines:
+                passed = False
+                msg = 'Your code should include a comment (using #)'
+            else:
+                passed = any(expected in _cl for _cl in comment_lines)
+                if not passed:
+                    msg = f'Your comment should contain: {{expected!r}}'
+                else:
+                    msg = None
         elif comparison == 'code_contains':
             passed = expected in _USER_CODE
             if not passed:
                 msg = f'Your code should contain: {{expected!r}}'
+            else:
+                msg = None
+        elif comparison == 'code_regex':
+            import re
+            passed = bool(re.search(expected, _USER_CODE))
+            if not passed:
+                msg = f'Your code does not match the required pattern'
             else:
                 msg = None
         else:
@@ -119,6 +149,9 @@ def _run_single(input_data, expected, comparison, test_name=None):
                 msg = f'Expected: {{expected!r}}, but got: {{actual!r}}'
             else:
                 msg = None
+        # Use human-readable message from test case when provided and test fails
+        if message is not None and not passed:
+            msg = message
         return {{'passed': passed, 'actual_output': actual, 'expected_output': expected, 'errors': err or None, 'name': test_name, 'message': msg, 'comparison_type': comparison}}
     except Exception as e:
         actual = sys.stdout.getvalue()
@@ -131,7 +164,7 @@ def _run_single(input_data, expected, comparison, test_name=None):
 results = []
 all_passed = True
 for i, tc in enumerate(_TEST_CASES):
-    r = _run_single(tc.get('input', ''), tc.get('expected_output', ''), tc.get('comparison_type', 'exact'), test_name=tc.get('name'))
+    r = _run_single(tc.get('input', ''), tc.get('expected_output', ''), tc.get('comparison_type', 'exact'), test_name=tc.get('name'), message=tc.get('message'))
     r['test_index'] = i
     if not r['passed']:
         all_passed = False
@@ -144,6 +177,7 @@ if results:
         'passed': all_passed,
         'actual_output': first['actual_output'],
         'expected_output': _TEST_CASES[0].get('expected_output', '') if _TEST_CASES else '',
+        'comparison_type': _TEST_CASES[0].get('comparison_type', 'exact') if _TEST_CASES else 'exact',
         'errors': first['errors'],
         'test_results': results
     }}))
