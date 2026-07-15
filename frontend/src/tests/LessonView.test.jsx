@@ -29,6 +29,11 @@ const mockLesson = {
 vi.mock('../api/client.js', () => ({
   getToken: vi.fn(() => null),
   setToken: vi.fn(),
+  setOnUnauthorized: vi.fn(),
+  isTokenExpired: vi.fn(() => true),
+  decodeToken: vi.fn(() => null),
+  checkAuth: vi.fn(() => false),
+  clearToken: vi.fn(),
   getLesson: vi.fn((slug) => {
     if (slug === 'python-basics') {
       return Promise.resolve(mockLesson);

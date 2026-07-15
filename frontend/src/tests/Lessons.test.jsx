@@ -14,6 +14,10 @@ vi.mock('../api/client.js', async (importOriginal) => {
     ...actual,
     getToken: vi.fn(() => 'test-token'),
     setToken: vi.fn(),
+    isTokenExpired: vi.fn(() => false),
+    decodeToken: vi.fn(() => ({ sub: '1' })),
+    setOnUnauthorized: vi.fn(),
+    clearToken: vi.fn(),
     getLessonsByPath: (...args) => mockGetLessonsByPath(...args),
     getLessons: (...args) => mockGetLessons(...args),
     getLesson: vi.fn(() => Promise.resolve(null)),
@@ -205,12 +209,12 @@ describe('Lessons page', () => {
     renderLessons();
 
     await waitFor(() => {
-      expect(screen.getByText('Master Python basics: from printing to modules and packages.')).toBeInTheDocument();
+      expect(screen.getByText('Master Python basics.')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('Learn to work with CSV, JSON, and data APIs.')).toBeInTheDocument();
+    expect(screen.getByText('Work with CSV, JSON, and APIs.')).toBeInTheDocument();
     expect(screen.getByText('Build web APIs with FastAPI.')).toBeInTheDocument();
-    expect(screen.getByText('Coming soon — dive into ML fundamentals.')).toBeInTheDocument();
+    expect(screen.getByText('Coming soon.')).toBeInTheDocument();
   });
 
   it('shows Branch badges on non-core paths', async () => {
