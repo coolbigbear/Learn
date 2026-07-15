@@ -51,8 +51,10 @@ async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
 
 
 @pytest_asyncio.fixture
-async def client() -> AsyncGenerator[AsyncClient, None]:
+async def client(monkeypatch) -> AsyncGenerator[AsyncClient, None]:
     """Provide an async HTTP client against the test app."""
+    # Use test engine for database integrity checks (health endpoint, etc.)
+    monkeypatch.setattr("app.database.engine", test_engine)
     app = create_app()
     app.dependency_overrides[get_db] = override_get_db
     transport = ASGITransport(app=app)

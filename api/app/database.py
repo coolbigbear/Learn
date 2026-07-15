@@ -73,18 +73,24 @@ async def enable_wal_and_pragmas() -> None:
         await conn.commit()
 
 
-async def check_database_integrity() -> dict:
+async def check_database_integrity(_engine=None) -> dict:
     """Run SQLite integrity_check and return results.
+
+    Accepts an optional engine parameter for test isolation.
+    When omitted, the module-level global engine is used.
 
     Returns a dict with:
       - ok: True if integrity check passed
       - message: human-readable result
       - table_count: number of user tables (if check passed)
     """
+    if _engine is None:
+        _engine = engine
+
     result = {"ok": True, "message": "Database integrity verified", "table_count": 0}
 
     try:
-        async with engine.connect() as conn:
+        async with _engine.connect() as conn:
             # Integrity check
             integrity = await conn.execute(text("PRAGMA integrity_check;"))
             rows = integrity.fetchall()

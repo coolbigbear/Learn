@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 from httpx import AsyncClient
 from sqlalchemy import text
+from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.database import (
     _get_db_path,
@@ -12,6 +13,14 @@ from app.database import (
     check_database_integrity,
     enable_wal_and_pragmas,
     engine,
+)
+
+# Test engine matching conftest.py — used to verify check_database_integrity
+# with the correct test database engine.
+_test_engine = create_async_engine(
+    "sqlite+aiosqlite://",
+    connect_args={"check_same_thread": False},
+    echo=False,
 )
 
 
@@ -50,7 +59,13 @@ class TestDatabaseIntegrity:
 
     async def test_integrity_ok_with_tables(self):
         """Integrity check should pass and report tables."""
-        result = await check_database_integrity()
+        # Create tables on our test engine (the autouse setup_database fixture
+        # creates them on a separate conftest engine, not ours)
+        from app.database import Base
+
+        async with _test_engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        result = await check_database_integrity(_engine=_test_engine)
         assert result["ok"] is True
         assert "message" in result
         # The test in-memory DB should have at least users, lessons, exercises, user_progress
