@@ -179,6 +179,50 @@ export default function Lessons() {
   }
 
   // Multi-path layout
+  // Split core path (full-width) from branch paths (horizontal grid on desktop)
+  const corePath = paths.find(p => p.path === 'core');
+  const branchPaths = paths.filter(p => p.path !== 'core');
+
+  function renderPathSection(section) {
+    const isBranch = section.path !== 'core';
+    const isEmpty = section.lessons.length === 0;
+    const colors = COLOR_MAP[section.color] || COLOR_MAP.indigo;
+
+    return (
+      <div key={section.path} className={`rounded-lg border ${colors.bg} ${colors.border} p-6`}>
+        <div className="flex items-center gap-3 mb-1">
+          <h2 className={`text-2xl font-bold ${colors.header}`}>{section.display_name}</h2>
+          {isBranch && (
+            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${colors.badge}`}>
+              Branch
+            </span>
+          )}
+        </div>
+        <p className="text-gray-600 text-sm mt-1 mb-4">{section.description}</p>
+
+        {isEmpty ? (
+          <div className="text-center py-10">
+            <div className="text-5xl mb-3 opacity-40">
+              {section.path === 'machine-learning' ? '🤖' : '📚'}
+            </div>
+            <p className="text-gray-400 font-medium">Coming Soon</p>
+            <p className="text-gray-400 text-sm mt-1">
+              {section.path === 'machine-learning'
+                ? 'Machine Learning lessons are being prepared.'
+                : 'New lessons are being prepared for this path.'}
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {section.lessons.map((lesson) => (
+              <LessonCard key={lesson.id} lesson={lesson} />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="mb-8">
@@ -186,49 +230,22 @@ export default function Lessons() {
         <p className="mt-2 text-gray-500">Follow the core path, then choose your specialization.</p>
       </div>
 
-      {paths.map((section) => {
-        const isBranch = section.path !== 'core';
-        const isEmpty = section.lessons.length === 0;
-        const colors = COLOR_MAP[section.color] || COLOR_MAP.indigo;
+      {/* Core path — full width at top */}
+      {corePath && (
+        <div className="mb-10">
+          {renderPathSection(corePath)}
+        </div>
+      )}
 
-        return (
-          <div key={section.path}>
-            {isBranch && <BranchDivider />}
+      {/* Branch divider — once between core and branches */}
+      {branchPaths.length > 0 && <BranchDivider />}
 
-            <div className={`mb-10 rounded-lg border ${colors.bg} ${colors.border} p-6`}>
-              <div className="flex items-center gap-3 mb-1">
-                <h2 className={`text-2xl font-bold ${colors.header}`}>{section.display_name}</h2>
-                {isBranch && (
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${colors.badge}`}>
-                    Branch
-                  </span>
-                )}
-              </div>
-              <p className="text-gray-600 text-sm mt-1 mb-4">{section.description}</p>
-
-              {isEmpty ? (
-                <div className="text-center py-10">
-                  <div className="text-5xl mb-3 opacity-40">
-                    {section.path === 'machine-learning' ? '🤖' : '📚'}
-                  </div>
-                  <p className="text-gray-400 font-medium">Coming Soon</p>
-                  <p className="text-gray-400 text-sm mt-1">
-                    {section.path === 'machine-learning'
-                      ? 'Machine Learning lessons are being prepared.'
-                      : 'New lessons are being prepared for this path.'}
-                  </p>
-                </div>
-              ) : (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {section.lessons.map((lesson) => (
-                    <LessonCard key={lesson.id} lesson={lesson} />
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        );
-      })}
+      {/* Branch paths — 3-column grid on desktop, stacked on mobile */}
+      {branchPaths.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          {branchPaths.map((section) => renderPathSection(section))}
+        </div>
+      )}
     </div>
   );
 }

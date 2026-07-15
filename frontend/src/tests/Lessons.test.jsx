@@ -148,7 +148,7 @@ describe('Lessons page', () => {
     expect(comingSoonTexts.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('shows branch divider before non-core paths', async () => {
+  it('shows branch divider once between core and branch paths', async () => {
     mockGetLessonsByPath.mockResolvedValue(mockGroupedData);
 
     renderLessons();
@@ -157,9 +157,9 @@ describe('Lessons page', () => {
       expect(screen.getByText('Python Fundamentals')).toBeInTheDocument();
     });
 
-    // The branch divider shows "Choose your path" (appears once per non-core path)
+    // The branch divider shows "Choose your path" — only once between core and branches
     const branchLabels = screen.getAllByText('Choose your path');
-    expect(branchLabels.length).toBeGreaterThanOrEqual(1);
+    expect(branchLabels.length).toBe(1);
   });
 
   it('falls back to flat list when by-path endpoint is unavailable', async () => {
