@@ -13,6 +13,7 @@ class Lesson(Base):
     slug = Column(String(80), unique=True, nullable=False, index=True)
     title = Column(String(200), nullable=False)
     content = Column(Text, nullable=False)
+    path = Column(String(50), nullable=False, default="core", server_default="core")
     order = Column(Integer, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 

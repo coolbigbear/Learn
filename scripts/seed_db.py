@@ -20,13 +20,44 @@ sys.path.insert(0, str(api_dir))
 
 # --- Database setup ---
 # We need to set up an engine and session to use the models
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from app.database import Base
 from app.models import Lesson, Exercise
 
 CONTENT_DIR = Path(__file__).resolve().parent.parent / "content"
 DATABASE_URL = "sqlite+aiosqlite:///./tutorials.db"
+
+
+async def ensure_path_column(engine):
+    """Add the `path` column to the lessons table if it doesn't exist."""
+    async with engine.connect() as conn:
+        result = await conn.execute(text("PRAGMA table_info(lessons)"))
+        columns = {row.name for row in result.fetchall()}
+        if "path" not in columns:
+            await conn.execute(
+                text("ALTER TABLE lessons ADD COLUMN path VARCHAR(50) NOT NULL DEFAULT 'core'")
+            )
+            await conn.commit()
+            print("Added `path` column to lessons table")
+        else:
+            print("`path` column already exists")
+
+
+async def update_existing_lessons(session, manifest):
+    """Update existing lessons with their path from the manifest."""
+    for entry in manifest:
+        slug = entry["slug"]
+        expected_path = entry.get("path", "core")
+        result = await session.execute(
+            select(Lesson).where(Lesson.slug == slug)
+        )
+        lesson = result.scalar_one_or_none()
+        if lesson is not None and lesson.path != expected_path:
+            lesson.path = expected_path
+            print(f"  Updated path for {slug}: {expected_path} (was: {lesson.path})")
+
+    await session.commit()
 
 
 async def seed():
@@ -39,6 +70,9 @@ async def seed():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
+    # Ensure the path column exists (migration for existing databases)
+    await ensure_path_column(engine)
+
     session_factory = async_sessionmaker(
         engine,
         class_=AsyncSession,
@@ -46,13 +80,6 @@ async def seed():
     )
 
     async with session_factory() as session:
-        # Check if data already exists
-        result = await session.execute(select(Lesson).limit(1))
-        existing = result.scalar_one_or_none()
-        if existing is not None:
-            print("Database already has lessons. Skipping seed.")
-            return
-
         # Read manifest
         manifest_path = CONTENT_DIR / "manifest.json"
         if not manifest_path.exists():
@@ -63,6 +90,16 @@ async def seed():
             manifest = json.load(f)
 
         print(f"Found {len(manifest)} lessons in manifest")
+
+        # Check if data already exists
+        result = await session.execute(select(Lesson).limit(1))
+        existing = result.scalar_one_or_none()
+        if existing is not None:
+            print("Database already has lessons. Updating existing records...")
+            await update_existing_lessons(session, manifest)
+            print("Migration complete!")
+            await engine.dispose()
+            return
 
         for entry in manifest:
             slug = entry["slug"]
@@ -80,6 +117,7 @@ async def seed():
                 slug=slug,
                 title=entry["title"],
                 content=content,
+                path=entry.get("path", "core"),
                 order=entry["order"],
             )
             session.add(lesson)

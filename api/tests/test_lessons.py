@@ -61,6 +61,8 @@ class TestListLessons:
         # First lesson should have exercise_count = 2
         assert body["lessons"][0]["exercise_count"] == 2
         assert body["lessons"][1]["exercise_count"] == 0
+        # Should include path field
+        assert body["lessons"][0]["path"] == "core"
 
     async def test_lessons_ordered(self, client: AsyncClient, auth_headers: dict):
         resp = await client.get("/api/lessons", headers=auth_headers)
@@ -70,6 +72,36 @@ class TestListLessons:
 
     async def test_lessons_require_auth(self, client: AsyncClient):
         resp = await client.get("/api/lessons")
+        assert resp.status_code == 401
+
+
+class TestLessonsByPath:
+    async def test_by_path_groups_lessons(self, client: AsyncClient, auth_headers: dict):
+        resp = await client.get("/api/lessons/by-path", headers=auth_headers)
+        assert resp.status_code == 200
+        body = resp.json()
+        assert "paths" in body
+        assert len(body["paths"]) == 4  # core, data-processing, api, machine-learning
+
+        # core path should have 2 test lessons
+        core_path = body["paths"][0]
+        assert core_path["path"] == "core"
+        assert core_path["display_name"] == "Python Fundamentals"
+        assert len(core_path["lessons"]) == 2
+        for lesson in core_path["lessons"]:
+            assert lesson["path"] == "core"
+            assert lesson["exercise_count"] is not None
+
+        # Other paths should be empty for now
+        assert body["paths"][1]["path"] == "data-processing"
+        assert body["paths"][1]["lessons"] == []
+        assert body["paths"][2]["path"] == "api"
+        assert body["paths"][2]["lessons"] == []
+        assert body["paths"][3]["path"] == "machine-learning"
+        assert body["paths"][3]["lessons"] == []
+
+    async def test_by_path_requires_auth(self, client: AsyncClient):
+        resp = await client.get("/api/lessons/by-path")
         assert resp.status_code == 401
 
 
