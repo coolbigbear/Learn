@@ -43,6 +43,7 @@ export default function Lessons() {
   const [paths, setPaths] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [progressByLesson, setProgressByLesson] = useState({});
 
   useEffect(() => {
     if (authLoading) return;
@@ -52,10 +53,36 @@ export default function Lessons() {
       return;
     }
 
-    async function fetchLessons() {
+    let cancelled = false;
+
+    async function fetchAll() {
       try {
-        const data = await api.getLessonsByPath();
-        // API returns {paths: [{path, display_name, description, color, lessons}]}
+        // Fetch lessons and progress in parallel
+        const [lessonsData, progressData] = await Promise.all([
+          api.getLessonsByPath(),
+          api.getProgress().catch(() => null), // progress is optional — don't block on it
+        ]);
+
+        if (cancelled) return;
+
+        // Build progress lookup: lesson_slug -> { completed, total }
+        if (progressData) {
+          const lookup = {};
+          const lessonTotals = progressData.lesson_totals || {};
+          if (progressData.progress) {
+            for (const p of progressData.progress) {
+              const slug = p.lesson_slug;
+              if (!lookup[slug]) {
+                lookup[slug] = { completed: 0, total: lessonTotals[slug] || 0 };
+              }
+              if (p.completed) lookup[slug].completed++;
+            }
+          }
+          setProgressByLesson(lookup);
+        }
+
+        // Process lessons-by-path data
+        const data = lessonsData;
         if (data && data.paths && Array.isArray(data.paths)) {
           setPaths(data.paths);
         } else {
@@ -79,7 +106,11 @@ export default function Lessons() {
       } catch (err) {
         // Fallback: try the flat lessons endpoint
         try {
-          const data = await api.getLessons();
+          const [data] = await Promise.all([
+            api.getLessons(),
+            // progress already fetched above, but if it failed try again here
+          ]);
+          if (cancelled) return;
           if (data.lessons && data.lessons.length > 0) {
             if (data.lessons[0].path) {
               // Group by path client-side
@@ -120,10 +151,12 @@ export default function Lessons() {
           setError(fallbackErr.message);
         }
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
-    fetchLessons();
+
+    fetchAll();
+    return () => { cancelled = true; };
   }, [isAuthenticated, authLoading]);
 
   if (authLoading || loading) {
@@ -160,6 +193,13 @@ export default function Lessons() {
     );
   }
 
+  function getProgressForLesson(lesson) {
+    const p = progressByLesson[lesson.slug];
+    if (p) return p;
+    // Fallback to lesson_totals if available
+    return null;
+  }
+
   // Single path (flat fallback — no path field in API)
   if (paths.length === 1) {
     const section = paths[0];
@@ -171,7 +211,11 @@ export default function Lessons() {
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {section.lessons.map((lesson) => (
-            <LessonCard key={lesson.id} lesson={lesson} />
+            <LessonCard
+              key={lesson.id}
+              lesson={lesson}
+              progress={getProgressForLesson(lesson)}
+            />
           ))}
         </div>
       </div>
@@ -215,7 +259,12 @@ export default function Lessons() {
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {section.lessons.map((lesson) => (
-              <LessonCard key={lesson.id} lesson={lesson} />
+              <LessonCard
+                key={lesson.id}
+                lesson={lesson}
+                color={section.color}
+                progress={getProgressForLesson(lesson)}
+              />
             ))}
           </div>
         )}

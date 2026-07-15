@@ -9,8 +9,19 @@ const ACCENT_COLORS = {
   gray: 'bg-gray-300',
 };
 
-export default function LessonCard({ lesson, color = 'indigo' }) {
+function getLessonProgress(completed, total) {
+  if (total === 0) return 'not-started';
+  if (completed >= total) return 'complete';
+  if (completed > 0) return 'in-progress';
+  return 'not-started';
+}
+
+export default function LessonCard({ lesson, color = 'indigo', progress }) {
   const accentClass = ACCENT_COLORS[color] || ACCENT_COLORS.gray;
+  const status = progress ? getLessonProgress(progress.completed, progress.total) : null;
+  const percentage = progress && progress.total > 0
+    ? Math.round((progress.completed / progress.total) * 100)
+    : 0;
 
   return (
     <Link
@@ -30,7 +41,36 @@ export default function LessonCard({ lesson, color = 'indigo' }) {
         <p className="mt-2 text-sm text-gray-500">
           {lesson.exercise_count} {lesson.exercise_count === 1 ? 'exercise' : 'exercises'}
         </p>
+
+        {/* Compact completion badge */}
+        {status === 'complete' && (
+          <div className="mt-2 flex items-center gap-1 text-xs text-green-600">
+            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <span className="font-medium">Complete</span>
+          </div>
+        )}
+        {status === 'in-progress' && (
+          <div className="mt-2 flex items-center gap-2">
+            <div className="flex-1 max-w-[100px] bg-gray-100 rounded-full h-1.5">
+              <div
+                className="bg-amber-400 h-1.5 rounded-full transition-all duration-300"
+                style={{ width: `${percentage}%` }}
+              />
+            </div>
+            <span className="text-xs text-amber-600 font-medium whitespace-nowrap">
+              {progress.completed}/{progress.total}
+            </span>
+          </div>
+        )}
       </div>
     </Link>
   );
 }
+
+export { getLessonProgress };
