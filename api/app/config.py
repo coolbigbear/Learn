@@ -3,8 +3,18 @@
 import os
 from pathlib import Path
 
-# Project root
-ROOT_DIR = Path(__file__).resolve().parent.parent.parent
+# Project root — supports both local dev and Docker layouts.
+# In local dev: __file__ = <project>/api/app/config.py  → 3 parents = project root
+# In Docker:   __file__ = /app/app/config.py             → 2 parents = /app
+# An explicit ROOT_DIR env var overrides both.
+ROOT_DIR_ENV = os.environ.get("ROOT_DIR")
+if ROOT_DIR_ENV:
+    ROOT_DIR = Path(ROOT_DIR_ENV)
+else:
+    _candidate = Path(__file__).resolve().parent.parent.parent
+    if not (_candidate / "api").is_dir():
+        _candidate = Path(__file__).resolve().parent.parent
+    ROOT_DIR = _candidate
 
 # Database
 DATABASE_URL = "sqlite+aiosqlite:///./tutorials.db"
