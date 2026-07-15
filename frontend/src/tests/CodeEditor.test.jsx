@@ -121,22 +121,37 @@ describe('CodeEditor', () => {
     const editor = container.querySelector('.cm-editor');
     expect(editor).toBeTruthy();
 
-    // Before focus, the selection should not be "all selected"
-    // (CodeMirror initializes with cursor at position 0, not selecting all)
     const content = container.querySelector('.cm-content');
     expect(content).toBeTruthy();
 
-    // Focus the editor — this triggers the select-all handler
+    // Focus the editor by clicking on the wrapper — this triggers the
+    // focusin handler which defers select-all via queueMicrotask.
+    // Verifies the handler doesn't crash with "update in progress".
     await user.click(editor);
 
-    // The editor should have focus after the click
-    const activeElement = document.activeElement;
-    // In happy-dom, the active element after clicking .cm-editor may be
-    // the contenteditable div. Check that the editor is focused.
-    const isFocused = editor.contains(activeElement) || editor === activeElement;
-    // Note: in happy-dom, focus behavior may differ from real browsers.
-    // The key test is that the component renders the focus listener
-    // without error and the editor is interactable.
+    // The editor should be rendered and functional after the click
+    // (happy-dom focus behavior differs from real browsers, but the
+    // key test is that no error was thrown — the queueMicrotask
+    // dispatch prevents the CodeMirror crash)
+    expect(editor).toBeTruthy();
+  });
+
+  it('handles focusin on contenteditable without crashing CodeMirror', async () => {
+    const user = userEvent.setup();
+    const { container } = render(<CodeEditor value="def foo():\n  pass" />);
+
+    const content = container.querySelector('.cm-content');
+    expect(content).toBeTruthy();
+
+    // Click directly on the contenteditable div — this triggers
+    // focusin on the inner element, which bubbles up to view.dom.
+    // The handler must defer the dispatch to avoid the CodeMirror
+    // "update in progress" error.
+    await user.click(content);
+
+    // Verify the editor is still functional after the interaction
+    // (no crash from the deferred dispatch)
+    const editor = container.querySelector('.cm-editor');
     expect(editor).toBeTruthy();
   });
 

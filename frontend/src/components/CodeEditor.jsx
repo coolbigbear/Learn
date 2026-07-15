@@ -43,16 +43,23 @@ export default function CodeEditor({ value, onChange, placeholder, readOnly = fa
     }
 
     const handleFocus = () => {
-      view.dispatch({
-        selection: { anchor: 0, head: view.state.doc.length },
+      // Defer to next microtask so CodeMirror finishes processing
+      // the current event (focusin/focus) before we dispatch a
+      // selection change — otherwise CodeMirror throws
+      // "Calls to EditorView.update are not allowed while an
+      // update is in progress".
+      queueMicrotask(() => {
+        view.dispatch({
+          selection: { anchor: 0, head: view.state.doc.length },
+        });
       });
     };
 
-    view.dom.addEventListener('focus', handleFocus);
+    view.dom.addEventListener('focusin', handleFocus);
 
     // Store the cleanup function
     focusHandlerRef.current = () => {
-      view.dom.removeEventListener('focus', handleFocus);
+      view.dom.removeEventListener('focusin', handleFocus);
     };
   }, []);
 
