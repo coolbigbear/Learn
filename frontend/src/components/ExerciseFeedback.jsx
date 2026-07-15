@@ -1,7 +1,7 @@
 export default function ExerciseFeedback({ result }) {
   if (!result) return null;
 
-  const { passed, errors, test_results, summary, expected_output, actual_output } = result;
+  const { passed, errors, test_results, summary, expected_output, actual_output, comparison_type } = result;
 
   return (
     <div
@@ -93,6 +93,18 @@ export default function ExerciseFeedback({ result }) {
                   ) : tr.comparison_type === "comment" ? (
                     /* comment: message field already says enough, no Expected/Got needed */
                     null
+                  ) : tr.comparison_type === "regex" ? (
+                    /* regex: show message (human-readable) and actual output, not raw pattern */
+                    <div className="flex gap-4">
+                      <div>
+                        <span className="text-gray-500">Got: </span>
+                        {tr.actual_output && tr.actual_output.trim() ? (
+                          <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-mono">{tr.actual_output}</code>
+                        ) : (
+                          <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-mono text-gray-400 italic">(empty)</code>
+                        )}
+                      </div>
+                    </div>
                   ) : (
                     /* Standard: Show Expected vs Got for output-based tests */
                     <div className="flex gap-4">
@@ -126,26 +138,49 @@ export default function ExerciseFeedback({ result }) {
         <div className="px-4 py-3 border-t border-gray-100">
           <div className="text-sm font-medium text-gray-700 mb-3">Output Comparison</div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <div className="text-xs font-medium uppercase tracking-wider text-gray-500 mb-1">Expected:</div>
-              <pre className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-mono whitespace-pre-wrap overflow-x-auto min-h-[2.5rem]">
-                {expected_output ? (
-                  <span className="text-gray-800">{expected_output}</span>
-                ) : (
-                  <span className="text-gray-400 italic">(empty)</span>
-                )}
-              </pre>
-            </div>
-            <div>
-              <div className="text-xs font-medium uppercase tracking-wider text-gray-500 mb-1">Got:</div>
-              <pre className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-mono whitespace-pre-wrap overflow-x-auto min-h-[2.5rem]">
-                {actual_output ? (
-                  <span className="text-gray-800">{actual_output}</span>
-                ) : (
-                  <span className="text-gray-400 italic">(empty)</span>
-                )}
-              </pre>
-            </div>
+            {comparison_type === "regex" ? (
+              <>
+                <div className="sm:col-span-2">
+                  <div className="text-xs font-medium uppercase tracking-wider text-gray-500 mb-1">Expected pattern:</div>
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm text-gray-700">
+                    {test_results[0]?.message || "Your output should match a specific pattern"}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-xs font-medium uppercase tracking-wider text-gray-500 mb-1">Got:</div>
+                  <pre className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-mono whitespace-pre-wrap overflow-x-auto min-h-[2.5rem]">
+                    {actual_output ? (
+                      <span className="text-gray-800">{actual_output}</span>
+                    ) : (
+                      <span className="text-gray-400 italic">(empty)</span>
+                    )}
+                  </pre>
+                </div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <div className="text-xs font-medium uppercase tracking-wider text-gray-500 mb-1">Expected:</div>
+                  <pre className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-mono whitespace-pre-wrap overflow-x-auto min-h-[2.5rem]">
+                    {expected_output ? (
+                      <span className="text-gray-800">{expected_output}</span>
+                    ) : (
+                      <span className="text-gray-400 italic">(empty)</span>
+                    )}
+                  </pre>
+                </div>
+                <div>
+                  <div className="text-xs font-medium uppercase tracking-wider text-gray-500 mb-1">Got:</div>
+                  <pre className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-mono whitespace-pre-wrap overflow-x-auto min-h-[2.5rem]">
+                    {actual_output ? (
+                      <span className="text-gray-800">{actual_output}</span>
+                    ) : (
+                      <span className="text-gray-400 italic">(empty)</span>
+                    )}
+                  </pre>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

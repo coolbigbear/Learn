@@ -9,8 +9,10 @@ ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 # Database
 DATABASE_URL = "sqlite+aiosqlite:///./tutorials.db"
 
-# Auth token length
-TOKEN_BYTES = 24  # 48 hex chars
+# JWT configuration
+JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "dev-secret-key-change-in-production")
+JWT_ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))  # 1 hour default
 
 # Sandbox (subprocess) — limits for the existing subprocess-based runner
 MAX_CPU_SECONDS = 2

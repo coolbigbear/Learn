@@ -10,6 +10,13 @@
         "input": "",
         "expected_output": "Hello Python\n",
         "comparison_type": "exact"
+      },
+      {
+        "input": "",
+        "expected_output": "[\"']Hello[\"'],\\s*[\"']Python[\"']",
+        "comparison_type": "code_regex",
+        "name": "Comma-separated arguments",
+        "message": "Use print() with two separate arguments separated by a comma like print(\"Hello\", \"Python\")"
       }
     ],
     "order": 1
@@ -25,6 +32,13 @@
         "input": "",
         "expected_output": "I love coding\n",
         "comparison_type": "exact"
+      },
+      {
+        "input": "",
+        "expected_output": "[\"']I[\"'],\\s*[\"']love[\"'],\\s*[\"']coding[\"']",
+        "comparison_type": "code_regex",
+        "name": "Comma-separated arguments",
+        "message": "Use print() with three separate arguments separated by commas like print(\"I\", \"love\", \"coding\")"
       }
     ],
     "order": 2
@@ -39,7 +53,8 @@
       {
         "input": "",
         "expected_output": ".+ .+\\n",
-        "comparison_type": "regex"
+        "comparison_type": "regex",
+        "message": "Output should have two words (your favorite food and color) separated by a space."
       }
     ],
     "order": 3
@@ -54,7 +69,8 @@
       {
         "input": "",
         "expected_output": ".+ .+\\n",
-        "comparison_type": "regex"
+        "comparison_type": "regex",
+        "message": "Output should have two words (your first name and last name) separated by a space."
       }
     ],
     "order": 4
@@ -69,7 +85,15 @@
       {
         "input": "",
         "expected_output": "I am \\d+ years old\\n",
-        "comparison_type": "regex"
+        "comparison_type": "regex",
+        "message": "Output should say \"I am\" followed by a number then \"years old\" (e.g., \"I am 30 years old\")."
+      },
+      {
+        "input": "",
+        "expected_output": ",\\s*\\d+,\\s*",
+        "comparison_type": "code_regex",
+        "name": "Number type check",
+        "message": "Your print() must pass a number (not a string) for the age — no quotes around the number."
       }
     ],
     "order": 5

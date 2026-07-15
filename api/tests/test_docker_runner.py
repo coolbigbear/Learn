@@ -359,6 +359,50 @@ class TestCodeContainsComparison:
         assert result["test_results"][0]["passed"] is False
 
 
+class TestCodeRegexComparison:
+    """code_regex: passes if user code matches a regex pattern."""
+
+    async def test_passes_when_code_matches_number_pattern(self):
+        """Student uses an unquoted number (correct approach)."""
+        result = await _run_or_skip('print("I am", 30, "years old")', [
+            {"input": "", "expected_output": r",\s*\d+,\s*", "comparison_type": "code_regex"},
+        ])
+        assert result["passed"] is True
+        assert result["test_results"][0]["passed"] is True
+
+    async def test_fails_when_code_uses_string_instead_of_number(self):
+        """Student wraps the number in quotes (incorrect approach)."""
+        result = await _run_or_skip('print("I am", "30", "years old")', [
+            {"input": "", "expected_output": r",\s*\d+,\s*", "comparison_type": "code_regex"},
+        ])
+        assert result["passed"] is False
+        assert result["test_results"][0]["passed"] is False
+
+    async def test_passes_with_different_age(self):
+        """Student uses a different unquoted number."""
+        result = await _run_or_skip('print("I am", 25, "years old")', [
+            {"input": "", "expected_output": r",\s*\d+,\s*", "comparison_type": "code_regex"},
+        ])
+        assert result["passed"] is True
+        assert result["test_results"][0]["passed"] is True
+
+    async def test_fails_when_pattern_not_in_code(self):
+        """Pattern does not match at all."""
+        result = await _run_or_skip('print("Hello, World!")', [
+            {"input": "", "expected_output": r"\d+", "comparison_type": "code_regex"},
+        ])
+        assert result["passed"] is False
+        assert result["test_results"][0]["passed"] is False
+
+    async def test_failure_message(self):
+        result = await _run_or_skip('print("I am", "30", "years old")', [
+            {"input": "", "expected_output": r",\s*\d+,\s*", "comparison_type": "code_regex"},
+        ])
+        msg = result["test_results"][0]["message"]
+        assert msg is not None
+        assert "pattern" in msg.lower()
+
+
 class TestMixedTestCases:
     """Multiple test cases with different comparison types."""
 
@@ -713,3 +757,121 @@ class TestContainerLifecycle:
         after = self._get_runner_container_ids()
         new_containers = after - before
         assert len(new_containers) == 0, f"Dangling containers after syntax error: {new_containers}"
+
+
+class TestBackwardCompatibility:
+    """Verify the original subprocess runner still works correctly.
+
+    These tests ensure that run_code_with_docker_fallback() defaulting to
+    the subprocess runner when Docker is unavailable, or that the direct
+    run_code() calls produce correct results independently.
+    """
+
+    async def test_subprocess_exact_pass(self):
+        from app.services.exercise_runner import run_code
+        result = await run_code('print("hello")', [
+            {"input": "", "expected_output": "hello\n", "comparison_type": "exact"},
+        ])
+        assert result["passed"] is True
+
+    async def test_subprocess_exact_fail(self):
+        from app.services.exercise_runner import run_code
+        result = await run_code('print("hello")', [
+            {"input": "", "expected_output": "world\n", "comparison_type": "exact"},
+        ])
+        assert result["passed"] is False
+
+    async def test_subprocess_regex(self):
+        from app.services.exercise_runner import run_code
+        result = await run_code('print("hello world")', [
+            {"input": "", "expected_output": r"hello\s+\w+", "comparison_type": "regex"},
+        ])
+        assert result["passed"] is True
+
+    async def test_subprocess_non_empty(self):
+        from app.services.exercise_runner import run_code
+        result = await run_code('print("something")', [
+            {"input": "", "expected_output": "", "comparison_type": "non_empty"},
+        ])
+        assert result["passed"] is True
+
+    async def test_subprocess_contains(self):
+        from app.services.exercise_runner import run_code
+        result = await run_code('print("hello world")', [
+            {"input": "", "expected_output": "world", "comparison_type": "contains"},
+        ])
+        assert result["passed"] is True
+
+    async def test_subprocess_whitelist(self):
+        from app.services.exercise_runner import run_code
+        result = await run_code('print("cat")', [
+            {"input": "", "expected_output": '["dog", "cat", "bird"]', "comparison_type": "whitelist"},
+        ])
+        assert result["passed"] is True
+
+    async def test_subprocess_comment(self):
+        from app.services.exercise_runner import run_code
+        result = await run_code('# comment\nprint("hello")', [
+            {"input": "", "expected_output": "", "comparison_type": "comment"},
+        ])
+        assert result["passed"] is True
+
+    async def test_subprocess_code_contains(self):
+        from app.services.exercise_runner import run_code
+        result = await run_code("print('hello')", [
+            {"input": "", "expected_output": "'", "comparison_type": "code_contains"},
+        ])
+        assert result["passed"] is True
+
+    async def test_subprocess_timeout(self):
+        from app.services.exercise_runner import run_code
+        result = await run_code("while True: pass", [])
+        assert result["passed"] is False
+        assert result.get("errors") is not None
+        assert result["test_results"] == [] or all(
+            not tr["passed"] for tr in result["test_results"]
+        )
+
+    async def test_subprocess_syntax_error(self):
+        from app.services.exercise_runner import run_code
+        result = await run_code('print("hello', [])
+        assert result["passed"] is False
+        assert "SyntaxError" in (result.get("errors") or "")
+
+    async def test_subprocess_no_test_cases(self):
+        from app.services.exercise_runner import run_code
+        result = await run_code('print("hello")', [])
+        assert result["passed"] is True
+        assert result["actual_output"] == "hello\n"
+
+
+def test_docker_host_process_isolation():
+    """Container has isolated PID namespace (few PIDs visible)."""
+    code = (
+        "import os\n"
+        "procs = os.listdir('/proc')\n"
+        "pids = [p for p in procs if p.isdigit()]\n"
+        "print(len(pids))\n"
+    )
+    result = _run_raw_in_container(code)
+    assert result["passed"], f"Container exited with code {result['exit_code']}: {result['stderr']}"
+    stdout = result["stdout"].strip()
+    pid_count = int(stdout.split()[0]) if stdout and stdout.split()[0].isdigit() else 999
+    assert pid_count < 50, f"Saw {pid_count} PIDs — expected isolated PID namespace"
+
+
+def test_docker_fork_bomb_killed_by_pids_limit():
+    """Fork bomb is killed by Docker pids_limit."""
+    code = (
+        "import os\n"
+        "while True:\n"
+        "    try:\n"
+        "        os.fork()\n"
+        "    except BlockingIOError:\n"
+        "        print('pids limit reached')\n"
+        "        break\n"
+    )
+    result = _run_raw_in_container(code, timeout=15)
+    assert not result["passed"] or "pids limit reached" in (result["stdout"] + result["stderr"]), (
+        f"Fork bomb not contained: stdout={result['stdout']!r} stderr={result['stderr']!r}"
+    )

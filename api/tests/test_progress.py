@@ -8,6 +8,7 @@ from app.models.exercise import Exercise
 from app.models.lesson import Lesson
 from app.models.progress import UserProgress
 from app.models.user import User
+from app.services.jwt import create_access_token
 
 
 @pytest.fixture(autouse=True)
@@ -46,9 +47,12 @@ async def seed_progress_data(db_session: AsyncSession):
     await db_session.flush()
 
     # Create a test user with progress on ex1
-    user = User(username="progress_user", password_hash="hash", token="progress-token-123")
+    user = User(username="progress_user", password_hash="hash")
     db_session.add(user)
     await db_session.flush()
+
+    # Generate a JWT token for the test user (stateless — no token column)
+    token = create_access_token(user.id)
 
     up = UserProgress(
         user_id=user.id,
@@ -61,7 +65,7 @@ async def seed_progress_data(db_session: AsyncSession):
     await db_session.flush()
 
     # Store for tests
-    pytest.progress_headers = {"Authorization": "Bearer progress-token-123"}
+    pytest.progress_headers = {"Authorization": f"Bearer {token}"}
     pytest.progress_ex1_id = ex1.id
     pytest.progress_ex2_id = ex2.id
     pytest.progress_lesson_slug = "10-progress-test"

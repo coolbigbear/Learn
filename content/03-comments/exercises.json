@@ -13,8 +13,8 @@
       },
       {
         "input": "",
-        "expected_output": "",
-        "comparison_type": "comment"
+        "expected_output": "# This program prints numbers",
+        "comparison_type": "comment_contains"
       }
     ],
     "order": 1
@@ -33,8 +33,8 @@
       },
       {
         "input": "",
-        "expected_output": "",
-        "comparison_type": "comment"
+        "expected_output": "# Prints a greeting",
+        "comparison_type": "comment_contains"
       }
     ],
     "order": 2
@@ -68,8 +68,8 @@
       },
       {
         "input": "",
-        "expected_output": "",
-        "comparison_type": "comment"
+        "expected_output": "# Tell the user Python is fun",
+        "comparison_type": "comment_contains"
       }
     ],
     "order": 4
@@ -88,8 +88,8 @@
       },
       {
         "input": "",
-        "expected_output": "",
-        "comparison_type": "comment"
+        "expected_output": "# TODO: Add more features later",
+        "comparison_type": "comment_contains"
       }
     ],
     "order": 5

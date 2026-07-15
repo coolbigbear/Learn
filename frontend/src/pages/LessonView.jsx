@@ -220,6 +220,7 @@ export default function LessonView() {
                       Your Code
                     </label>
                     <CodeEditor
+                      key={activeExercise.id}
                       value={code}
                       onChange={setCode}
                       placeholder={activeExercise.starter_code || '# Write your Python code here'}
@@ -383,6 +384,7 @@ export default function LessonView() {
                   Your Code
                 </label>
                 <CodeEditor
+                  key={activeExercise.id}
                   value={code}
                   onChange={setCode}
                   placeholder={activeExercise.starter_code || '# Write your Python code here'}

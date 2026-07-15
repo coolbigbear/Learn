@@ -59,3 +59,9 @@ async def create_tables():
             )
         except Exception:
             pass  # Column already exists
+
+        # Migrate: drop `token` column from users table (replaced by JWT auth)
+        try:
+            await conn.execute(text("ALTER TABLE users DROP COLUMN token"))
+        except Exception:
+            pass  # Column already dropped or SQLite version doesn't support DROP COLUMN

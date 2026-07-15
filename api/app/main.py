@@ -14,6 +14,8 @@ from app.config import ALLOWED_ORIGINS
 from app.database import create_tables
 from app.routers import auth, exercises, lessons, progress
 
+# Single source of truth for the app version
+__version__ = "0.1.0"
 
 # Whether we are in production mode
 PRODUCTION = os.environ.get("PRODUCTION", "").lower() in ("1", "true", "yes")
@@ -42,7 +44,7 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title="Interactive Python Tutorials API",
         description="Backend for the Interactive Python Tutorials platform",
-        version="0.1.0",
+        version=__version__,
         docs_url="/docs" if not PRODUCTION else None,
         redoc_url="/redoc" if not PRODUCTION else None,
         lifespan=lifespan,
@@ -73,6 +75,11 @@ def create_app() -> FastAPI:
     @app.get("/api/health")
     async def health():
         return {"status": "ok"}
+
+    # Version endpoint
+    @app.get("/api/version")
+    async def version():
+        return {"version": __version__}
 
     # In production mode, serve the built frontend as static files
     # and provide SPA fallback for client-side routing.

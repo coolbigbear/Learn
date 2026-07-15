@@ -11,7 +11,7 @@ INPUT  (stdin, one JSON object):
       {
         "input": "Alice",
         "expected_output": "Hello, Alice!\\n",
-        "comparison_type": "exact",       # exact | regex | non_empty | contains | whitelist | comment | code_contains
+        "comparison_type": "exact",       # exact | regex | non_empty | contains | whitelist | comment | code_contains | code_regex
         "name": "Test 1"                  # optional human-readable name
       }
     ]
@@ -109,12 +109,20 @@ def _check_code_contains(actual: str, expected: str, user_code: str) -> tuple[bo
     return passed, msg
 
 
+def _check_code_regex(user_code: str, pattern: str) -> tuple[bool, str | None]:
+    import re
+    passed = bool(re.search(pattern, user_code))
+    msg = None if passed else f"Your code does not match the required pattern"
+    return passed, msg
+
+
 def run_test_case(user_code: str, test_case: dict, index: int) -> dict:
     """Execute user code with the given test case and return result dict."""
     input_data = test_case.get("input", "")
     expected = test_case.get("expected_output", "")
     comparison = test_case.get("comparison_type", "exact")
     test_name = test_case.get("name")
+    test_message = test_case.get("message")  # Human-readable message from test case
 
     # Redirect stdin/stdout/stderr
     old_stdin = sys.stdin
@@ -150,8 +158,14 @@ def run_test_case(user_code: str, test_case: dict, index: int) -> dict:
             passed, msg = _check_comment(actual_output, expected, user_code)
         elif comparison == "code_contains":
             passed, msg = _check_code_contains(actual_output, expected, user_code)
+        elif comparison == "code_regex":
+            passed, msg = _check_code_regex(user_code, expected)
         else:
             passed, msg = _check_exact(actual_output, expected)
+
+        # Use test case message (human-readable) when provided and test fails
+        if test_message is not None and not passed:
+            msg = test_message
 
         return {
             "passed": passed,
@@ -273,6 +287,7 @@ def main():
         "passed": all_passed,
         "actual_output": first["actual_output"],
         "expected_output": test_cases[0].get("expected_output", ""),
+        "comparison_type": test_cases[0].get("comparison_type", "exact"),
         "errors": first.get("errors"),
         "test_results": results,
     }

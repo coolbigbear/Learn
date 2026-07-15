@@ -1,0 +1,47 @@
+# =============================================================================
+# Docker Compose — Multi-environment deployment
+#
+# Two services sharing the same image, separated by host port and DB volume:
+#   qa   → port 8081 (configurable via $QA_PORT)
+#   prod → port 8080 (configurable via $PROD_PORT)
+# =============================================================================
+
+services:
+  # ── QA environment ───────────────────────────────────────────────────────────
+  qa:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: python-tutorials:latest
+    container_name: python-tutorials-qa
+    ports:
+      - "${QA_PORT:-8081}:8080"
+    environment:
+      - PRODUCTION=1
+      - DATABASE_URL=sqlite+aiosqlite:///./data/tutorials.db
+    volumes:
+      - qa-db:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+
+  # ── Production environment ───────────────────────────────────────────────────
+  prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: python-tutorials:latest
+    container_name: python-tutorials-prod
+    ports:
+      - "${PROD_PORT:-8080}:8080"
+    environment:
+      - PRODUCTION=1
+      - DATABASE_URL=sqlite+aiosqlite:///./data/tutorials.db
+    volumes:
+      - prod-db:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+
+# ── Named volumes for data isolation per environment ──────────────────────────
+volumes:
+  qa-db:
+  prod-db:

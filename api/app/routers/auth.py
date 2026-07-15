@@ -1,4 +1,8 @@
-"""Auth router: register, login, logout, profile."""
+"""Auth router: register, login, logout, profile.
+
+JWT-based authentication — tokens are stateless and self-validating.
+No token column on the User model; logout is a client-side action.
+"""
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
@@ -9,6 +13,7 @@ from app.dependencies import get_current_user
 from app.models.user import User
 from app.schemas.user import AuthRequest, AuthResponse, LogoutResponse, UserResponse
 from app.services.auth import hash_password, verify_password
+from app.services.jwt import create_access_token
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -24,12 +29,12 @@ async def register(body: AuthRequest, db: AsyncSession = Depends(get_db)):
         username=body.username,
         password_hash=hash_password(body.password),
     )
-    user.generate_token()
     db.add(user)
     await db.flush()
     await db.refresh(user)
 
-    return AuthResponse(id=user.id, username=user.username, token=user.token)
+    token = create_access_token(user.id)
+    return AuthResponse(id=user.id, username=user.username, token=token)
 
 
 @router.post("/login", response_model=AuthResponse)
@@ -39,19 +44,19 @@ async def login(body: AuthRequest, db: AsyncSession = Depends(get_db)):
     if user is None or not verify_password(body.password, user.password_hash):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
-    user.generate_token()
-    await db.flush()
-
-    return AuthResponse(id=user.id, username=user.username, token=user.token)
+    token = create_access_token(user.id)
+    return AuthResponse(id=user.id, username=user.username, token=token)
 
 
 @router.post("/logout", response_model=LogoutResponse)
 async def logout(
     user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
 ):
-    user.clear_token()
-    await db.flush()
+    """Logout is a client-side action — just acknowledge the request.
+
+    The client discards the JWT token; the server has nothing to invalidate
+    since JWT tokens are stateless.
+    """
     return LogoutResponse(detail="Logged out")
 
 

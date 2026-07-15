@@ -174,6 +174,62 @@ class TestCommentComparison:
         assert result["passed"] is True
 
 
+class TestCommentContainsComparison:
+    """comment_contains: passes if a comment line contains the expected substring."""
+
+    async def test_passes_when_comment_contains_expected(self):
+        result = await run_code('# This program prints numbers\nprint(10)', [
+            {"input": "", "expected_output": "# This program prints numbers", "comparison_type": "comment_contains"},
+        ])
+        assert result["passed"] is True
+        assert result["test_results"][0]["passed"] is True
+
+    async def test_passes_with_inline_comment_containing_expected(self):
+        result = await run_code('print("hello")  # Prints a greeting', [
+            {"input": "", "expected_output": "# Prints a greeting", "comparison_type": "comment_contains"},
+        ])
+        assert result["passed"] is True
+
+    async def test_fails_when_expected_text_not_in_comment(self):
+        """Comment exists but doesn't contain the expected text."""
+        result = await run_code('# This is wrong\nprint(10)', [
+            {"input": "", "expected_output": "# This program prints numbers", "comparison_type": "comment_contains"},
+        ])
+        assert result["passed"] is False
+        assert result["test_results"][0]["passed"] is False
+
+    async def test_fails_when_no_comment_at_all(self):
+        result = await run_code('print("hello")', [
+            {"input": "", "expected_output": "# Some comment", "comparison_type": "comment_contains"},
+        ])
+        assert result["passed"] is False
+        assert result["test_results"][0]["passed"] is False
+
+    async def test_fails_when_expected_text_in_string_but_not_comment(self):
+        """Text appears in a string literal, not a comment — should fail."""
+        result = await run_code('x = "# This program prints numbers"\nprint(x)', [
+            {"input": "", "expected_output": "# This program prints numbers", "comparison_type": "comment_contains"},
+        ])
+        assert result["passed"] is False
+        assert result["test_results"][0]["passed"] is False
+
+    async def test_failure_message_when_no_comment(self):
+        result = await run_code('print("hello")', [
+            {"input": "", "expected_output": "# Some comment", "comparison_type": "comment_contains"},
+        ])
+        msg = result["test_results"][0]["message"]
+        assert msg is not None
+        assert "comment" in msg.lower()
+
+    async def test_failure_message_when_comment_wrong(self):
+        result = await run_code('# Wrong comment\nprint("hello")', [
+            {"input": "", "expected_output": "# Expected text", "comparison_type": "comment_contains"},
+        ])
+        msg = result["test_results"][0]["message"]
+        assert msg is not None
+        assert "contain" in msg.lower()
+
+
 class TestCodeContainsComparison:
     """code_contains: passes if user code contains the expected substring."""
 
@@ -333,6 +389,14 @@ class TestFailureMessages:
         msg = result["test_results"][0]["message"]
         assert msg is not None
         assert "comment" in msg.lower()
+
+    async def test_comment_contains_failure_message(self):
+        result = await run_code('# Wrong\nprint("hello")', [
+            {"input": "", "expected_output": "# Expected text", "comparison_type": "comment_contains"},
+        ])
+        msg = result["test_results"][0]["message"]
+        assert msg is not None
+        assert "contain" in msg.lower()
 
     async def test_runtime_error_message(self):
         result = await run_code('raise ValueError("boom")', [

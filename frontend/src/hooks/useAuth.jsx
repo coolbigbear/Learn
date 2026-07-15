@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, createContext, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import * as api from '../api/client.js';
 
 const AuthContext = createContext(null);
@@ -6,16 +7,46 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  const performLogout = useCallback(() => {
+    api.setToken(null);
+    setUser(null);
+  }, []);
+
+  const handleUnauthorized = useCallback(() => {
+    performLogout();
+    navigate('/login', { replace: true });
+  }, [performLogout, navigate]);
 
   useEffect(() => {
+    // Register the global 401 handler so client.js can call it
+    api.setOnUnauthorized(handleUnauthorized);
+
+    // On mount, check if the stored token is already expired
     const token = api.getToken();
     if (token) {
-      // Token exists — user is considered logged in.
-      // The token's validity can be checked on first API call.
-      setUser({ token });
+      if (api.isTokenExpired()) {
+        // Token is expired — clear it and redirect to login
+        api.clearToken();
+        setUser(null);
+      } else {
+        // Token exists and is not expired — user is considered logged in.
+        // Decode the payload to extract user info (if available).
+        const payload = api.decodeToken(token);
+        setUser({
+          token,
+          userId: payload?.sub ? parseInt(payload.sub, 10) : undefined,
+        });
+      }
     }
     setLoading(false);
-  }, []);
+
+    return () => {
+      // Cleanup: unregister the handler when provider unmounts
+      api.setOnUnauthorized(null);
+    };
+  }, [handleUnauthorized]);
 
   const login = useCallback(async (username, password) => {
     const data = await api.login(username, password);
@@ -37,9 +68,9 @@ export function AuthProvider({ children }) {
     } catch {
       // Even if the API call fails, clear local state
     }
-    api.setToken(null);
-    setUser(null);
-  }, []);
+    performLogout();
+    navigate('/', { replace: true });
+  }, [performLogout, navigate]);
 
   return (
     <AuthContext.Provider value={{ user, loading, login, register, logout, isAuthenticated: !!user }}>

@@ -89,6 +89,13 @@ def _run_single(input_data, expected, comparison, test_name=None):
                 msg = f'Your code should contain: {expected!r}'
             else:
                 msg = None
+        elif comparison == "code_regex":
+            import re
+            passed = bool(re.search(expected, _USER_CODE))
+            if not passed:
+                msg = f"Your code does not match the required pattern"
+            else:
+                msg = None
         else:
             passed = actual == expected
             if not passed:

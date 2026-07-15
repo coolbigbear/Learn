@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { python } from '@codemirror/lang-python';
 import { oneDark } from '@codemirror/theme-one-dark';
@@ -8,6 +8,10 @@ import { EditorState } from '@codemirror/state';
 const customDarkTheme = oneDark;
 
 export default function CodeEditor({ value, onChange, placeholder, readOnly = false, onRun }) {
+  const viewRef = useRef(null);
+  // Track the focus listener so we can clean it up
+  const focusHandlerRef = useRef(null);
+
   const extensions = [
     python(),
   ];
@@ -26,6 +30,40 @@ export default function CodeEditor({ value, onChange, placeholder, readOnly = fa
       ])
     );
   }
+
+  // Store the CodeMirror editor view and set up the focus handler.
+  // Select all text when the editor gains focus so the learner's first
+  // keystroke replaces the content instead of appending to it.
+  const handleCreateEditor = useCallback((view) => {
+    viewRef.current = view;
+
+    // Clean up any previously attached listener (safety net for hot-reload)
+    if (focusHandlerRef.current) {
+      focusHandlerRef.current();
+    }
+
+    const handleFocus = () => {
+      view.dispatch({
+        selection: { anchor: 0, head: view.state.doc.length },
+      });
+    };
+
+    view.dom.addEventListener('focus', handleFocus);
+
+    // Store the cleanup function
+    focusHandlerRef.current = () => {
+      view.dom.removeEventListener('focus', handleFocus);
+    };
+  }, []);
+
+  // Clean up the focus listener when the component unmounts
+  useEffect(() => {
+    return () => {
+      if (focusHandlerRef.current) {
+        focusHandlerRef.current();
+      }
+    };
+  }, []);
 
   return (
     <div className="border border-gray-700 rounded-lg overflow-hidden">
@@ -49,6 +87,7 @@ export default function CodeEditor({ value, onChange, placeholder, readOnly = fa
         }}
         editable={!readOnly}
         placeholder={placeholder || '# Write your Python code here'}
+        onCreateEditor={handleCreateEditor}
       />
     </div>
   );

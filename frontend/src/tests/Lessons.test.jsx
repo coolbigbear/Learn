@@ -4,25 +4,29 @@ import { MemoryRouter } from 'react-router-dom';
 import { AuthProvider } from '../hooks/useAuth.jsx';
 import Lessons from '../pages/Lessons.jsx';
 
-// Mock only the API module — leave useAuth/AuthProvider intact
+// Mock only specific API module functions — keep the rest intact
 const mockGetLessonsByPath = vi.fn();
 const mockGetLessons = vi.fn();
 
-vi.mock('../api/client.js', () => ({
-  getToken: vi.fn(() => 'test-token'),
-  setToken: vi.fn(),
-  getLessonsByPath: (...args) => mockGetLessonsByPath(...args),
-  getLessons: (...args) => mockGetLessons(...args),
-  getLesson: vi.fn(() => Promise.resolve(null)),
-  runExercise: vi.fn(() => Promise.resolve({})),
-  submitExercise: vi.fn(() => Promise.resolve({ passed: true, test_results: [] })),
-  logout: vi.fn(() => Promise.resolve()),
-  login: vi.fn(() => Promise.resolve({ token: 'test-token', id: 1, username: 'test' })),
-  register: vi.fn(() => Promise.resolve({ token: 'test-token', id: 1, username: 'test' })),
-  getProgress: vi.fn(() => Promise.resolve({})),
-  getLessonProgress: vi.fn(() => Promise.resolve({})),
-  health: vi.fn(() => Promise.resolve({ status: 'ok' })),
-}));
+vi.mock('../api/client.js', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    getToken: vi.fn(() => 'test-token'),
+    setToken: vi.fn(),
+    getLessonsByPath: (...args) => mockGetLessonsByPath(...args),
+    getLessons: (...args) => mockGetLessons(...args),
+    getLesson: vi.fn(() => Promise.resolve(null)),
+    runExercise: vi.fn(() => Promise.resolve({})),
+    submitExercise: vi.fn(() => Promise.resolve({ passed: true, test_results: [] })),
+    logout: vi.fn(() => Promise.resolve()),
+    login: vi.fn(() => Promise.resolve({ token: 'test-token', id: 1, username: 'test' })),
+    register: vi.fn(() => Promise.resolve({ token: 'test-token', id: 1, username: 'test' })),
+    getProgress: vi.fn(() => Promise.resolve({})),
+    getLessonProgress: vi.fn(() => Promise.resolve({})),
+    health: vi.fn(() => Promise.resolve({ status: 'ok' })),
+  };
+});
 
 // Sample lesson data matching the LessonSummary schema
 const coreLessons = [
