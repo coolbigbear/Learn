@@ -13,7 +13,7 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:8081',
         changeOrigin: true,
       },
     },
@@ -21,7 +21,7 @@ export default defineConfig({
   preview: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:8081',
         changeOrigin: true,
       },
     },
@@ -31,5 +31,6 @@ export default defineConfig({
     environment: 'happy-dom',
     setupFiles: './src/tests/setup.js',
     css: true,
+    pool: 'forks',
   },
 })

@@ -24,6 +24,18 @@ Thumbs.db
 # Hermes
 .hermes/
 
+# QA scratch scripts
+_qa_*
+api/_qa_*
+api/_debug_*
+api/_check_*
+api/_verify_*
+api/_save_*
+api/_test_*
+
+# Git worktrees
+.worktrees/
+
 # Environment
 .env
 .env.local

@@ -103,6 +103,26 @@ def _check_comment(actual: str, expected: str, user_code: str) -> tuple[bool, st
     return passed, msg
 
 
+def _check_comment_contains(actual: str, expected: str, user_code: str) -> tuple[bool, str | None]:
+    import re
+    comment_lines = []
+    for _l in user_code.split("\n"):
+        _s = _l.strip()
+        if not _s:
+            continue
+        # Remove string contents to avoid false positives on # inside strings
+        _no_strings = re.sub(r"'[^']*'", '""', re.sub(r'"[^"]*"', '""', _s))
+        if "#" in _no_strings:
+            idx = _no_strings.index("#")
+            comment_lines.append(_s[idx:])
+    if not comment_lines:
+        return False, "Your code should include a comment (using #)"
+    passed = any(expected in _cl for _cl in comment_lines)
+    if not passed:
+        return False, f"Your comment should contain: {expected!r}"
+    return True, None
+
+
 def _check_code_contains(actual: str, expected: str, user_code: str) -> tuple[bool, str | None]:
     passed = expected in user_code
     msg = None if passed else f"Your code should contain: {expected!r}"
@@ -156,6 +176,8 @@ def run_test_case(user_code: str, test_case: dict, index: int) -> dict:
             passed, msg = _check_whitelist(actual_output, expected)
         elif comparison == "comment":
             passed, msg = _check_comment(actual_output, expected, user_code)
+        elif comparison == "comment_contains":
+            passed, msg = _check_comment_contains(actual_output, expected, user_code)
         elif comparison == "code_contains":
             passed, msg = _check_code_contains(actual_output, expected, user_code)
         elif comparison == "code_regex":

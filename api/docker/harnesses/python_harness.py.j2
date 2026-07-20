@@ -20,7 +20,7 @@ _USER_CODE = {user_code!r}
 _TEST_CASES = {test_cases!r}
 
 
-def _run_single(input_data, expected, comparison, test_name=None):
+def _run_single(input_data, expected, comparison, test_name=None, message=None):
     """Run user code with given stdin and compare output."""
     old_stdin = sys.stdin
     old_stdout = sys.stdout
@@ -83,6 +83,27 @@ def _run_single(input_data, expected, comparison, test_name=None):
                 msg = "Your code should include a comment (using #)"
             else:
                 msg = None
+        elif comparison == "comment_contains":
+            import re as _re
+            comment_lines = []
+            for _l in _USER_CODE.split("\\n"):
+                _s = _l.strip()
+                if not _s:
+                    continue
+                # Remove string contents to avoid false positives on # inside strings
+                _no_strings = _re.sub(r"'[^']*'", "\"\"", _re.sub(r'"[^"]*"', "\"\"", _s))
+                if "#" in _no_strings:
+                    idx = _no_strings.index("#")
+                    comment_lines.append(_s[idx:])
+            if not comment_lines:
+                passed = False
+                msg = "Your code should include a comment (using #)"
+            else:
+                passed = any(expected in _cl for _cl in comment_lines)
+                if not passed:
+                    msg = f"Your comment should contain: {expected!r}"
+                else:
+                    msg = None
         elif comparison == "code_contains":
             passed = expected in _USER_CODE
             if not passed:
@@ -102,6 +123,9 @@ def _run_single(input_data, expected, comparison, test_name=None):
                 msg = f"Expected: {expected!r}, but got: {actual!r}"
             else:
                 msg = None
+        # Use human-readable message from test case when provided and test fails
+        if message is not None and not passed:
+            msg = message
         return {
             "passed": passed,
             "actual_output": actual,
@@ -136,6 +160,7 @@ for i, tc in enumerate(_TEST_CASES):
         tc.get("expected_output", ""),
         tc.get("comparison_type", "exact"),
         test_name=tc.get("name"),
+        message=tc.get("message"),
     )
     r["test_index"] = i
     if not r["passed"]:
