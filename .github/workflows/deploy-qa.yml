@@ -26,6 +26,8 @@ jobs:
 
       - name: Deploy QA service
         run: |
+          docker compose stop qa 2>/dev/null || true
+          docker compose rm -f qa 2>/dev/null || true
           docker compose up -d qa
 
       - name: Health check
