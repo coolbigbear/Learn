@@ -51,7 +51,24 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
 
+  # ── Self-hosted GitHub Actions Runner ─────────────────────────────────────────
+  runner:
+    image: myoung34/github-runner:latest
+    container_name: github-runner-learn
+    restart: unless-stopped
+    environment:
+      - REPO_URL=https://github.com/coolbigbear/Learn
+      - RUNNER_NAME=pi2-qa-runner
+      - RUNNER_TOKEN=AFSPESKYIUIKBENCY562SOTKL4TMI
+      - RUNNER_WORKDIR=/tmp/runner-work
+      - RUNNER_GROUP=default
+      - LABELS=self-hosted,linux,arm64,pi
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - runner-work:/tmp/runner-work
+
 # ── Named volumes for data isolation per environment ──────────────────────────
 volumes:
   qa-db:
   prod-db:
+  runner-work:
