@@ -26,9 +26,10 @@ jobs:
 
       - name: Deploy QA service
         run: |
+          docker rm -f python-tutorials-qa 2>/dev/null || true
           docker compose up -d qa
 
       - name: Health check
         run: |
           sleep 5
-          curl -sf http://localhost:8081/health || curl -sf http://localhost:8081/api/health || echo "⚠ Health check endpoint not found — verify manually"
+          curl -sf http://localhost:8081 > /dev/null && echo "✅ QA is responding on port 8081" || echo "⚠ QA not responding yet"
