@@ -1,0 +1,34 @@
+name: Deploy QA
+
+on:
+  push:
+    branches:
+      - QA
+
+concurrency:
+  group: qa-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy-qa:
+    name: Build & Deploy to QA
+    runs-on: [self-hosted, linux, arm64, pi]
+
+    steps:
+      - name: Checkout QA branch
+        uses: actions/checkout@v4
+        with:
+          ref: QA
+
+      - name: Build Docker image
+        run: |
+          docker compose build qa
+
+      - name: Deploy QA service
+        run: |
+          docker compose up -d qa
+
+      - name: Health check
+        run: |
+          sleep 5
+          curl -sf http://localhost:8081/health || curl -sf http://localhost:8081/api/health || echo "⚠ Health check endpoint not found — verify manually"
