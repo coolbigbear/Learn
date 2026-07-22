@@ -34,18 +34,18 @@ vi.mock('../api/client.js', async (importOriginal) => {
 
 // Sample lesson data matching the LessonSummary schema
 const coreLessons = [
-  { id: 1, slug: '01-print-strings', title: 'Print Strings', order: 1, path: 'core', exercise_count: 2 },
-  { id: 2, slug: '02-print-multiple', title: 'Print Multiple Items', order: 2, path: 'core', exercise_count: 1 },
-  { id: 15, slug: '15-modules', title: 'Modules and Packages', order: 15, path: 'core', exercise_count: 3 },
+  { id: 1, slug: '01-print-strings', title: 'Print Strings', order: 1, path: 'core', exercise_count: 2, exercises: [{ id: 1, slug: 'ex1', title: 'Print Hello', order: 1 }, { id: 2, slug: 'ex2', title: 'Print Your Name', order: 2 }] },
+  { id: 2, slug: '02-print-multiple', title: 'Print Multiple Items', order: 2, path: 'core', exercise_count: 1, exercises: [{ id: 3, slug: 'ex3', title: 'Print Multiple', order: 1 }] },
+  { id: 15, slug: '15-modules', title: 'Modules and Packages', order: 15, path: 'core', exercise_count: 3, exercises: [{ id: 40, slug: 'mod1', title: 'Import Module', order: 1 }, { id: 41, slug: 'mod2', title: 'Use Module', order: 2 }, { id: 42, slug: 'mod3', title: 'Create Module', order: 3 }] },
 ];
 
 const dataProcessingLessons = [
-  { id: 16, slug: '16-data-processing', title: 'Data Processing — CSV, JSON, and APIs', order: 16, path: 'data-processing', exercise_count: 2 },
+  { id: 16, slug: '16-data-processing', title: 'Data Processing — CSV, JSON, and APIs', order: 16, path: 'data-processing', exercise_count: 2, exercises: [{ id: 50, slug: 'dp1', title: 'Read CSV', order: 1 }, { id: 51, slug: 'dp2', title: 'Parse JSON', order: 2 }] },
 ];
 
 const apiLessons = [
-  { id: 17, slug: '17-fastapi-intro', title: 'Introduction to FastAPI', order: 17, path: 'api', exercise_count: 2 },
-  { id: 18, slug: '18-mini-api-project', title: 'Mini API Project', order: 18, path: 'api', exercise_count: 3 },
+  { id: 17, slug: '17-fastapi-intro', title: 'Introduction to FastAPI', order: 17, path: 'api', exercise_count: 2, exercises: [{ id: 60, slug: 'api1', title: 'Hello Route', order: 1 }, { id: 61, slug: 'api2', title: 'Path Params', order: 2 }] },
+  { id: 18, slug: '18-mini-api-project', title: 'Mini API Project', order: 18, path: 'api', exercise_count: 3, exercises: [{ id: 70, slug: 'proj1', title: 'Setup', order: 1 }, { id: 71, slug: 'proj2', title: 'Routes', order: 2 }, { id: 72, slug: 'proj3', title: 'Deploy', order: 3 }] },
 ];
 
 // The component expects the by-path endpoint to return a dict of path_key -> lessons[]
