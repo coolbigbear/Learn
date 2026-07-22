@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
 import LessonCard from '../components/LessonCard.jsx';
+import LessonsPoc from '../components/LessonsPoc.jsx';
 import * as api from '../api/client.js';
 
 function BranchDivider() {
@@ -39,7 +40,7 @@ const COLOR_MAP = {
 };
 
 export default function Lessons() {
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { isAuthenticated, loading: authLoading, user } = useAuth();
   const [paths, setPaths] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -198,6 +199,11 @@ export default function Lessons() {
     if (p) return p;
     // Fallback to lesson_totals if available
     return null;
+  }
+
+  // POC: New lessons UI for testuser
+  if (user?.username === 'testuser' && paths && paths.length > 0) {
+    return <LessonsPoc paths={paths} getProgressForLesson={getProgressForLesson} />;
   }
 
   // Single path (flat fallback — no path field in API)
