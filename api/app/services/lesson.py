@@ -51,37 +51,34 @@ async def get_exercise_by_id(db: AsyncSession, exercise_id: int) -> Exercise | N
 
 
 async def get_lessons_grouped_by_path(db: AsyncSession) -> dict[str, list[dict]]:
-    """Return lessons grouped by their learning path."""
+    """Return lessons grouped by their learning path, with exercise metadata."""
     stmt = (
-        select(
-            Lesson.id,
-            Lesson.slug,
-            Lesson.title,
-            Lesson.order,
-            Lesson.path,
-            func.count(Exercise.id).label("exercise_count"),
-        )
-        .outerjoin(Exercise, Exercise.lesson_id == Lesson.id)
-        .group_by(Lesson.id)
+        select(Lesson)
+        .options(selectinload(Lesson.exercises))
         .order_by(Lesson.order)
     )
     result = await db.execute(stmt)
-    rows = result.all()
+    lessons_rows = result.scalars().all()
 
     # Known paths in display order
     known_paths = ["core", "data-processing", "api", "machine-learning"]
 
     grouped: dict[str, list[dict]] = {}
-    for row in rows:
+    for lesson in lessons_rows:
+        exercise_refs = [
+            {"id": ex.id, "slug": ex.slug, "title": ex.title, "order": ex.order}
+            for ex in sorted(lesson.exercises, key=lambda e: e.order)
+        ]
         lesson_dict = {
-            "id": row.id,
-            "slug": row.slug,
-            "title": row.title,
-            "order": row.order,
-            "path": row.path,
-            "exercise_count": row.exercise_count,
+            "id": lesson.id,
+            "slug": lesson.slug,
+            "title": lesson.title,
+            "order": lesson.order,
+            "path": lesson.path,
+            "exercise_count": len(exercise_refs),
+            "exercises": exercise_refs,
         }
-        grouped.setdefault(row.path, []).append(lesson_dict)
+        grouped.setdefault(lesson.path, []).append(lesson_dict)
 
     # Ensure all known paths are present, even if empty
     for p in known_paths:

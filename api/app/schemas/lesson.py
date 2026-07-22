@@ -5,6 +5,14 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict
 
 
+class ExerciseRef(BaseModel):
+    """Minimal exercise reference for lesson listings."""
+    id: int
+    slug: str
+    title: str
+    order: int
+
+
 class LessonSummary(BaseModel):
     id: int
     slug: str
@@ -12,6 +20,7 @@ class LessonSummary(BaseModel):
     path: str = "core"
     order: int
     exercise_count: int
+    exercises: list[ExerciseRef] = []
 
 
 class LessonListResponse(BaseModel):
