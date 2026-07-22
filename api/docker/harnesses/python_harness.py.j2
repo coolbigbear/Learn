@@ -30,8 +30,10 @@ def _run_single(input_data, expected, comparison, test_name=None, message=None):
     sys.stderr = io.StringIO()
 
     # Build restricted builtins for user code
+    # __import__ is NOT restricted — the container provides full isolation
+    # (comment at line 3). User code needs to import stdlib modules.
     user_builtins = dict(_builtins)
-    for _name in ("__import__", "exec", "eval", "compile", "open"):
+    for _name in ("exec", "eval", "compile", "open"):
         user_builtins.pop(_name, None)
 
     try:
@@ -186,7 +188,8 @@ if results:
 else:
     # No test cases — just run the code
     user_builtins = dict(_builtins)
-    for _name in ("__import__", "exec", "eval", "compile", "open"):
+    # __import__ is NOT restricted — container provides isolation
+    for _name in ("exec", "eval", "compile", "open"):
         user_builtins.pop(_name, None)
     old_stdout = sys.stdout
     sys.stdout = io.StringIO()
