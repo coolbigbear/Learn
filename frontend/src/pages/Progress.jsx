@@ -303,7 +303,6 @@ export default function Progress() {
 
   // Build a lookup: lesson_slug -> { completed, exercises[] }
   const progressByLesson = {};
-  const progressByExerciseKey = {};  // exercise_id -> ProgressItem
 
   if (progress?.progress) {
     for (const p of progress.progress) {
@@ -313,41 +312,30 @@ export default function Progress() {
       }
       if (p.completed) progressByLesson[slug].completed++;
       progressByLesson[slug].exercises.push(p);
-      progressByExerciseKey[p.exercise_id] = p;
-      progressByExerciseKey[p.exercise_slug] = p;
     }
   }
 
   // Merge lessons data with progress
   const mergedPaths = (pathsData || []).map((path) => {
     const mergedLessons = path.lessons.map((lesson) => {
-      // Use exercises from lesson metadata (backed by backend), preserving order
-      const lessonExercises = lesson.exercises || [];
-      const total = lessonExercises.length || lessonTotals[lesson.slug] || lesson.exercise_count || 0;
+      // Use lesson progress data as the primary exercise source, cross-referencing metadata
+      const lessonProg = progressByLesson[lesson.slug] || { completed: 0, exercises: [] };
+      const total = lessonTotals[lesson.slug] || lesson.exercise_count || 0;
 
-      const exercises = lessonExercises.map((ex) => ({
-        ...ex,
-        // Alias fields for backward compat with ExerciseRow
-        exercise_id: ex.id,
-        exercise_title: ex.title,
-        exercise_slug: ex.slug,
-      }));
+      // Build exercise list from progress data
+      const exercises = lessonProg.exercises.length > 0
+        ? lessonProg.exercises
+        : [];
 
-      // Cross-reference each exercise against the user's progress data
+      // Lookup: given an exercise dict from progress, find it by exercise_id
       const progressByExercise = {};
-      let completed = 0;
       for (const ex of exercises) {
-        const progItem = progressByExerciseKey[ex.id] || progressByExerciseKey[ex.slug];
-        if (progItem) {
-          progressByExercise[ex.id] = progItem;
-          progressByExercise[ex.slug] = progItem;
-          if (progItem.completed) completed++;
-        }
+        progressByExercise[ex.exercise_id] = ex;
       }
 
       return {
         lesson,
-        completed,
+        completed: lessonProg.completed,
         total,
         exercises,
         progressByExercise,
