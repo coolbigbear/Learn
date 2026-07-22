@@ -82,6 +82,71 @@ def _truncate_output(result: dict) -> dict:
     return result
 
 
+def _get_container_logs(container) -> bytes:
+    """Safely retrieve container logs, returning empty bytes on failure.
+
+    The Docker API can return 409 Conflict when a container exits and its
+    state transitions to 'dead' or 'removed' between ``wait()`` and
+    ``logs()``. This helper prevents that race condition from propagating
+    as an unhandled exception.
+    """
+    try:
+        return container.logs(stdout=True, stderr=True)
+    except Exception:
+        return b""
+
+
+def _remove_container_with_retry(container, max_attempts: int = 5):
+    """Remove a container with retry + backoff for Docker daemon races.
+
+    On ARM/Pi the Docker daemon sometimes returns "removal of container
+    ... is already in progress" when a container transitions between
+    states.  Retrying after a short delay resolves the issue.
+
+    Falls back to ``docker rm -f`` via subprocess as a last resort,
+    because the Docker SDK's ``remove(force=True)`` can get stuck on
+    state transitions on this platform.
+    """
+    import subprocess as sp
+    import time
+
+    cid = ""
+    for attempt in range(max_attempts):
+        try:
+            cid = container.id
+            container.remove(force=True)
+            return
+        except Exception:
+            if attempt < max_attempts - 1:
+                time.sleep(0.5 * (attempt + 1))
+
+    # Last resort: use Docker CLI directly
+    if cid:
+        try:
+            sp.run(
+                ["docker", "rm", "-f", cid],
+                capture_output=True, text=True, timeout=10,
+            )
+        except Exception:
+            pass
+
+    # Log warning if still cant remove
+    try:
+        remaining = sp.run(
+            ["docker", "ps", "-a", "-q", "--filter", f"id={cid}"],
+            capture_output=True, text=True, timeout=5,
+        )
+        if remaining.stdout.strip():
+            logger.warning(
+                "Container %s still present after all removal attempts",
+                cid[:12],
+            )
+        else:
+            logger.info("Container %s removed via docker CLI fallback", cid[:12])
+    except Exception:
+        pass
+
+
 class DockerRunner:
     """Runs user code in Docker containers with sandbox isolation.
 
@@ -269,8 +334,6 @@ class DockerRunner:
                 pids_limit=cfg["pids_limit"],
                 user="sandbox",
                 cap_drop=["ALL"],
-                stdout=True,
-                stderr=True,
             )
         except docker_sdk.errors.ImageNotFound:
             return {
@@ -318,43 +381,34 @@ class DockerRunner:
             # Step 4: Wait for completion with Docker-level timeout
             try:
                 container.wait(timeout=cfg["timeout_seconds"])
-                logs_bytes = container.logs(stdout=True, stderr=True)
+                logs_bytes = _get_container_logs(container)
             except (requests.ReadTimeout, requests.ConnectionError):
-                # Container did not finish within the timeout — force-kill
-                try:
-                    container.kill()
-                except Exception:
-                    pass
-                logs_bytes = container.logs(stdout=True, stderr=True)
-                output = self._parse_container_output(logs_bytes)
+                # Container did not finish within the timeout.
+                # The finally block handles kill + removal atomically.
+                logs_bytes = _get_container_logs(container)
+                parsed = self._parse_container_output(logs_bytes)
                 return {
                     "passed": False,
-                    "actual_output": output.get("actual_output", ""),
+                    "actual_output": parsed.get("actual_output", ""),
                     "expected_output": "",
                     "errors": "Execution timed out",
                     "test_results": [],
                 }
             except docker_sdk.errors.APIError as e:
                 # Some API errors are also timeout-like
-                try:
-                    container.kill()
-                except Exception:
-                    pass
-                logs_bytes = container.logs(stdout=True, stderr=True)
-                output = self._parse_container_output(logs_bytes)
+                logs_bytes = _get_container_logs(container)
+                parsed = self._parse_container_output(logs_bytes)
                 return {
                     "passed": False,
-                    "actual_output": output.get("actual_output", ""),
+                    "actual_output": parsed.get("actual_output", ""),
                     "expected_output": "",
                     "errors": f"Docker API error: {e}",
                     "test_results": [],
                 }
         finally:
-            # Always remove the container to prevent dangling instances
-            try:
-                container.remove(force=True)
-            except Exception:
-                pass
+            # Best-effort: remove(force=True) atomically kills + removes.
+            # Single removal point — avoids "already in progress" 409 races.
+            _remove_container_with_retry(container)
 
         return self._parse_container_output(logs_bytes)
 
@@ -374,7 +428,7 @@ class DockerRunner:
         else:
             output = str(logs_bytes)
 
-        lines = output.strip().split("\n")
+        lines = [l.strip() for l in output.strip().split("\n") if l.strip()]
         if not lines:
             return {
                 "passed": False,
@@ -384,7 +438,7 @@ class DockerRunner:
                 "test_results": [],
             }
 
-        first_line = lines[0].strip()
+        first_line = lines[0]
         try:
             result = json.loads(first_line)
             return result

@@ -37,6 +37,12 @@ DOCKER_TIMEOUT = 5             # Container wall-clock timeout (seconds)
 DOCKER_MEMORY_LIMIT = "128m"   # Memory limit per container (Docker format string)
 DOCKER_CPU_LIMIT = 500_000_000   # nano_cpus (0.5 CPU)
 DOCKER_NETWORK_DISABLED = True
+# Shared temp directory for Docker-in-Docker bind mounts.
+# When running inside a Docker container (QA/prod), tempfile.mkdtemp() creates
+# directories invisible to the host Docker daemon, breaking bind mounts.
+# Set this to a path shared via host bind mount (e.g., /tmp/sandbox-work in
+# docker-compose.yml) so the daemon can resolve the bind mount source.
+DOCKER_TEMP_DIR = os.environ.get("DOCKER_TEMP_DIR") or None
 # In local dev:  <project>/api/docker/languages.json
 # In Docker:    /app/docker/languages.json (COPY api/ → /app/)
 _candidate_lang = ROOT_DIR / "api" / "docker" / "languages.json"

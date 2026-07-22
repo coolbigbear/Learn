@@ -28,9 +28,11 @@ services:
       - ROOT_DIR=/app
       - FRONTEND_DIST=/app/frontend/dist
       - DOCKER_ENABLED=true
+      - DOCKER_TEMP_DIR=/tmp/sandbox-work
     volumes:
       - qa-db:/app/data
       - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/sandbox-work:/tmp/sandbox-work
     restart: unless-stopped
 
   # ── Production environment ───────────────────────────────────────────────────
@@ -48,9 +50,11 @@ services:
       - ROOT_DIR=/app
       - FRONTEND_DIST=/app/frontend/dist
       - DOCKER_ENABLED=true
+      - DOCKER_TEMP_DIR=/tmp/sandbox-work
     volumes:
       - prod-db:/app/data
       - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/sandbox-work:/tmp/sandbox-work
     restart: unless-stopped
 
   # ── Self-hosted GitHub Actions Runner ─────────────────────────────────────────
