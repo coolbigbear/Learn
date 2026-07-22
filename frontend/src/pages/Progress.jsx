@@ -321,23 +321,33 @@ export default function Progress() {
   // Merge lessons data with progress
   const mergedPaths = (pathsData || []).map((path) => {
     const mergedLessons = path.lessons.map((lesson) => {
-      const lessonProg = progressByLesson[lesson.slug] || { completed: 0, exercises: [] };
-      const total = lessonTotals[lesson.slug] || lesson.exercise_count || 0;
+      // Use exercises from lesson metadata (backed by backend), preserving order
+      const lessonExercises = lesson.exercises || [];
+      const total = lessonExercises.length || lessonTotals[lesson.slug] || lesson.exercise_count || 0;
 
-      // Build exercise list with progress info
-      const exercises = lessonProg.exercises.length > 0
-        ? lessonProg.exercises
-        : [];
+      const exercises = lessonExercises.map((ex) => ({
+        ...ex,
+        // Alias fields for backward compat with ExerciseRow
+        exercise_id: ex.id,
+        exercise_title: ex.title,
+        exercise_slug: ex.slug,
+      }));
 
-      // Lookup: given an exercise dict from progress, find it by exercise_id
+      // Cross-reference each exercise against the user's progress data
       const progressByExercise = {};
+      let completed = 0;
       for (const ex of exercises) {
-        progressByExercise[ex.exercise_id] = ex;
+        const progItem = progressByExerciseKey[ex.id] || progressByExerciseKey[ex.slug];
+        if (progItem) {
+          progressByExercise[ex.id] = progItem;
+          progressByExercise[ex.slug] = progItem;
+          if (progItem.completed) completed++;
+        }
       }
 
       return {
         lesson,
-        completed: lessonProg.completed,
+        completed,
         total,
         exercises,
         progressByExercise,

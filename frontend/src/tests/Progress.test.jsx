@@ -34,13 +34,13 @@ vi.mock('../api/client.js', async (importOriginal) => {
 
 // Sample data matching the API response shapes
 const coreLessons = [
-  { id: 1, slug: '01-print-strings', title: 'Print Strings', order: 1, path: 'core', exercise_count: 2 },
-  { id: 2, slug: '02-print-multiple', title: 'Print Multiple Items', order: 2, path: 'core', exercise_count: 1 },
-  { id: 3, slug: '03-variables', title: 'Variables', order: 3, path: 'core', exercise_count: 3 },
+  { id: 1, slug: '01-print-strings', title: 'Print Strings', order: 1, path: 'core', exercise_count: 2, exercises: [{ id: 1, slug: 'ex1', title: 'Print Hello', order: 1 }, { id: 2, slug: 'ex2', title: 'Print Your Name', order: 2 }] },
+  { id: 2, slug: '02-print-multiple', title: 'Print Multiple Items', order: 2, path: 'core', exercise_count: 1, exercises: [{ id: 3, slug: 'ex3', title: 'Print Multiple Items', order: 1 }] },
+  { id: 3, slug: '03-variables', title: 'Variables', order: 3, path: 'core', exercise_count: 3, exercises: [{ id: 4, slug: 'ex4', title: 'Variables', order: 1 }, { id: 5, slug: 'ex5', title: 'Data Types', order: 2 }, { id: 6, slug: 'ex6', title: 'Type Conversion', order: 3 }] },
 ];
 
 const dataProcessingLessons = [
-  { id: 16, slug: '16-data-processing', title: 'Data Processing — CSV, JSON, and APIs', order: 16, path: 'data-processing', exercise_count: 2 },
+  { id: 16, slug: '16-data-processing', title: 'Data Processing — CSV, JSON, and APIs', order: 16, path: 'data-processing', exercise_count: 2, exercises: [{ id: 50, slug: 'dp1', title: 'Read CSV', order: 1 }, { id: 51, slug: 'dp2', title: 'Parse JSON', order: 2 }] },
 ];
 
 const pathsData = [
