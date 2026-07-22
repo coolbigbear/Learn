@@ -33,7 +33,7 @@ SHELL_TIMEOUT = 5.0
 
 # Docker sandbox runner configuration
 DOCKER_ENABLED = os.environ.get("DOCKER_ENABLED", "true").lower() in ("1", "true", "yes")
-DOCKER_TIMEOUT = 5             # Container wall-clock timeout (seconds)
+DOCKER_TIMEOUT = 15            # Container wall-clock timeout (seconds)
 DOCKER_MEMORY_LIMIT = "128m"   # Memory limit per container (Docker format string)
 DOCKER_CPU_LIMIT = 500_000_000   # nano_cpus (0.5 CPU)
 DOCKER_NETWORK_DISABLED = True
