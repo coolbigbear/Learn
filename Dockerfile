@@ -46,6 +46,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # ── API source code ──────────────────────────────────────────────────────────
 COPY api/ /app/
 
+# ── Lesson content (seeded into DB on first start) ───────────────────────────
+COPY content/ /app/content/
+
 # ── Built frontend (from Stage 1) ────────────────────────────────────────────
 # FRONTEND_DIST = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
 # With the API at /app/api/ this resolves to /app/frontend/dist/
