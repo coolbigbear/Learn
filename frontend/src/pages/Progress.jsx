@@ -318,24 +318,29 @@ export default function Progress() {
   // Merge lessons data with progress
   const mergedPaths = (pathsData || []).map((path) => {
     const mergedLessons = path.lessons.map((lesson) => {
-      // Use lesson progress data as the primary exercise source, cross-referencing metadata
+      // Use lesson metadata exercises as the primary exercise source (from /by-path endpoint)
       const lessonProg = progressByLesson[lesson.slug] || { completed: 0, exercises: [] };
       const total = lessonTotals[lesson.slug] || lesson.exercise_count || 0;
 
-      // Build exercise list from progress data
-      const exercises = lessonProg.exercises.length > 0
-        ? lessonProg.exercises
-        : [];
-
-      // Lookup: given an exercise dict from progress, find it by exercise_id
+      // Build a cross-reference map from progress data, keyed by exercise_id AND exercise_slug
       const progressByExercise = {};
-      for (const ex of exercises) {
-        progressByExercise[ex.exercise_id] = ex;
+      for (const ex of lessonProg.exercises) {
+        if (ex.exercise_id) progressByExercise[ex.exercise_id] = ex;
+        if (ex.exercise_slug) progressByExercise[ex.exercise_slug] = ex;
       }
+
+      // Use lesson.exercises (metadata) as the exercise list — always has all exercises
+      const exercises = lesson.exercises || [];
+
+      // Compute completed count from cross-referenced data
+      const completed = exercises.filter((ex) => {
+        const key = ex.exercise_id || ex.id || ex.slug;
+        return progressByExercise[key]?.completed;
+      }).length;
 
       return {
         lesson,
-        completed: lessonProg.completed,
+        completed,
         total,
         exercises,
         progressByExercise,
