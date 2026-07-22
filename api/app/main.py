@@ -65,7 +65,27 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             print(f"[seed] WARNING: Could not verify database state: {e}")
 
-    yield
+        # Seed lesson content on first start (idempotent — skips if lessons exist)
+        try:
+            from app.services.content_seed import seed_content
+
+            seed_result = await seed_content()
+            status = seed_result.get("status", "?")
+            if status == "seeded":
+                print(
+                    f"[content_seed] Seeded {seed_result['lessons_added']} lessons "
+                    f"and {seed_result['exercises_added']} exercises"
+                )
+            elif status == "skipped":
+                # Normal — lessons already exist
+                pass
+            else:
+                error = seed_result.get("error", "unknown")
+                print(f"[content_seed] Warning: could not seed content: {error}")
+        except Exception as e:
+            print(f"[content_seed] Error seeding content: {e}")
+
+    yield  # Always yield — every code path must reach this
 
 
 def create_app() -> FastAPI:
