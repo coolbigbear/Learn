@@ -1,4 +1,4 @@
-# Lesson 23: Introduction to Machine Learning & NumPy
+# Lesson 24: Introduction to Machine Learning & NumPy
 
 ## Learning Objectives
 

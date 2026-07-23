@@ -1,4 +1,4 @@
-# Lesson 26: Unsupervised Learning & Mini ML Project
+# Lesson 27: Unsupervised Learning & Mini ML Project
 
 ## Learning Objectives
 

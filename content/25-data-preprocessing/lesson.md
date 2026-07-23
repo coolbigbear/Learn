@@ -1,4 +1,4 @@
-# Lesson 24: Data Preprocessing
+# Lesson 25: Data Preprocessing
 
 ## Learning Objectives
 
