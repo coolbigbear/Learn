@@ -76,10 +76,10 @@
   },
   {
     "slug": "xml-api-call-simulation",
-    "title": "Build an XML payload and send it to an API",
-    "instruction": "Build an XML string representing a product using `ET.SubElement()` and send it to `https://httpbin.org/post` with `Content-Type: application/xml`.\n\nThe product should have:\n- Root element: `<product>` with attribute `sku=\"TBL-001\"`\n- Child `<name>`: \"Oak Table\"\n- Child `<price>`: \"249.99\"\n- Child `<in_stock>`: \"true\"\n\nSerialize with `ET.tostring(root, encoding=\"unicode\")` and send it with `requests.post()`. Print the JSON-decoded response's `\"data\"` field (which will echo back the XML string you sent).",
-    "starter_code": "import requests\nimport xml.etree.ElementTree as ET\n\n# Build the product XML\n\n# Send it to httpbin\nurl = \"https://httpbin.org/post\"\n\nresponse = requests.post(url, data=..., headers={\"Content-Type\": \"application/xml\"})\nprint(response.json()[\"data\"])\n",
-    "solution_code": "import requests\nimport xml.etree.ElementTree as ET\n\nroot = ET.Element(\"product\")\nroot.set(\"sku\", \"TBL-001\")\nET.SubElement(root, \"name\").text = \"Oak Table\"\nET.SubElement(root, \"price\").text = \"249.99\"\nET.SubElement(root, \"in_stock\").text = \"true\"\n\nxml_payload = ET.tostring(root, encoding=\"unicode\")\n\nurl = \"https://httpbin.org/post\"\nresponse = requests.post(url, data=xml_payload, headers={\"Content-Type\": \"application/xml\"})\nprint(response.json()[\"data\"])\n",
+    "title": "Build an XML payload for an API request",
+    "instruction": "Build an XML string representing a product using `ET.SubElement()` and print the result.\n\nThe product should have:\n- Root element: `<product>` with attribute `sku=\"TBL-001\"`\n- Child `<name>`: \"Oak Table\"\n- Child `<price>`: \"249.99\"\n- Child `<in_stock>`: \"true\"\n\nSerialize with `ET.tostring(root, encoding=\"unicode\")` and print the XML string.",
+    "starter_code": "import xml.etree.ElementTree as ET\n\n# Build the product XML\n",
+    "solution_code": "import xml.etree.ElementTree as ET\n\nroot = ET.Element(\"product\")\nroot.set(\"sku\", \"TBL-001\")\nET.SubElement(root, \"name\").text = \"Oak Table\"\nET.SubElement(root, \"price\").text = \"249.99\"\nET.SubElement(root, \"in_stock\").text = \"true\"\n\nxml_payload = ET.tostring(root, encoding=\"unicode\")\nprint(xml_payload)\n",
     "test_cases": [
       {
         "input": "",
