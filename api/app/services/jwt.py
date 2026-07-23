@@ -12,16 +12,17 @@ from app.config import ACCESS_TOKEN_EXPIRE_MINUTES, JWT_ALGORITHM, JWT_SECRET_KE
 
 
 def create_access_token(user_id: int, username: str | None = None) -> str:
-    """Create a signed JWT access token for the given user ID.
+    """Create a signed JWT access token for the given user.
 
-    The token encodes the user ID as the 'sub' (subject) claim,
-    the username (if provided) as the 'username' claim, and
-    includes an 'exp' (expiration) claim set to now + configured minutes.
+    The token encodes the user ID as the 'sub' (subject) claim, the
+    username (if provided) as the 'username' claim, and includes an 'exp'
+    (expiration) claim set to now + configured minutes.
     """
     now = datetime.now(timezone.utc)
     expire = now + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     payload = {
         "sub": str(user_id),
+        "username": username,
         "iat": now,
         "exp": expire,
     }
