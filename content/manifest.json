@@ -20,9 +20,11 @@
   {"slug": "json-api-payloads", "title": "Handling JSON Payloads in APIs", "order": 19, "path": "api"},
   {"slug": "19-fastapi-intro", "title": "Introduction to FastAPI", "order": 20, "path": "api"},
   {"slug": "20-mini-api-project", "title": "Mini API Project", "order": 21, "path": "api"},
-  {"slug": "21-intro-to-ml", "title": "Introduction to Machine Learning & NumPy", "order": 22, "path": "machine-learning"},
-  {"slug": "22-data-preprocessing", "title": "Data Preprocessing", "order": 23, "path": "machine-learning"},
-  {"slug": "23-supervised-learning", "title": "Supervised Learning: Regression & Classification", "order": 24, "path": "machine-learning"},
-  {"slug": "24-unsupervised-learning", "title": "Unsupervised Learning & Mini ML Project", "order": 25, "path": "machine-learning"},
-  {"slug": "25-api-authentication", "title": "API Authentication Methods", "order": 26, "path": "api"}
+  {"slug": "19-working-with-databases", "title": "Working with Databases", "order": 22, "path": "api"},
+  {"slug": "21-intro-to-ml", "title": "Introduction to Machine Learning & NumPy", "order": 23, "path": "machine-learning"},
+  {"slug": "22-data-preprocessing", "title": "Data Preprocessing", "order": 24, "path": "machine-learning"},
+  {"slug": "23-supervised-learning", "title": "Supervised Learning: Regression & Classification", "order": 25, "path": "machine-learning"},
+  {"slug": "24-unsupervised-learning", "title": "Unsupervised Learning & Mini ML Project", "order": 26, "path": "machine-learning"},
+  {"slug": "25-api-authentication", "title": "API Authentication Methods", "order": 27, "path": "api"},
+  {"slug": "26-api-capstone-project", "title": "API Capstone Project — Full-Stack Task Manager", "order": 28, "path": "api"}
 ]
