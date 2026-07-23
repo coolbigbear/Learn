@@ -317,8 +317,8 @@ async def test_seed_same_exercise_slug_different_lessons(
     manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
 
     # Old lesson with exercise slug "build-json-payload"
-    old_dir = tmp_path / "old-api-lesson"
-    old_dir.mkdir()
+    old_dir = _lesson_dir(tmp_path, "api", "old-api-lesson")
+    old_dir.mkdir(parents=True)
     (old_dir / "lesson.md").write_text("# Old API Lesson\n\nContent.\n", encoding="utf-8")
     old_exercises = [
         {
@@ -345,8 +345,8 @@ async def test_seed_same_exercise_slug_different_lessons(
     )
     manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
 
-    new_dir = tmp_path / "19-json-api-payloads"
-    new_dir.mkdir()
+    new_dir = _lesson_dir(tmp_path, "api", "19-json-api-payloads")
+    new_dir.mkdir(parents=True)
     (new_dir / "lesson.md").write_text("# JSON API Payloads\n\nContent.\n", encoding="utf-8")
     new_exercises = [
         {
@@ -410,3 +410,71 @@ async def test_seed_same_exercise_slug_different_lessons(
     # There should be exactly 3 exercises total across both lessons
     count_result = await db_session.execute(select(func.count(Exercise.id)))
     assert count_result.scalar() == 3
+
+
+@pytest.mark.asyncio
+async def test_seed_nested_manifest(
+    tmp_path: Path, db_session: AsyncSession
+):
+    """Manifest inside a python/ subdirectory (the restructured layout).
+
+    After the content was reorganised from ``content/manifest.json`` to
+    ``content/python/manifest.json``, the seed function must find the
+    nested manifest via ``_find_manifest()`` and still resolve lesson
+    paths correctly.
+    """
+    # Build a nested structure:  tmp_path/python/manifest.json
+    #                             tmp_path/python/lesson-a/lesson.md  etc.
+    lessons = [
+        {"slug": "nested-lesson-a", "title": "Nested A", "order": 1, "path": "python"},
+        {"slug": "nested-lesson-b", "title": "Nested B", "order": 2, "path": "python"},
+    ]
+    language_dir = tmp_path / "python"
+    language_dir.mkdir()
+    manifest_path = language_dir / "manifest.json"
+    manifest_path.write_text(json.dumps(lessons), encoding="utf-8")
+
+    for lesson in lessons:
+        _write_lesson(tmp_path, lesson)
+
+    result = await seed_content(session=db_session, content_dir=tmp_path)
+
+    assert result["status"] == "seeded"
+    assert result["lessons_added"] == 2
+    assert result["exercises_added"] == 2
+
+    # Verify data
+    count_result = await db_session.execute(select(func.count(Lesson.id)))
+    assert count_result.scalar() == 2
+    ex_result = await db_session.execute(select(func.count(Exercise.id)))
+    assert ex_result.scalar() == 2
+
+
+@pytest.mark.asyncio
+async def test_seed_nested_manifest_incremental(
+    tmp_path: Path, db_session: AsyncSession
+):
+    """Incremental seeding works when manifest is in a python/ subdirectory."""
+    language_dir = tmp_path / "python"
+    language_dir.mkdir()
+
+    # First seed
+    lessons = [
+        {"slug": "inc-a", "title": "Inc A", "order": 1, "path": "python"},
+    ]
+    manifest_path = language_dir / "manifest.json"
+    manifest_path.write_text(json.dumps(lessons), encoding="utf-8")
+    _write_lesson(tmp_path, lessons[0])
+
+    result1 = await seed_content(session=db_session, content_dir=tmp_path)
+    assert result1["status"] == "seeded"
+
+    # Add a second lesson
+    lessons.append({"slug": "inc-b", "title": "Inc B", "order": 2, "path": "python"})
+    manifest_path.write_text(json.dumps(lessons), encoding="utf-8")
+    _write_lesson(tmp_path, lessons[1])
+
+    result2 = await seed_content(session=db_session, content_dir=tmp_path)
+    assert result2["status"] == "synced_with_new"
+    assert result2["lessons_added"] == 1
+    assert result2["exercises_added"] == 1

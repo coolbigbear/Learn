@@ -80,10 +80,18 @@ async def seed():
     )
 
     async with session_factory() as session:
-        # Read manifest
+        # Read manifest — supports both flat and language-nested layouts
         manifest_path = CONTENT_DIR / "manifest.json"
         if not manifest_path.exists():
-            print(f"ERROR: manifest not found at {manifest_path}")
+            if CONTENT_DIR.is_dir():
+                for sub in sorted(CONTENT_DIR.iterdir()):
+                    if sub.is_dir():
+                        candidate = sub / "manifest.json"
+                        if candidate.exists():
+                            manifest_path = candidate
+                            break
+        if not manifest_path.exists():
+            print(f"ERROR: manifest not found in {CONTENT_DIR}")
             return
 
         with open(manifest_path) as f:
