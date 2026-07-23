@@ -12,14 +12,23 @@ export function setOnUnauthorized(cb) {
 }
 
 function getToken() {
-  return localStorage.getItem('auth_token');
+  try {
+    return localStorage.getItem('auth_token');
+  } catch {
+    return null;
+  }
 }
 
 function setToken(token) {
-  if (token) {
-    localStorage.setItem('auth_token', token);
-  } else {
-    localStorage.removeItem('auth_token');
+  try {
+    if (token) {
+      localStorage.setItem('auth_token', token);
+    } else {
+      localStorage.removeItem('auth_token');
+    }
+  } catch {
+    // localStorage may be unavailable (private browsing, quota, etc.)
+    // Fail gracefully — treat as not authenticated.
   }
 }
 
