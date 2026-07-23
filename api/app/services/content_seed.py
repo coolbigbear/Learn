@@ -51,6 +51,9 @@ async def _sync_exercise_test_cases(
     Reads content/<lesson>/exercises.json for each lesson in the manifest and
     updates the database if any exercise's test_cases differ. Returns count of
     updates made.
+
+    Uses lesson slug + exercise slug to uniquely identify exercises (the
+    Exercise.slug is unique per lesson, not globally).
     """
     manifest_path = content_dir / "manifest.json"
     if not manifest_path.is_file():
@@ -65,6 +68,14 @@ async def _sync_exercise_test_cases(
         if not exercises_json_path.is_file():
             continue
 
+        # Resolve the lesson ID for scoping exercise lookups
+        lesson_result = await session.execute(
+            select(Lesson).where(Lesson.slug == slug)
+        )
+        lesson = lesson_result.scalar_one_or_none()
+        if lesson is None:
+            continue
+
         exercises_data = json.loads(exercises_json_path.read_text(encoding="utf-8"))
 
         for content_ex in exercises_data:
@@ -72,7 +83,10 @@ async def _sync_exercise_test_cases(
             content_test_cases = content_ex.get("test_cases", [])
 
             result = await session.execute(
-                select(Exercise).where(Exercise.slug == ex_slug)
+                select(Exercise).where(
+                    Exercise.slug == ex_slug,
+                    Exercise.lesson_id == lesson.id,
+                )
             )
             db_exercise = result.scalar_one_or_none()
             if db_exercise is None:

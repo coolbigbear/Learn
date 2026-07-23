@@ -325,3 +325,116 @@ async def test_seed_skips_already_existing_when_adding_new(content_dir: Path, db
     assert result["status"] == "synced_with_new"
     assert result["lessons_added"] == 1  # Only brand-new, not lesson-1 duplicate
     assert result["exercises_added"] == 0
+
+
+@pytest.mark.asyncio
+async def test_seed_same_exercise_slug_different_lessons(
+    tmp_path: Path, db_session: AsyncSession
+):
+    """Two different lessons may have exercises with the same slug.
+
+    Previously, Exercise.slug had a global UNIQUE constraint. With the fix,
+    uniqueness is per (lesson_id, slug), so two different lessons can share
+    exercise slugs without conflict. This simulates the exact scenario that
+    crashed seed_content() after lesson renumbering.
+    """
+    manifest = [
+        {"slug": "old-api-lesson", "title": "Old API Lesson", "order": 1, "path": "api"},
+    ]
+    manifest_path = tmp_path / "manifest.json"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    # Old lesson with exercise slug "build-json-payload"
+    old_dir = tmp_path / "old-api-lesson"
+    old_dir.mkdir()
+    (old_dir / "lesson.md").write_text("# Old API Lesson\n\nContent.\n", encoding="utf-8")
+    old_exercises = [
+        {
+            "slug": "build-json-payload",
+            "title": "Build a JSON payload",
+            "instruction": "Do something.",
+            "starter_code": "# Write\n",
+            "solution_code": "print('done')\n",
+            "test_cases": [{"input": "", "expected_output": "done\n", "comparison_type": "exact"}],
+            "order": 1,
+        }
+    ]
+    (old_dir / "exercises.json").write_text(json.dumps(old_exercises), encoding="utf-8")
+
+    # Seed the old lesson
+    result1 = await seed_content(session=db_session, content_dir=tmp_path)
+    assert result1["status"] == "seeded"
+    assert result1["lessons_added"] == 1
+    assert result1["exercises_added"] == 1
+
+    # Now add a new lesson with the SAME exercise slug (the renumbering scenario)
+    manifest.append(
+        {"slug": "19-json-api-payloads", "title": "Handling JSON Payloads", "order": 2, "path": "api"}
+    )
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    new_dir = tmp_path / "19-json-api-payloads"
+    new_dir.mkdir()
+    (new_dir / "lesson.md").write_text("# JSON API Payloads\n\nContent.\n", encoding="utf-8")
+    new_exercises = [
+        {
+            "slug": "build-json-payload",  # Same slug as old lesson!
+            "title": "Build a JSON payload for an API request",
+            "instruction": "Do something else.",
+            "starter_code": "# Write\n",
+            "solution_code": "print('ok')\n",
+            "test_cases": [{"input": "", "expected_output": "ok\n", "comparison_type": "exact"}],
+            "order": 1,
+        },
+        {
+            "slug": "parse-api-response",
+            "title": "Parse a simulated API response",
+            "instruction": "Parse it.",
+            "starter_code": "# Write\n",
+            "solution_code": "print('parsed')\n",
+            "test_cases": [],
+            "order": 2,
+        },
+    ]
+    (new_dir / "exercises.json").write_text(json.dumps(new_exercises), encoding="utf-8")
+
+    # Seed again — this must NOT crash with UNIQUE constraint violation
+    result2 = await seed_content(session=db_session, content_dir=tmp_path)
+
+    assert result2["status"] == "synced_with_new"
+    assert result2["lessons_added"] == 1
+    assert result2["exercises_added"] == 2
+
+    # Verify both lessons have their exercises
+    old_lesson = (
+        await db_session.execute(select(Lesson).where(Lesson.slug == "old-api-lesson"))
+    ).scalar_one()
+    new_lesson = (
+        await db_session.execute(select(Lesson).where(Lesson.slug == "19-json-api-payloads"))
+    ).scalar_one()
+
+    old_ex = (
+        await db_session.execute(
+            select(Exercise).where(
+                Exercise.slug == "build-json-payload",
+                Exercise.lesson_id == old_lesson.id,
+            )
+        )
+    ).scalar_one()
+    assert old_ex is not None
+    assert old_ex.title == "Build a JSON payload"  # Old lesson's version
+
+    new_ex = (
+        await db_session.execute(
+            select(Exercise).where(
+                Exercise.slug == "build-json-payload",
+                Exercise.lesson_id == new_lesson.id,
+            )
+        )
+    ).scalar_one()
+    assert new_ex is not None
+    assert new_ex.title == "Build a JSON payload for an API request"  # New lesson's version
+
+    # There should be exactly 3 exercises total across both lessons
+    count_result = await db_session.execute(select(func.count(Exercise.id)))
+    assert count_result.scalar() == 3
