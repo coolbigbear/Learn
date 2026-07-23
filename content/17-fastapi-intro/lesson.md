@@ -1,4 +1,4 @@
-# Lesson 17: Introduction to FastAPI
+# Lesson 22: Introduction to FastAPI
 
 ## Learning Objectives
 
@@ -116,6 +116,24 @@ Send a POST request with JSON:
 ```json
 {"name": "Widget", "price": 9.99}
 ```
+
+---
+
+## Common Mistakes
+
+- **Forgetting to run the server** — You need `uvicorn main:app --reload` running in a terminal for your API to respond. If you get a connection error, check that the server is started.
+- **Missing type hints on parameters** — FastAPI relies on type hints for validation and docs. `name: str` works; `name` without a type hint is treated as a string but loses validation.
+- **Confusing path and query parameters** — Path parameters are part of the URL path (`/items/3`), query parameters come after `?` (`/items?limit=5`). Both go in the function signature but FastAPI routes them differently.
+- **Not using `async def`** — FastAPI supports both sync and async, but using `async def` is recommended for non-blocking endpoints.
+- **Returning plain strings instead of dicts** — FastAPI expects a dict (which becomes JSON). Return `{"message": "ok"}` not `"ok"`.
+
+## Best Practices
+
+1. **Always use type hints** — FastAPI uses them for request validation, serialisation, and automatic API docs.
+2. **Prefer `async def` for endpoints** — It keeps the server responsive during I/O operations.
+3. **Use descriptive endpoint paths** — `/items/{item_id}` is clear; `/get_item` is not. Follow RESTful naming conventions.
+4. **Set explicit status codes** — Return `201` for created resources, `204` for deletions, `404` for missing resources.
+5. **Test with `/docs`** — The interactive Swagger UI at `/docs` is the fastest way to verify your endpoints work.
 
 ---
 

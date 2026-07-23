@@ -1,4 +1,4 @@
-# Lesson 19: Working with Databases
+# Lesson 24: Working with Databases
 
 ## Learning Objectives
 
@@ -16,7 +16,7 @@
 
 ## Why Databases?
 
-Think about the Task Manager API you built in Lesson 18. It worked, but it had a big problem: **every time you restarted the server, all your tasks disappeared!**
+Think about the Task Manager API you built in Lesson 23. It worked, but it had a big problem: **every time you restarted the server, all your tasks disappeared!**
 
 The data lived in a Python list inside the process memory. When the process stopped, the memory was reclaimed and your data was gone.
 
@@ -377,7 +377,7 @@ async def safe_query():
 
 ## End-to-End: Task Manager with SQLite
 
-Let's bring everything together by converting the Lesson 18 Task Manager to use a real SQLite database.
+Let's bring everything together by converting the Lesson 23 Task Manager to use a real SQLite database.
 
 Create `main.py`:
 
@@ -516,7 +516,7 @@ async def delete_task(task_id: int, db: AsyncSession = Depends(get_db)):
 
 ### What Changed from the In-Memory Version?
 
-| Before (Lesson 18) | After (Lesson 19) |
+| Before (Lesson 23) | After (Lesson 24) |
 |--------------------|--------------------|
 | `tasks = []` — a Python list | `TaskDB` — a SQLAlchemy model |
 | `next_id` counter | Auto-incrementing `id` column |
@@ -534,6 +534,24 @@ uvicorn main:app --reload
 Test it the same way as before — visit `/docs` or use curl. But now your tasks survive a server restart! Try it: create a task, stop the server (Ctrl+C), start it again, and list tasks.
 
 > **Pro tip:** `--reload` is great for development, but in production you'd omit it. The database file `tasks.db` will appear in your project directory after the first request.
+
+---
+
+## Common Mistakes
+
+- **Forgetting to await DB queries** — SQLAlchemy async queries need `await session.execute(...)`. Without `await`, you get a coroutine object, not the result.
+- **Not closing database sessions** — Always use `async with` or a dependency generator to ensure sessions are closed. Leaked sessions exhaust the connection pool.
+- **Hardcoding connection strings** — `DATABASE_URL` should come from an environment variable, not be hardcoded. Different environments (dev, test, prod) need different databases.
+- **Mixing sync and async SQLAlchemy** — Don't use `from sqlalchemy import create_engine` with async endpoints. Use `create_async_engine` for async code.
+- **Catching exceptions too broadly** — Catching all exceptions in DB code can hide real errors. Catch specific exceptions like `IntegrityError` and let unexpected ones propagate.
+
+## Best Practices
+
+1. **Use the `get_db` dependency pattern** — A generator function that yields a session and handles commit/rollback in `finally` is the standard FastAPI approach.
+2. **Always use async SQLAlchemy with FastAPI** — Async sessions don't block the event loop. Sync sessions can, under load, slow down all concurrent requests.
+3. **Define models with explicit column types** — `Column(Integer)`, `Column(String(100))`, not just `Column()`. Explicit types improve readability and portability.
+4. **Use environment variables for `DATABASE_URL`** — Keep connection strings out of source code. Use `os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./tasks.db")` for a sensible default.
+5. **Add indexes for frequently queried columns** — Foreign keys and columns used in `WHERE` clauses should have indexes for performance.
 
 ---
 

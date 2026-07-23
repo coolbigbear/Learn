@@ -350,6 +350,24 @@ const data = await response.json();
 
 ---
 
+## Common Mistakes
+
+- **Hardcoding secrets in code** — Never write API keys, passwords, or JWT secrets directly in your source code. Use environment variables or `.env` files.
+- **Using Basic Auth without HTTPS** — Base64 is encoding, not encryption. Anyone intercepting the request can read the credentials instantly.
+- **Exposing API keys in client-side code** — Frontend JavaScript is visible to every user. Any API key embedded in frontend code is public.
+- **Not rotating keys or tokens** — If a key is compromised, rotate it immediately. Regular rotation limits the damage of a leak.
+- **Using JWTs without expiration** — A JWT without an `exp` claim never expires. If stolen, it's valid forever. Always set a short expiration (15–60 minutes).
+
+## Best Practices
+
+1. **Always use HTTPS** — Every authentication method in this lesson sends secrets over the wire. Without HTTPS, all of them are vulnerable to interception.
+2. **Prefer Bearer tokens (API keys / JWT) over Basic Auth** — Bearer tokens can be scoped, rotated independently of user accounts, and revoked individually.
+3. **Store secrets in environment variables** — Use `os.getenv("API_KEY")` or a `.env` file (with `python-dotenv`). Never commit secrets to git.
+4. **Use short-lived JWTs with refresh tokens** — Access tokens expire in minutes; refresh tokens last longer and are stored more securely.
+5. **Validate tokens on every request** — Server-side verification of JWTs (signature, expiration, issuer) prevents tampering and replay attacks.
+
+---
+
 ## Comparison Table
 
 | Method | Best For | Security Level | Complexity |
@@ -372,4 +390,4 @@ const data = await response.json();
 
 ### What's Next?
 
-In the next lesson, you'll build a FastAPI server that implements authentication — issuing JWTs, protecting routes, and verifying tokens on every request.
+In the next lesson, you'll build a complete **API Capstone Project** that brings together authentication, database storage, and everything you've learned so far.

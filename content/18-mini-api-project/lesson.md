@@ -1,4 +1,4 @@
-# Lesson 18: Mini API Project
+# Lesson 23: Mini API Project
 
 ## Learning Objectives
 
@@ -136,6 +136,24 @@ Start your server with `uvicorn main:app --reload`, then:
 - **Delete task 1:** `DELETE /tasks/1`
 
 Visit `/docs` to test everything interactively!
+
+---
+
+## Common Mistakes
+
+- **Forgetting to import `HTTPException`** — It's `from fastapi import HTTPException`, not from anywhere else. Without it, you can't return proper error status codes.
+- **Using mutable default values** — Don't use `[]` or `{}` as function defaults. They're shared across calls. Use `None` and handle it inside the function.
+- **Not raising `HTTPException` on missing resources** — When a task isn't found, return `404` with `HTTPException`, not a 200 with an error message.
+- **Hardcoding `status_code=200` for everything** — POST should return `201`, DELETE should return `204`. Use the right status code for the operation.
+- **Forgetting to restart the server** — FastAPI with `--reload` handles this, but if you're not using `--reload`, restart `uvicorn` after every code change.
+
+## Best Practices
+
+1. **Use Pydantic models for both request and response** — Define separate models for input (`Task`) and output (`TaskResponse`) so you control what the client sees.
+2. **Return meaningful HTTP status codes** — `201` for creation, `204` for deletion, `404` for not found, `422` for validation errors.
+3. **Use path parameters for resource identifiers** — `/tasks/{task_id}` is RESTful; `/tasks?task_id=1` is not.
+4. **Filter with query parameters** — The `completed` filter in the list endpoint is a clean pattern for optional filtering.
+5. **Test all CRUD operations** — Use `/docs` or `curl` to test create, read, update, and delete — including error cases like requesting a non-existent task.
 
 ---
 
