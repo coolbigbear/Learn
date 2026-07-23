@@ -1,0 +1,147 @@
+[
+  {
+    "slug": "basic-auth-header",
+    "title": "Build a Basic Auth Header",
+    "instruction": "Write a function `basic_auth_header(username, password)` that returns the `Authorization` header string for Basic Authentication. It should base64-encode the string `username:password` and return it in the format `Basic <encoded>`.\n\nExample: `basic_auth_header(\"admin\", \"secret\")` → `\"Basic YWRtaW46c2VjcmV0\"`\n\nHint: Use `base64.b64encode()` from Python's `base64` module. Remember to encode the string to bytes first, then decode the result back to a string.",
+    "starter_code": "import base64\n\ndef basic_auth_header(username, password):\n    # Combine username and password with a colon\n    # Base64-encode the combined string\n    # Return \"Basic <encoded>\"\n    pass\n\n# Test it\nprint(basic_auth_header(\"admin\", \"secret\"))",
+    "solution_code": "import base64\n\ndef basic_auth_header(username, password):\n    credentials = f\"{username}:{password}\"\n    encoded = base64.b64encode(credentials.encode()).decode()\n    return f\"Basic {encoded}\"\n\n# Test it\nprint(basic_auth_header(\"admin\", \"secret\"))",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "Basic YWRtaW46c2VjcmV0\n",
+        "comparison_type": "exact"
+      },
+      {
+        "input": "",
+        "expected_output": "base64.b64encode",
+        "comparison_type": "code_contains"
+      }
+    ],
+    "order": 1
+  },
+  {
+    "slug": "api-key-auth",
+    "title": "Send a Request with an API Key",
+    "instruction": "Write a function `get_api_data(api_key)` that builds a headers dictionary and sends a GET request to `\"https://api.example.com/data\"` with the API key as a Bearer token in the Authorization header. Return the response JSON (call `.json()` on the response object).\n\nHint: Use `requests.get(url, headers=headers)`. The headers dict should have `\"Authorization\"` set to `\"Bearer <api_key>\"`.",
+    "starter_code": "import requests\n\ndef get_api_data(api_key):\n    # Build the headers dict\n    # Send a GET request to \"https://api.example.com/data\"\n    # Return response.json()\n    pass\n\n# Test with a dummy key (won't actually work, but the code is what matters)\nprint(get_api_data(\"sk-test-abc123\") if False else \"Code complete - see submitted code\")",
+    "solution_code": "import requests\n\ndef get_api_data(api_key):\n    headers = {\"Authorization\": f\"Bearer {api_key}\"}\n    response = requests.get(\"https://api.example.com/data\", headers=headers)\n    return response.json()\n\nprint(\"get_api_data function defined correctly\")",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "get_api_data function defined correctly\n",
+        "comparison_type": "exact"
+      },
+      {
+        "input": "",
+        "expected_output": "Bearer",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "Authorization",
+        "comparison_type": "code_contains"
+      }
+    ],
+    "order": 2
+  },
+  {
+    "slug": "jwt-decode-payload",
+    "title": "Decode a JWT Payload",
+    "instruction": "Write a function `decode_jwt_payload(token)` that decodes the **payload** (the second part) of a JWT token and returns it as a Python dictionary. The three parts of a JWT are separated by dots: `header.payload.signature`. Each part is base64-encoded.\n\nExample:\n`decode_jwt_payload(\"eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoiYWxpY2UiLCJyb2xlIjoiYWRtaW4ifQ.signature\")`\n→ `{\"user\": \"alice\", \"role\": \"admin\"}`\n\nHint: Split the token on `\".\"`, take the second element (index 1), decode it with `base64.urlsafe_b64decode()`, then parse with `json.loads()`. Use `.decode()` on the decoded bytes.",
+    "starter_code": "import base64\nimport json\n\ndef decode_jwt_payload(token):\n    # Split the token by \".\"\n    # Take the second part (payload, index 1)\n    # Add padding if needed (base64.b64decode handles this)\n    # Decode with base64.urlsafe_b64decode\n    # Parse with json.loads and return\n    pass\n\n# Test\ntoken = \"eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoiYWxpY2UiLCJyb2xlIjoiYWRtaW4ifQ.signature\"\nprint(decode_jwt_payload(token))",
+    "solution_code": "import base64\nimport json\n\ndef decode_jwt_payload(token):\n    parts = token.split(\".\")\n    payload_b64 = parts[1]\n    # Add padding for base64 decoding\n    padding = 4 - len(payload_b64) % 4\n    if padding != 4:\n        payload_b64 += \"=\" * padding\n    decoded_bytes = base64.urlsafe_b64decode(payload_b64)\n    return json.loads(decoded_bytes)\n\ntoken = \"eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoiYWxpY2UiLCJyb2xlIjoiYWRtaW4ifQ.signature\"\nprint(decode_jwt_payload(token))",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "{'user': 'alice', 'role': 'admin'}\n",
+        "comparison_type": "exact"
+      },
+      {
+        "input": "",
+        "expected_output": "base64.urlsafe_b64decode",
+        "comparison_type": "code_contains"
+      }
+    ],
+    "order": 3
+  },
+  {
+    "slug": "oauth-client-creds",
+    "title": "Build an OAuth 2.0 Token Request",
+    "instruction": "Write a function `get_oauth_token(client_id, client_secret)` that sends a POST request to `\"https://auth.example.com/oauth/token\"` with the body as a form-encoded dictionary containing `grant_type`, `client_id`, and `client_secret`.\n\nReturn the access token from the response: `response.json()[\"access_token\"]`.\n\nHint: Use `requests.post(url, data=body)` where body is a dict. `requests` automatically encodes the dict as form data.",
+    "starter_code": "import requests\n\ndef get_oauth_token(client_id, client_secret):\n    # Build the form body (dict)\n    # POST to \"https://auth.example.com/oauth/token\"\n    # Return response.json()[\"access_token\"]\n    pass\n\nprint(\"get_oauth_token function defined correctly\")",
+    "solution_code": "import requests\n\ndef get_oauth_token(client_id, client_secret):\n    body = {\n        \"grant_type\": \"client_credentials\",\n        \"client_id\": client_id,\n        \"client_secret\": client_secret\n    }\n    response = requests.post(\"https://auth.example.com/oauth/token\", data=body)\n    return response.json()[\"access_token\"]\n\nprint(\"get_oauth_token function defined correctly\")",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "get_oauth_token function defined correctly\n",
+        "comparison_type": "exact"
+      },
+      {
+        "input": "",
+        "expected_output": "grant_type",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "client_credentials",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "client_id",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "client_secret",
+        "comparison_type": "code_contains"
+      }
+    ],
+    "order": 4
+  },
+  {
+    "slug": "send-jwt-bearer",
+    "title": "Send a Request with JWT Bearer Token",
+    "instruction": "Write a function `get_protected_data(jwt_token)` that sends a GET request to `\"https://api.example.com/protected\"` with the JWT token as a Bearer token in the Authorization header. Return the response JSON.\n\nHint: Same pattern as the API key exercise, but the token value is a JWT string.",
+    "starter_code": "import requests\n\ndef get_protected_data(jwt_token):\n    # Build the Authorization header with Bearer + token\n    # Send GET request to \"https://api.example.com/protected\"\n    # Return response.json()\n    pass\n\nprint(\"get_protected_data function defined correctly\")",
+    "solution_code": "import requests\n\ndef get_protected_data(jwt_token):\n    headers = {\"Authorization\": f\"Bearer {jwt_token}\"}\n    response = requests.get(\"https://api.example.com/protected\", headers=headers)\n    return response.json()\n\nprint(\"get_protected_data function defined correctly\")",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "get_protected_data function defined correctly\n",
+        "comparison_type": "exact"
+      },
+      {
+        "input": "",
+        "expected_output": "\"Authorization\"",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "Bearer",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "requests.get",
+        "comparison_type": "code_contains"
+      }
+    ],
+    "order": 5
+  },
+  {
+    "slug": "choose-auth-method",
+    "title": "Identify the Right Auth Method",
+    "instruction": "Write a function `recommend_auth(scenario)` that takes one of these strings and returns the recommended authentication method:\n\n- `\"quick-test\"` → `\"basic\"` (simplest for internal tools)\n- `\"public-api\"` → `\"api-key\"` (simple, widely used for public APIs)\n- `\"stateless-sso\"` → `\"jwt\"` (self-contained tokens for stateless auth)\n- `\"third-party-login\"` → `\"oauth2\"` (delegated authorisation for third-party access)\n- anything else → `\"unknown\"`\n\nThis exercise tests your understanding of when to use each auth method.",
+    "starter_code": "def recommend_auth(scenario):\n    # Return the appropriate auth method for each scenario\n    pass\n\n# Test cases\nprint(recommend_auth(\"quick-test\"))\nprint(recommend_auth(\"public-api\"))\nprint(recommend_auth(\"stateless-sso\"))\nprint(recommend_auth(\"third-party-login\"))\nprint(recommend_auth(\"something-else\"))",
+    "solution_code": "def recommend_auth(scenario):\n    if scenario == \"quick-test\":\n        return \"basic\"\n    elif scenario == \"public-api\":\n        return \"api-key\"\n    elif scenario == \"stateless-sso\":\n        return \"jwt\"\n    elif scenario == \"third-party-login\":\n        return \"oauth2\"\n    else:\n        return \"unknown\"\n\nprint(recommend_auth(\"quick-test\"))\nprint(recommend_auth(\"public-api\"))\nprint(recommend_auth(\"stateless-sso\"))\nprint(recommend_auth(\"third-party-login\"))\nprint(recommend_auth(\"something-else\"))",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "basic\napi-key\njwt\noauth2\nunknown\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 6
+  }
+]

@@ -23,5 +23,6 @@
   {"slug": "21-intro-to-ml", "title": "Introduction to Machine Learning & NumPy", "order": 22, "path": "machine-learning"},
   {"slug": "22-data-preprocessing", "title": "Data Preprocessing", "order": 23, "path": "machine-learning"},
   {"slug": "23-supervised-learning", "title": "Supervised Learning: Regression & Classification", "order": 24, "path": "machine-learning"},
-  {"slug": "24-unsupervised-learning", "title": "Unsupervised Learning & Mini ML Project", "order": 25, "path": "machine-learning"}
+  {"slug": "24-unsupervised-learning", "title": "Unsupervised Learning & Mini ML Project", "order": 25, "path": "machine-learning"},
+  {"slug": "25-api-authentication", "title": "API Authentication Methods", "order": 26, "path": "api"}
 ]
