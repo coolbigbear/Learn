@@ -75,7 +75,7 @@ services:
     environment:
       - REPO_URL=https://github.com/coolbigbear/Learn
       - RUNNER_NAME=pi2-qa-runner
-      - RUNNER_TOKEN=AFSPESKYIUIKBENCY562SOTKL4TMI
+      - RUNNER_TOKEN=AFSPESPQ4CEX6YURBO2RNGTKMHLZW
       - RUNNER_WORKDIR=/tmp/runner-work
       - RUNNER_GROUP=default
       - LABELS=self-hosted,linux,arm64,pi

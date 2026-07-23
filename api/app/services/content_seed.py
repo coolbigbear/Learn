@@ -43,14 +43,16 @@ async def _get_existing_lesson_slugs(session: AsyncSession) -> set[str]:
     return {row[0] for row in result.all()}
 
 
-async def _sync_exercise_test_cases(session: AsyncSession) -> int:
+async def _sync_exercise_test_cases(
+    session: AsyncSession, content_dir: Path
+) -> int:
     """Sync exercise test_cases from content files to DB.
 
     Reads content/<lesson>/exercises.json for each lesson in the manifest and
     updates the database if any exercise's test_cases differ. Returns count of
     updates made.
     """
-    manifest_path = CONTENT_DIR / "manifest.json"
+    manifest_path = content_dir / "manifest.json"
     if not manifest_path.is_file():
         return 0
 
@@ -59,7 +61,7 @@ async def _sync_exercise_test_cases(session: AsyncSession) -> int:
 
     for entry in manifest:
         slug = entry["slug"]
-        exercises_json_path = CONTENT_DIR / slug / "exercises.json"
+        exercises_json_path = content_dir / slug / "exercises.json"
         if not exercises_json_path.is_file():
             continue
 
@@ -85,7 +87,7 @@ async def _sync_exercise_test_cases(session: AsyncSession) -> int:
 
 
 async def _seed_lesson(
-    session: AsyncSession, entry: dict
+    session: AsyncSession, content_dir: Path, entry: dict
 ) -> tuple[int, int]:
     """Insert a single lesson and its exercises from the manifest entry.
 
@@ -97,15 +99,15 @@ async def _seed_lesson(
     path_key = entry.get("path", "core")
 
     # Read lesson content
-    lesson_md = CONTENT_DIR / slug / "lesson.md"
+    lesson_md = content_dir / slug / "lesson.md"
     if not lesson_md.is_file():
         return 0, 0
-    content = lesson_md.read_text(encoding="utf-8")
+    md_content = lesson_md.read_text(encoding="utf-8")
 
     lesson = Lesson(
         slug=slug,
         title=title,
-        content=content,
+        content=md_content,
         path=path_key,
         order=order,
     )
@@ -113,7 +115,7 @@ async def _seed_lesson(
     await session.flush()  # Get lesson.id
 
     # Read exercises
-    exercises_json = CONTENT_DIR / slug / "exercises.json"
+    exercises_json = content_dir / slug / "exercises.json"
     if not exercises_json.is_file():
         return 1, 0
 
@@ -168,8 +170,8 @@ async def seed_content(
 
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
 
-    async def _work(session: AsyncSession) -> dict:
-        existing_slugs = await _get_existing_lesson_slugs(session)
+    async def _work(db: AsyncSession) -> dict:
+        existing_slugs = await _get_existing_lesson_slugs(db)
         new_entries = [e for e in manifest if e["slug"] not in existing_slugs]
 
         lessons_added = 0
@@ -177,12 +179,12 @@ async def seed_content(
 
         # Add new lessons
         for entry in new_entries:
-            added_l, added_e = await _seed_lesson(session, entry)
+            added_l, added_e = await _seed_lesson(db, content_dir, entry)
             lessons_added += added_l
             exercises_added += added_e
 
         # Sync test cases for all existing exercises
-        synced = await _sync_exercise_test_cases(session)
+        synced = await _sync_exercise_test_cases(db, content_dir)
 
         if existing_slugs and not new_entries:
             # Existing data, nothing new to add

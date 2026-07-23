@@ -1,0 +1,32 @@
+[
+  {
+    "slug": "preproc-fill-nan",
+    "title": "Fill missing values with column mean",
+    "instruction": "You have the following dataset with missing values. Fill each NaN with the mean of its column (using np.nanmean), then print the filled array.\n\nData:\n[[ 1.,  2., np.nan],\n [ 4., np.nan,  6.],\n [ 7.,  8.,  9.]]",
+    "starter_code": "import numpy as np\n\ndata = np.array([[ 1.,  2., np.nan],\n                 [ 4., np.nan,  6.],\n                 [ 7.,  8.,  9.]])\n\n# Fill NaN with column means\n",
+    "solution_code": "import numpy as np\n\ndata = np.array([[ 1.,  2., np.nan],\n                 [ 4., np.nan,  6.],\n                 [ 7.,  8.,  9.]])\n\ncol_mean = np.nanmean(data, axis=0)\nfor col in range(data.shape[1]):\n    mask = np.isnan(data[:, col])\n    data[mask, col] = col_mean[col]\n\nprint(data)\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "[[1. 2. 9.]\n [4. 5. 6.]\n [7. 8. 9.]]\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 1
+  },
+  {
+    "slug": "preproc-standardize",
+    "title": "Standardize a dataset",
+    "instruction": "Standardize the following dataset (center at mean=0, scale to std=1). Print the standardized array and its new mean and standard deviation (rounded to 2 decimal places).\n\nData: [10, 20, 30, 40, 50]",
+    "starter_code": "import numpy as np\n\ndata = np.array([10, 20, 30, 40, 50], dtype=float)\n\n# Standardize the data\n",
+    "solution_code": "import numpy as np\n\ndata = np.array([10, 20, 30, 40, 50], dtype=float)\n\nstandardized = (data - data.mean()) / data.std()\nprint(standardized)\nprint(f\"Mean: {standardized.mean():.2f}, Std: {standardized.std():.2f}\")\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "[-1.41421356 -0.70710678  0.          0.70710678  1.41421356]\nMean: -0.00, Std: 1.00\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 2
+  }
+]

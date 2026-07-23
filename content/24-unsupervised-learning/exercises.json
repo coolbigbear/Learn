@@ -1,0 +1,32 @@
+[
+  {
+    "slug": "unsupervised-kmeans-basic",
+    "title": "K-Means on 2D data",
+    "instruction": "Apply K-Means with k=2 to the following 2D data. Print the cluster labels for each point and the coordinates of the centroids.\n\nData:\n[[1, 2], [1.5, 1.8], [2, 2.5], [5, 6], [5.5, 5.5], [6, 6.2]]",
+    "starter_code": "import numpy as np\nfrom sklearn.cluster import KMeans\n\nX = np.array([[1, 2], [1.5, 1.8], [2, 2.5], [5, 6], [5.5, 5.5], [6, 6.2]])\n\n# Apply K-Means with k=2\n",
+    "solution_code": "import numpy as np\nfrom sklearn.cluster import KMeans\n\nX = np.array([[1, 2], [1.5, 1.8], [2, 2.5], [5, 6], [5.5, 5.5], [6, 6.2]])\n\nkmeans = KMeans(n_clusters=2, random_state=42, n_init=10)\nkmeans.fit(X)\nprint(\"Labels:\", kmeans.labels_)\nprint(\"Centroids:\", kmeans.cluster_centers_)\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "Labels: [0 0 0 1 1 1]\nCentroids: [[1.5  2.1 ]\n [5.5  5.9 ]]\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 1
+  },
+  {
+    "slug": "unsupervised-predict-cluster",
+    "title": "Predict cluster for a new point",
+    "instruction": "Using the same data and k=2 from the previous exercise, predict which cluster a new point [3, 4] belongs to and print the predicted cluster label.",
+    "starter_code": "import numpy as np\nfrom sklearn.cluster import KMeans\n\nX = np.array([[1, 2], [1.5, 1.8], [2, 2.5], [5, 6], [5.5, 5.5], [6, 6.2]])\nnew_point = np.array([[3, 4]])\n\n# Train K-Means and predict\n",
+    "solution_code": "import numpy as np\nfrom sklearn.cluster import KMeans\n\nX = np.array([[1, 2], [1.5, 1.8], [2, 2.5], [5, 6], [5.5, 5.5], [6, 6.2]])\nnew_point = np.array([[3, 4]])\n\nkmeans = KMeans(n_clusters=2, random_state=42, n_init=10)\nkmeans.fit(X)\npred = kmeans.predict(new_point)\nprint(pred[0])\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "0\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 2
+  }
+]
