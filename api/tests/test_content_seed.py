@@ -478,3 +478,92 @@ async def test_seed_nested_manifest_incremental(
     assert result2["status"] == "synced_with_new"
     assert result2["lessons_added"] == 1
     assert result2["exercises_added"] == 1
+
+
+@pytest.mark.asyncio
+async def test_seed_syncs_existing_lesson_paths(
+    tmp_path: Path, db_session: AsyncSession
+):
+    """Existing lessons should have their path updated when the manifest changes.
+
+    This simulates the real-world scenario where a content restructure
+    flattened all paths to ``"python"``, then was corrected back to
+    proper paths (core, api, data-processing, machine-learning).
+    """
+    # Seed initial data with wrong paths
+    initial_lessons = [
+        {"slug": "01-basics", "title": "Basics", "order": 1, "path": "python"},
+        {"slug": "19-api-lesson", "title": "API Lesson", "order": 19, "path": "python"},
+        {"slug": "24-ml-intro", "title": "ML Intro", "order": 24, "path": "python"},
+    ]
+    manifest_path = tmp_path / "python" / "manifest.json"
+    manifest_path.parent.mkdir(parents=True)
+    manifest_path.write_text(json.dumps(initial_lessons), encoding="utf-8")
+
+    for lesson in initial_lessons:
+        _write_lesson(tmp_path, lesson)
+
+    result1 = await seed_content(session=db_session, content_dir=tmp_path)
+    assert result1["status"] == "seeded"
+    assert result1["lessons_added"] == 3
+
+    # Now update the manifest with corrected paths
+    corrected_lessons = [
+        {"slug": "01-basics", "title": "Basics", "order": 1, "path": "core"},
+        {"slug": "19-api-lesson", "title": "API Lesson", "order": 19, "path": "api"},
+        {"slug": "24-ml-intro", "title": "ML Intro", "order": 24, "path": "machine-learning"},
+    ]
+    manifest_path.write_text(json.dumps(corrected_lessons), encoding="utf-8")
+
+    # Re-seed — should detect path mismatches and fix them
+    result2 = await seed_content(session=db_session, content_dir=tmp_path)
+
+    assert result2["status"] == "synced"
+    assert result2["paths_synced"] == 3
+
+    # Verify the database paths were updated
+    for slug, expected_path in [
+        ("01-basics", "core"),
+        ("19-api-lesson", "api"),
+        ("24-ml-intro", "machine-learning"),
+    ]:
+        db_lesson = (
+            await db_session.execute(select(Lesson).where(Lesson.slug == slug))
+        ).scalar_one()
+        assert db_lesson.path == expected_path, (
+            f"Expected {slug} to have path='{expected_path}', got '{db_lesson.path}'"
+        )
+
+
+@pytest.mark.asyncio
+async def test_seed_syncs_path_partially(content_dir: Path, db_session: AsyncSession):
+    """When only some lessons' paths changed, only those should be synced."""
+    # Seed with 3 lessons all under "python"
+    await seed_content(session=db_session, content_dir=content_dir)
+
+    # Change path for lesson-1 only
+    manifest_path = content_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest[0]["path"] = "core"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    # Re-seed
+    result = await seed_content(session=db_session, content_dir=content_dir)
+
+    assert result["status"] == "synced"
+    assert result["paths_synced"] == 1
+
+    # Verify lesson-1 path changed
+    lesson1 = (
+        await db_session.execute(
+            select(Lesson).where(Lesson.slug == "lesson-1")
+        )
+    ).scalar_one()
+    assert lesson1.path == "core"
+
+    # Verify others unchanged
+    for slug in ("lesson-2", "lesson-3"):
+        db_lesson = (
+            await db_session.execute(select(Lesson).where(Lesson.slug == slug))
+        ).scalar_one()
+        assert db_lesson.path == "python"
