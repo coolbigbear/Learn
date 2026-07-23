@@ -5,7 +5,7 @@ RUN addgroup --system --gid 1001 sandbox \
     && adduser --system --uid 1001 --ingroup sandbox --disabled-password --no-create-home sandbox
 
 # Install xmltodict for XML exercises (not in stdlib)
-RUN pip install --no-cache-dir xmltodict
+RUN pip install --no-cache-dir xmltodict==1.0.4
 
 USER sandbox
 WORKDIR /home/sandbox
