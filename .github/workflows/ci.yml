@@ -1,0 +1,220 @@
+# =============================================================================
+# CI — Pull Request Test Runner
+#
+# Triggers on every PR to QA or main, runs both backend (pytest) and
+# frontend (vitest) test suites on the self-hosted ARM64 runner, and
+# reports results as a status check named "Test Results".
+#
+# The CI runner (myoung34/github-runner) ships Ubuntu 20.04 (Python 3.8)
+# by default.  This workflow installs a standalone Python 3.12 build for
+# ARM64 Linux when the system Python is too old (or uses the native
+# Python 3.12 on ubuntu-noble runner images).
+#
+# Node.js/npm is installed via actions/setup-node@v4 because the runner
+# doesn't ship it.
+# =============================================================================
+
+name: CI - Test Results
+
+on:
+  pull_request:
+    branches:
+      - QA
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+# Cancel any in-progress CI run for the same PR when a new commit is pushed
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Test configuration — in-memory SQLite, no Docker sandbox in CI
+  JWT_SECRET_KEY: ci-test-secret-key
+  DOCKER_ENABLED: "false"
+  MAX_CPU_SECONDS: 2
+  MAX_MEMORY_MB: 512
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Backend: Python / FastAPI (pytest)
+  # ─────────────────────────────────────────────────────────────────────────────
+  test-backend:
+    name: Backend Tests (Python)
+    runs-on: [self-hosted, linux, arm64, pi]
+    defaults:
+      run:
+        working-directory: api
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Ensure Python 3.12+
+        run: |
+          # The self-hosted runner may ship Python 3.8 (Ubuntu 20.04).
+          # actions/setup-python@v5 does NOT support ARM64 Ubuntu 20.04,
+          # so we install a standalone Python 3.12 build for ARM64 Linux
+          # when the system version is too old.
+          if python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3,12) else 1)' 2>/dev/null; then
+            echo "✓ Python $(python3 --version 2>&1) is sufficient"
+            exit 0
+          fi
+          echo "⟳ Installing Python 3.12 from python-build-standalone…"
+          curl -fsSL \
+            "https://github.com/astral-sh/python-build-standalone/releases/download/20260718/cpython-3.12.13%2B20260718-aarch64-unknown-linux-gnu-install_only.tar.gz" \
+            -o /tmp/cpython.tar.gz
+          sudo tar -xzf /tmp/cpython.tar.gz -C /opt
+          echo "/opt/python/bin" >> "$GITHUB_PATH"
+          echo "PYTHON=/opt/python/bin/python3" >> "$GITHUB_ENV"
+          echo "✓ Python 3.12 installed at /opt/python"
+
+      - name: Install Python dependencies
+        run: |
+          pip install --quiet -r requirements.txt
+          pip install --quiet ".[dev]"
+
+      - name: Run backend tests with pytest
+        run: |
+          mkdir -p ../test-results
+          python -m pytest \
+            --junitxml=../test-results/backend-results.xml \
+            --verbose \
+            --tb=short \
+            2>&1 | tee ../test-results/backend-output.txt
+
+      - name: Upload backend test results (artifacts)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-test-results
+          path: test-results/backend-results.xml
+          retention-days: 14
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Frontend: React / Vite (vitest)
+  # ─────────────────────────────────────────────────────────────────────────────
+  test-frontend:
+    name: Frontend Tests (React/Vite)
+    runs-on: [self-hosted, linux, arm64, pi]
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js (self-hosted runner doesn't ship npm)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Run frontend tests with vitest
+        run: |
+          mkdir -p ../test-results
+          npm test -- --reporter=verbose 2>&1 | tee ../test-results/frontend-output.txt
+
+      - name: Upload frontend test output (artifacts)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-test-results
+          path: test-results/
+          retention-days: 14
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Combined status check — "Test Results"
+  #
+  # This job always runs (even on failure) and aggregates test results from
+  # both suites.  Branch protection rules should reference this check name.
+  # ─────────────────────────────────────────────────────────────────────────────
+  test-results:
+    name: Test Results
+    if: always()
+    runs-on: [self-hosted, linux, arm64, pi]
+    needs: [test-backend, test-frontend]
+
+    steps:
+      - name: Download all test artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-artifacts
+
+      - name: Publish combined test results artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: combined-test-results
+          path: all-artifacts/
+          retention-days: 14
+
+      - name: Summarise test results in job summary
+        run: |
+          echo "## 🧪 Test Results Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Suite | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+
+          BACKEND="${{ needs.test-backend.result }}"
+          FRONTEND="${{ needs.test-frontend.result }}"
+
+          if [ "$BACKEND" = "success" ]; then
+            echo "| ✅ Backend (Python/pytest) | Passed |" >> $GITHUB_STEP_SUMMARY
+          elif [ "$BACKEND" = "skipped" ]; then
+            echo "| ⏭️ Backend (Python/pytest) | Skipped |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| ❌ Backend (Python/pytest) | Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "$FRONTEND" = "success" ]; then
+            echo "| ✅ Frontend (React/vitest) | Passed |" >> $GITHUB_STEP_SUMMARY
+          elif [ "$FRONTEND" = "skipped" ]; then
+            echo "| ⏭️ Frontend (React/vitest) | Skipped |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| ❌ Frontend (React/vitest) | Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "$BACKEND" = "success" ] && [ "$FRONTEND" = "success" ]; then
+            echo "**✅ All tests passed!**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**❌ Some tests failed — check the individual job logs for details.**" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Create kanban review task (on test success)
+        if: needs.test-backend.result == 'success' && needs.test-frontend.result == 'success'
+        env:
+          HERMES_BIN: /home/pi2/.hermes/hermes-agent/venv/bin/hermes
+          HERMES_KANBAN_BOARD: interactive-python-tutorials
+        run: |
+          PR_NUM="${{ github.event.pull_request.number }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          TASK_TITLE="Review PR #${PR_NUM} — ${PR_TITLE}"
+          IDEM_KEY="review-pr-${PR_NUM}"
+          BODY="PR: ${PR_URL}%0AAuto-created by CI after tests passed."
+
+          echo "Creating kanban review task for PR #${PR_NUM}…"
+
+          $HERMES_BIN kanban create \
+            --board "$HERMES_KANBAN_BOARD" \
+            --assignee reviewer \
+            --workspace worktree \
+            --body "$BODY" \
+            --idempotency-key "$IDEM_KEY" \
+            "$TASK_TITLE" \
+            2>&1 || echo "⚠ kanban create returned non-zero (may be a duplicate)"
+
+      - name: Fail if any test suite failed
+        if: needs.test-backend.result != 'success' || needs.test-frontend.result != 'success'
+        run: |
+          echo "One or more test suites failed."
+          echo "  Backend:  ${{ needs.test-backend.result }}"
+          echo "  Frontend: ${{ needs.test-frontend.result }}"
+          exit 1

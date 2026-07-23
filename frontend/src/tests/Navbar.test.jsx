@@ -60,7 +60,7 @@ describe('Navbar', () => {
     // Set a valid-ish token — AuthProvider detects it on mount
     const payload = btoa(JSON.stringify({ sub: '1', username: 'testuser', exp: 9999999999 }));
     const header = btoa(JSON.stringify({ alg: 'HS256' }));
-    const token = `${header}.${payload.replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')}.fakesig`;
+    const token = `${header}.${payload.replace(/=/g, '').replace(/[+]/g, '-').replace(/[/]/g, '_')}.fakesig`;
     localStorage.setItem('auth_token', token);
 
     renderNavbar();
@@ -71,6 +71,31 @@ describe('Navbar', () => {
     // Should show logout button in mobile menu
     const logoutButtons = screen.getAllByText('Logout');
     expect(logoutButtons.length).toBeGreaterThanOrEqual(1);
+
+    // Username should be visible in the mobile menu after token restore
+    // When mobile menu is open, username appears in both desktop and mobile nav
+    const usernameSpans = screen.getAllByText('testuser');
+    expect(usernameSpans.length).toBeGreaterThanOrEqual(2);
+
+    localStorage.removeItem('auth_token');
+  });
+
+  it('shows username in desktop navbar when authenticated via stored token', () => {
+    // Simulate a page reload with a valid stored JWT that includes username
+    const payload = btoa(JSON.stringify({ sub: '1', username: 'johndoe', exp: 9999999999 }));
+    const header = btoa(JSON.stringify({ alg: 'HS256' }));
+    const token = `${header}.${payload.replace(/=/g, '').replace(/[+]/g, '-').replace(/[/]/g, '_')}.fakesig`;
+    localStorage.setItem('auth_token', token);
+
+    // Ensure API mock is set for the token-based auth path
+    renderNavbar();
+
+    // The username from the JWT payload should be rendered in the desktop navbar
+    expect(screen.getByText('johndoe')).toBeInTheDocument();
+
+    // Desktop should show Logout button (not Login link)
+    expect(screen.getByText('Logout')).toBeInTheDocument();
+    expect(screen.queryByText('Login')).not.toBeInTheDocument();
 
     localStorage.removeItem('auth_token');
   });

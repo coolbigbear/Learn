@@ -33,7 +33,7 @@ async def register(body: AuthRequest, db: AsyncSession = Depends(get_db)):
     await db.flush()
     await db.refresh(user)
 
-    token = create_access_token(user.id)
+    token = create_access_token(user.id, username=user.username)
     return AuthResponse(id=user.id, username=user.username, token=token)
 
 
@@ -44,7 +44,7 @@ async def login(body: AuthRequest, db: AsyncSession = Depends(get_db)):
     if user is None or not verify_password(body.password, user.password_hash):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
-    token = create_access_token(user.id)
+    token = create_access_token(user.id, username=user.username)
     return AuthResponse(id=user.id, username=user.username, token=token)
 
 

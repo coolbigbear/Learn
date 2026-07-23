@@ -35,6 +35,12 @@ services:
       - /tmp/sandbox-work:/tmp/sandbox-work
       - ./content:/app/content:ro
     restart: unless-stopped
+    healthcheck:
+      test: python -c "import urllib.request; exit(0 if urllib.request.urlopen('http://localhost:8080/api/health', timeout=5).status == 200 else 1)"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
 
   # ── Production environment ───────────────────────────────────────────────────
   prod:
@@ -60,8 +66,10 @@ services:
     restart: unless-stopped
 
   # ── Self-hosted GitHub Actions Runner ─────────────────────────────────────────
+  # Uses ubuntu-noble (24.04 LTS) which ships Python 3.12 out of the box,
+  # avoiding the Python 3.8 issue on the focal-based `latest` tag.
   runner:
-    image: myoung34/github-runner:latest
+    image: myoung34/github-runner:ubuntu-noble
     container_name: github-runner-learn
     restart: unless-stopped
     environment:

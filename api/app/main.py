@@ -94,6 +94,18 @@ async def lifespan(app: FastAPI):
 
     yield  # Always yield — every code path must reach this
 
+    # ── Graceful shutdown ──────────────────────────────────────────────
+    # Clean up any in-flight Docker runner containers that may have been
+    # created but not started/removed before the server stops.
+    try:
+        from app.services.docker_runner import get_runner
+
+        runner = get_runner()
+        if runner is not None and runner._client is not None:
+            runner._clean_orphans()
+    except Exception:
+        pass
+
 
 def create_app() -> FastAPI:
     app = FastAPI(
@@ -172,9 +184,10 @@ def create_app() -> FastAPI:
             # SPA catch-all — serve real files from dist/ directly
             # (favicon.svg, icons.svg, etc.) and fall back to index.html
             # for client-side routes (/lessons, /progress, /login, /).
-            # Note: we use @app.route (Starlette) with a catch-all pattern,
-            # but get the path from request.url.path because the route
-            # parameter {path:path} is not reliably populated by FastAPI.
+            #
+            # Cache control:
+            #   - index.html       → no-cache (always revalidate to pick up new asset hashes)
+            #   - hashed assets     → cached implicitly via Vite's content-hashed filenames
             @app.route("/{path:path}", methods=["GET"])
             async def serve_spa(request):
                 path = request.url.path.lstrip("/")
@@ -186,10 +199,20 @@ def create_app() -> FastAPI:
                 # If the path matches a real file under dist, serve it
                 file_path = FRONTEND_DIST / path if path else FRONTEND_DIST / "index.html"
                 if file_path.exists() and file_path.is_file():
+                    if file_path.name == "index.html":
+                        # Never cache the app shell — forces browser to revalidate
+                        # and pick up newly-hashed JS/CSS assets on every reload.
+                        return FileResponse(
+                            str(file_path),
+                            headers={"Cache-Control": "no-cache, must-revalidate"},
+                        )
                     return FileResponse(str(file_path))
 
                 # Otherwise serve index.html for client-side routing
-                return FileResponse(str(index_path))
+                return FileResponse(
+                    str(index_path),
+                    headers={"Cache-Control": "no-cache, must-revalidate"},
+                )
 
     return app
 

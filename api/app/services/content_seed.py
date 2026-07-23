@@ -19,7 +19,22 @@ from app.database import async_session_factory
 from app.models.exercise import Exercise
 from app.models.lesson import Lesson
 
-CONTENT_DIR = Path(os.environ.get("CONTENT_DIR", "/app/content"))
+# Resolve the content directory path.
+# Supports three strategies in priority order:
+#   1. CONTENT_DIR env var (explicit override, e.g. in docker-compose)
+#   2. Derive from this file's location — works in both Docker and local dev
+#   3. Hardcoded fallback (/app/content for backward compat with older images)
+_content_env = os.environ.get("CONTENT_DIR")
+if _content_env:
+    CONTENT_DIR = Path(_content_env)
+else:
+    # File is at api/app/services/content_seed.py (or /app/app/services/ in Docker)
+    _root = Path(__file__).resolve().parent.parent.parent.parent  # project root
+    if not (_root / "api").is_dir():
+        # Running inside Docker: /app/app/services/ → /app
+        _root = Path(__file__).resolve().parent.parent.parent
+    _candidate = _root / "content"
+    CONTENT_DIR = _candidate if _candidate.is_dir() else Path("/app/content")
 
 
 async def _get_existing_lesson_slugs(session: AsyncSession) -> set[str]:
@@ -202,3 +217,12 @@ async def seed_content(
     async with async_session_factory() as new_session:
         async with new_session.begin():
             return await _work(new_session)
+
+
+async def _seed_all(session: AsyncSession) -> dict:
+    """Legacy helper: seed all lessons from manifest (for fresh databases).
+
+    Deprecated in favour of seed_content(). Kept for backward compatibility
+    in case external callers reference it by name.
+    """
+    return await seed_content(session=session)

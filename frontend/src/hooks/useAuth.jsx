@@ -37,6 +37,7 @@ export function AuthProvider({ children }) {
         setUser({
           token,
           userId: payload?.sub ? parseInt(payload.sub, 10) : undefined,
+          username: payload?.username,
         });
       }
     }
