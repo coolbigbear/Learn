@@ -33,7 +33,14 @@ services:
       - qa-db:/app/data
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/sandbox-work:/tmp/sandbox-work
-      - ./content:/app/content:ro
+    # NOTE: No ./content:/app/content bind mount here.
+    # Content is baked into the image via Dockerfile COPY.
+    # A bind mount here would override the baked-in content
+    # and breaks in CI because the GitHub runner container
+    # resolves the path relative to its own filesystem while
+    # Docker interprets bind mounts from the host — the paths
+    # don't align. Use docker-compose.override.yml for local
+    # dev if you need live content reload without rebuild.
     restart: unless-stopped
     healthcheck:
       test: python -c "import urllib.request; exit(0 if urllib.request.urlopen('http://localhost:8080/api/health', timeout=5).status == 200 else 1)"
@@ -62,7 +69,6 @@ services:
       - prod-db:/app/data
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/sandbox-work:/tmp/sandbox-work
-      - ./content:/app/content:ro
     restart: unless-stopped
 
   # ── Self-hosted GitHub Actions Runner ─────────────────────────────────────────
