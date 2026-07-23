@@ -4,7 +4,9 @@ FROM python:3.11-slim
 RUN addgroup --system --gid 1001 sandbox \
     && adduser --system --uid 1001 --ingroup sandbox --disabled-password --no-create-home sandbox
 
-# No Python packages needed — all execution is stdlib-only
+# Install xmltodict for XML exercises (not in stdlib)
+RUN pip install --no-cache-dir xmltodict
+
 USER sandbox
 WORKDIR /home/sandbox
 
