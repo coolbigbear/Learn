@@ -1,0 +1,167 @@
+# =============================================================================
+# CI — Pull Request Test Runner
+#
+# Triggers on every PR to QA or main, runs both backend (pytest) and
+# frontend (vitest) test suites on the self-hosted ARM64 runner, and
+# reports results as a status check named "Test Results".
+#
+# The self-hosted runner already has Python 3.13.5 and Node 20.18.0
+# pre-installed, so we skip setup-python / setup-node for speed.
+# =============================================================================
+
+name: CI - Test Results
+
+on:
+  pull_request:
+    branches:
+      - QA
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+# Cancel any in-progress CI run for the same PR when a new commit is pushed
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Test configuration — in-memory SQLite, no Docker sandbox in CI
+  JWT_SECRET_KEY: ci-test-secret-key
+  DOCKER_ENABLED: "false"
+  MAX_CPU_SECONDS: 2
+  MAX_MEMORY_MB: 512
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Backend: Python / FastAPI (pytest)
+  # ─────────────────────────────────────────────────────────────────────────────
+  test-backend:
+    name: Backend Tests (Python)
+    runs-on: [self-hosted, linux, arm64, pi]
+    defaults:
+      run:
+        working-directory: api
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Python dependencies
+        run: |
+          pip install --quiet -r requirements.txt
+          pip install --quiet -e ".[dev]"
+
+      - name: Run backend tests with pytest
+        run: |
+          mkdir -p ../test-results
+          python -m pytest \
+            --junitxml=../test-results/backend-results.xml \
+            --verbose \
+            --tb=short \
+            2>&1 | tee ../test-results/backend-output.txt
+
+      - name: Upload backend test results (artifacts)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-test-results
+          path: test-results/backend-results.xml
+          retention-days: 14
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Frontend: React / Vite (vitest)
+  # ─────────────────────────────────────────────────────────────────────────────
+  test-frontend:
+    name: Frontend Tests (React/Vite)
+    runs-on: [self-hosted, linux, arm64, pi]
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Run frontend tests with vitest
+        run: |
+          mkdir -p ../test-results
+          npm test -- --reporter=verbose 2>&1 | tee ../test-results/frontend-output.txt
+
+      - name: Upload frontend test output (artifacts)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-test-results
+          path: test-results/
+          retention-days: 14
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Combined status check — "Test Results"
+  #
+  # This job always runs (even on failure) and aggregates test results from
+  # both suites.  Branch protection rules should reference this check name.
+  # ─────────────────────────────────────────────────────────────────────────────
+  test-results:
+    name: Test Results
+    if: always()
+    runs-on: [self-hosted, linux, arm64, pi]
+    needs: [test-backend, test-frontend]
+
+    steps:
+      - name: Download all test artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-artifacts
+
+      - name: Publish combined test results artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: combined-test-results
+          path: all-artifacts/
+          retention-days: 14
+
+      - name: Summarise test results in job summary
+        run: |
+          echo "## 🧪 Test Results Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Suite | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+
+          BACKEND="${{ needs.test-backend.result }}"
+          FRONTEND="${{ needs.test-frontend.result }}"
+
+          if [ "$BACKEND" = "success" ]; then
+            echo "| ✅ Backend (Python/pytest) | Passed |" >> $GITHUB_STEP_SUMMARY
+          elif [ "$BACKEND" = "skipped" ]; then
+            echo "| ⏭️ Backend (Python/pytest) | Skipped |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| ❌ Backend (Python/pytest) | Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "$FRONTEND" = "success" ]; then
+            echo "| ✅ Frontend (React/vitest) | Passed |" >> $GITHUB_STEP_SUMMARY
+          elif [ "$FRONTEND" = "skipped" ]; then
+            echo "| ⏭️ Frontend (React/vitest) | Skipped |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| ❌ Frontend (React/vitest) | Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "$BACKEND" = "success" ] && [ "$FRONTEND" = "success" ]; then
+            echo "**✅ All tests passed!**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**❌ Some tests failed — check the individual job logs for details.**" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Fail if any test suite failed
+        if: needs.test-backend.result != 'success' || needs.test-frontend.result != 'success'
+        run: |
+          echo "One or more test suites failed."
+          echo "  Backend:  ${{ needs.test-backend.result }}"
+          echo "  Frontend: ${{ needs.test-frontend.result }}"
+          exit 1
