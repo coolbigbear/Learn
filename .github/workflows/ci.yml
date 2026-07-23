@@ -5,9 +5,13 @@
 # frontend (vitest) test suites on the self-hosted ARM64 runner, and
 # reports results as a status check named "Test Results".
 #
-# The self-hosted runner already has Python 3.13.5 pre-installed, so we
-# skip setup-python for speed.  Node.js/npm is installed via
-# actions/setup-node@v4 because the runner doesn't ship it.
+# The CI runner (myoung34/github-runner) ships Ubuntu 20.04 (Python 3.8)
+# by default.  This workflow installs a standalone Python 3.12 build for
+# ARM64 Linux when the system Python is too old (or uses the native
+# Python 3.12 on ubuntu-noble runner images).
+#
+# Node.js/npm is installed via actions/setup-node@v4 because the runner
+# doesn't ship it.
 # =============================================================================
 
 name: CI - Test Results
@@ -48,6 +52,25 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Ensure Python 3.12+
+        run: |
+          # The self-hosted runner may ship Python 3.8 (Ubuntu 20.04).
+          # actions/setup-python@v5 does NOT support ARM64 Ubuntu 20.04,
+          # so we install a standalone Python 3.12 build for ARM64 Linux
+          # when the system version is too old.
+          if python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3,12) else 1)' 2>/dev/null; then
+            echo "✓ Python $(python3 --version 2>&1) is sufficient"
+            exit 0
+          fi
+          echo "⟳ Installing Python 3.12 from python-build-standalone…"
+          curl -fsSL \
+            "https://github.com/astral-sh/python-build-standalone/releases/download/20260718/cpython-3.12.13%2B20260718-aarch64-unknown-linux-gnu-install_only.tar.gz" \
+            -o /tmp/cpython.tar.gz
+          sudo tar -xzf /tmp/cpython.tar.gz -C /opt
+          echo "/opt/python/bin" >> "$GITHUB_PATH"
+          echo "PYTHON=/opt/python/bin/python3" >> "$GITHUB_ENV"
+          echo "✓ Python 3.12 installed at /opt/python"
 
       - name: Install Python dependencies
         run: |
