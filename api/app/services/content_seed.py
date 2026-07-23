@@ -66,6 +66,38 @@ async def _get_existing_lesson_slugs(session: AsyncSession) -> set[str]:
     return {row[0] for row in result.all()}
 
 
+async def _sync_existing_lesson_paths(
+    session: AsyncSession, content_dir: Path
+) -> int:
+    """Update existing lessons' path column to match the manifest.
+
+    When manifest paths are corrected (e.g. after a restructure that flattened
+    all paths to ``\"python\"``), existing lessons in the database that were
+    seeded with wrong or outdated paths get corrected. Returns count of
+    updates made.
+    """
+    manifest_path = _find_manifest(content_dir)
+    if manifest_path is None:
+        return 0
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    update_count = 0
+
+    for entry in manifest:
+        slug = entry["slug"]
+        expected_path = entry.get("path", "python")
+
+        result = await session.execute(
+            select(Lesson).where(Lesson.slug == slug)
+        )
+        lesson = result.scalar_one_or_none()
+        if lesson is not None and lesson.path != expected_path:
+            lesson.path = expected_path
+            update_count += 1
+
+    return update_count
+
+
 async def _sync_exercise_test_cases(
     session: AsyncSession, content_dir: Path
 ) -> int:
@@ -224,6 +256,9 @@ async def seed_content(
         # Sync test cases for all existing exercises
         synced = await _sync_exercise_test_cases(db, content_dir)
 
+        # Sync paths for existing lessons (e.g. after manifest path corrections)
+        paths_synced = await _sync_existing_lesson_paths(db, content_dir)
+
         if existing_slugs and not new_entries:
             # Existing data, nothing new to add
             return {
@@ -231,6 +266,7 @@ async def seed_content(
                 "reason": f"Lessons table already has {len(existing_slugs)} rows",
                 "lessons_existing": len(existing_slugs),
                 "exercises_synced": synced,
+                "paths_synced": paths_synced,
             }
         elif existing_slugs and new_entries:
             # Existing data plus new lessons added
@@ -240,6 +276,7 @@ async def seed_content(
                 "lessons_added": lessons_added,
                 "exercises_added": exercises_added,
                 "exercises_synced": synced,
+                "paths_synced": paths_synced,
             }
         else:
             # Fresh seed
