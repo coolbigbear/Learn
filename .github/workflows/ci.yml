@@ -158,12 +158,9 @@ jobs:
             echo "**❌ Some tests failed — check the individual job logs for details.**" >> $GITHUB_STEP_SUMMARY
           fi
 
-<<<<<<< HEAD
-=======
       - name: Create kanban review task (on test success)
         if: needs.test-backend.result == 'success' && needs.test-frontend.result == 'success'
         env:
-          HERMES_BIN: /home/pi2/.hermes/hermes-agent/venv/bin/hermes
           HERMES_KANBAN_BOARD: interactive-python-tutorials
         run: |
           PR_NUM="${{ github.event.pull_request.number }}"
@@ -171,11 +168,11 @@ jobs:
           PR_URL="${{ github.event.pull_request.html_url }}"
           TASK_TITLE="Review PR #${PR_NUM} — ${PR_TITLE}"
           IDEM_KEY="review-pr-${PR_NUM}"
-          BODY="PR: ${PR_URL}%0AAuto-created by CI after tests passed."
+          BODY=$'PR: '"${PR_URL}"$'\nAuto-created by CI after tests passed.'
 
           echo "Creating kanban review task for PR #${PR_NUM}…"
 
-          $HERMES_BIN kanban create \
+          hermes kanban create \
             --board "$HERMES_KANBAN_BOARD" \
             --assignee reviewer \
             --workspace worktree \
@@ -184,7 +181,6 @@ jobs:
             "$TASK_TITLE" \
             2>&1 || echo "⚠ kanban create returned non-zero (may be a duplicate)"
 
->>>>>>> pr-13
       - name: Fail if any test suite failed
         if: needs.test-backend.result != 'success' || needs.test-frontend.result != 'success'
         run: |
