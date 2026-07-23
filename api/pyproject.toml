@@ -7,7 +7,7 @@ name = "python-tutorials-api"
 version = "0.1.0"
 description = "Interactive Python Tutorials — FastAPI backend"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.12"
 license = {text = "MIT"}
 dependencies = [
     "fastapi==0.115.0",
