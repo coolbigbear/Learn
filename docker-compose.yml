@@ -66,8 +66,10 @@ services:
     restart: unless-stopped
 
   # ── Self-hosted GitHub Actions Runner ─────────────────────────────────────────
+  # Uses ubuntu-noble (24.04 LTS) which ships Python 3.12 out of the box,
+  # avoiding the Python 3.8 issue on the focal-based `latest` tag.
   runner:
-    image: myoung34/github-runner:latest
+    image: myoung34/github-runner:ubuntu-noble
     container_name: github-runner-learn
     restart: unless-stopped
     environment:
