@@ -50,7 +50,7 @@ When you make the request, you replace `{id}` with an actual value:
 | Pattern         | Actual URL              | Meaning               |
 |-----------------|-------------------------|-----------------------|
 | `/users/{id}`   | `/users/42`             | Get user with ID 42   |
-| `/posts/{id}`   | `/posts/5/comments`     | Get comments on post 5|
+| `/posts/{id}/comments` | `/posts/5/comments`     | Get comments on post 5|
 | `/search/{q}`   | `/search/python`        | Search for "python"   |
 
 ### Path Parameters vs Query Parameters
