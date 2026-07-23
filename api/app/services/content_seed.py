@@ -75,10 +75,65 @@ def resolve_content_base(content_dir: Path) -> tuple[Path, Path]:
     )
 
 
+def _find_manifest(content_dir: Path) -> Path | None:
+    """Locate manifest.json in the content directory.
+
+    Tries the direct path first, then falls back to looking inside
+    language-subdirectories (e.g. ``content/python/manifest.json``) to
+    support restructured content layouts where lessons were grouped
+    under language folders.
+
+    Returns the manifest Path if found, otherwise None.
+    """
+    direct = content_dir / "manifest.json"
+    if direct.is_file():
+        return direct
+    # Fallback: scan immediate subdirectories for one that contains manifest.json
+    if content_dir.is_dir():
+        for sub in sorted(content_dir.iterdir()):
+            if sub.is_dir():
+                nested = sub / "manifest.json"
+                if nested.is_file():
+                    return nested
+    return None
+
+
 async def _get_existing_lesson_slugs(session: AsyncSession) -> set[str]:
     """Return the set of lesson slugs already in the database."""
     result = await session.execute(select(Lesson.slug))
     return {row[0] for row in result.all()}
+
+
+async def _sync_existing_lesson_paths(
+    session: AsyncSession, content_dir: Path
+) -> int:
+    """Update existing lessons' path column to match the manifest.
+
+    When manifest paths are corrected (e.g. after a restructure that flattened
+    all paths to ``"python"``), existing lessons in the database that were
+    seeded with wrong or outdated paths get corrected. Returns count of
+    updates made.
+    """
+    manifest_path = _find_manifest(content_dir)
+    if manifest_path is None:
+        return 0
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    update_count = 0
+
+    for entry in manifest:
+        slug = entry["slug"]
+        expected_path = entry.get("path", "python")
+
+        result = await session.execute(
+            select(Lesson).where(Lesson.slug == slug)
+        )
+        lesson = result.scalar_one_or_none()
+        if lesson is not None and lesson.path != expected_path:
+            lesson.path = expected_path
+            update_count += 1
+
+    return update_count
 
 
 async def _sync_exercise_test_cases(
@@ -89,6 +144,9 @@ async def _sync_exercise_test_cases(
     Reads base_dir/<lesson>/exercises.json for each lesson in the manifest and
     updates the database if any exercise's test_cases differ. Returns count of
     updates made.
+
+    Uses lesson slug + exercise slug to uniquely identify exercises (the
+    Exercise.slug is unique per lesson, not globally).
 
     Args:
         session: Database session.
@@ -103,6 +161,14 @@ async def _sync_exercise_test_cases(
         if not exercises_json_path.is_file():
             continue
 
+        # Resolve the lesson ID for scoping exercise lookups
+        lesson_result = await session.execute(
+            select(Lesson).where(Lesson.slug == slug)
+        )
+        lesson = lesson_result.scalar_one_or_none()
+        if lesson is None:
+            continue
+
         exercises_data = json.loads(exercises_json_path.read_text(encoding="utf-8"))
 
         for content_ex in exercises_data:
@@ -110,7 +176,10 @@ async def _sync_exercise_test_cases(
             content_test_cases = content_ex.get("test_cases", [])
 
             result = await session.execute(
-                select(Exercise).where(Exercise.slug == ex_slug)
+                select(Exercise).where(
+                    Exercise.slug == ex_slug,
+                    Exercise.lesson_id == lesson.id,
+                )
             )
             db_exercise = result.scalar_one_or_none()
             if db_exercise is None:
@@ -139,7 +208,7 @@ async def _seed_lesson(
     slug = entry["slug"]
     title = entry["title"]
     order = entry["order"]
-    path_key = entry.get("path", "core")
+    path_key = entry.get("path", "python")
 
     # Read lesson content
     lesson_md = base_dir / slug / "lesson.md"
@@ -259,13 +328,18 @@ async def seed_content(
                 "lessons_added": lessons_added,
                 "exercises_added": exercises_added,
             }
-        elif existing_slugs and not new_entries:
+
+        # Sync paths for existing lessons (e.g. after manifest path corrections)
+        paths_synced = await _sync_existing_lesson_paths(db, content_dir)
+
+        if existing_slugs and not new_entries:
             # Existing data, nothing new to add
             return {
                 "status": "synced",
                 "reason": f"Lessons table already has {len(existing_slugs)} rows",
                 "lessons_existing": len(existing_slugs),
                 "exercises_synced": synced,
+                "paths_synced": paths_synced,
             }
         elif existing_slugs and new_entries:
             # Existing data plus new lessons added
@@ -275,6 +349,7 @@ async def seed_content(
                 "lessons_added": lessons_added,
                 "exercises_added": exercises_added,
                 "exercises_synced": synced,
+                "paths_synced": paths_synced,
             }
         else:
             # Fresh seed

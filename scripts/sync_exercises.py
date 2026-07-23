@@ -59,10 +59,19 @@ async def sync() -> int:
         expire_on_commit=False,
     )
 
-    # Read manifest
+    # Read manifest — supports both flat and language-nested layouts
     manifest_path = CONTENT_DIR / "manifest.json"
     if not manifest_path.exists():
-        print(f"ERROR: manifest not found at {manifest_path}")
+        # Fallback: look inside a language subdirectory
+        if CONTENT_DIR.is_dir():
+            for sub in sorted(CONTENT_DIR.iterdir()):
+                if sub.is_dir():
+                    candidate = sub / "manifest.json"
+                    if candidate.exists():
+                        manifest_path = candidate
+                        break
+    if not manifest_path.exists():
+        print(f"ERROR: manifest not found in {CONTENT_DIR}")
         return 1
 
     with open(manifest_path) as f:
@@ -73,7 +82,8 @@ async def sync() -> int:
     async with session_factory() as session:
         for entry in manifest:
             slug = entry["slug"]
-            exercises_json_path = CONTENT_DIR / slug / "exercises.json"
+            path_key = entry.get("path", "python")
+            exercises_json_path = CONTENT_DIR / path_key / slug / "exercises.json"
             if not exercises_json_path.exists():
                 continue
 

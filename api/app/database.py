@@ -223,6 +223,30 @@ async def create_tables():
         except Exception:
             pass  # Column already dropped or SQLite version doesn't support DROP COLUMN
 
+        # Migrate: Change exercises.slug from globally UNIQUE to per-lesson unique.
+        # The new model uses UniqueConstraint('lesson_id', 'slug'), but existing DBs
+        # have a global UNIQUE on slug (auto-indexed). SQLite doesn't allow ALTER TABLE
+        # DROP CONSTRAINT, so we drop the auto-index and create the composite index.
+        try:
+            # Drop old auto-index from UNIQUE(slug) — SQLite names these
+            # sqlite_autoindex_<table>_<N>. Safe to try; fails silently if absent.
+            for n in (1, 2, 3):
+                try:
+                    await conn.execute(
+                        text(f"DROP INDEX IF EXISTS sqlite_autoindex_exercises_{n}")
+                    )
+                except Exception:
+                    pass
+            # Create composite unique index (idempotent)
+            await conn.execute(
+                text(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS uq_exercise_per_lesson "
+                    "ON exercises(lesson_id, slug)"
+                )
+            )
+        except Exception:
+            pass
+
     # Verify integrity after migrations
     try:
         integrity = await check_database_integrity()

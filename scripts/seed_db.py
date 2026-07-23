@@ -36,7 +36,7 @@ async def ensure_path_column(engine):
         columns = {row.name for row in result.fetchall()}
         if "path" not in columns:
             await conn.execute(
-                text("ALTER TABLE lessons ADD COLUMN path VARCHAR(50) NOT NULL DEFAULT 'core'")
+                text("ALTER TABLE lessons ADD COLUMN path VARCHAR(50) NOT NULL DEFAULT 'python'")
             )
             await conn.commit()
             print("Added `path` column to lessons table")
@@ -48,7 +48,7 @@ async def update_existing_lessons(session, manifest):
     """Update existing lessons with their path from the manifest."""
     for entry in manifest:
         slug = entry["slug"]
-        expected_path = entry.get("path", "core")
+        expected_path = entry.get("path", "python")
         result = await session.execute(
             select(Lesson).where(Lesson.slug == slug)
         )
@@ -80,10 +80,18 @@ async def seed():
     )
 
     async with session_factory() as session:
-        # Read manifest
+        # Read manifest — supports both flat and language-nested layouts
         manifest_path = CONTENT_DIR / "manifest.json"
         if not manifest_path.exists():
-            print(f"ERROR: manifest not found at {manifest_path}")
+            if CONTENT_DIR.is_dir():
+                for sub in sorted(CONTENT_DIR.iterdir()):
+                    if sub.is_dir():
+                        candidate = sub / "manifest.json"
+                        if candidate.exists():
+                            manifest_path = candidate
+                            break
+        if not manifest_path.exists():
+            print(f"ERROR: manifest not found in {CONTENT_DIR}")
             return
 
         with open(manifest_path) as f:
@@ -103,7 +111,8 @@ async def seed():
 
         for entry in manifest:
             slug = entry["slug"]
-            lesson_dir = CONTENT_DIR / slug
+            path_key = entry.get("path", "python")
+            lesson_dir = CONTENT_DIR / path_key / slug
 
             # Read lesson.md
             md_path = lesson_dir / "lesson.md"
@@ -117,7 +126,7 @@ async def seed():
                 slug=slug,
                 title=entry["title"],
                 content=content,
-                path=entry.get("path", "core"),
+                path=entry.get("path", "python"),
                 order=entry["order"],
             )
             session.add(lesson)
