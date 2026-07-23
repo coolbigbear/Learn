@@ -8,6 +8,7 @@ import Lessons from './pages/Lessons.jsx';
 import LessonView from './pages/LessonView.jsx';
 import Progress from './pages/Progress.jsx';
 
+// CI test: verify setup-node step works for frontend tests
 export default function App() {
   return (
     <BrowserRouter>
