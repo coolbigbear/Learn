@@ -1,0 +1,122 @@
+[
+  {
+    "slug": "build-json-payload",
+    "title": "Build a JSON payload for an API request",
+    "instruction": "Build a Python dictionary that represents a JSON payload for creating a new product in an API. The payload should have:\n- 'name': 'Wireless Mouse'\n- 'price': 29.99\n- 'in_stock': True\n- 'tags': ['electronics', 'accessories']\n\nThen serialize it to a JSON string using `json.dumps(indent=2)` and print it.",
+    "starter_code": "import json\n\n# Build the payload dictionary\npayload = {\n    # Your code here\n}\n\n# Serialize and print\n",
+    "solution_code": "import json\n\npayload = {\n    \"name\": \"Wireless Mouse\",\n    \"price\": 29.99,\n    \"in_stock\": True,\n    \"tags\": [\"electronics\", \"accessories\"]\n}\n\nprint(json.dumps(payload, indent=2))\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "{\n  \"name\": \"Wireless Mouse\",\n  \"price\": 29.99,\n  \"in_stock\": true,\n  \"tags\": [\n    \"electronics\",\n    \"accessories\"\n  ]\n}\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 1
+  },
+  {
+    "slug": "parse-api-response",
+    "title": "Parse a simulated API response",
+    "instruction": "The variable `api_response` contains a JSON string that simulates what an API returns after creating a user. Parse it with `json.loads()`, then print the user's name and email, each on its own line.\n\nJSON string:\n```\n{\"id\": 101, \"name\": \"Alice\", \"email\": \"alice@example.com\", \"role\": \"admin\"}\n```",
+    "starter_code": "import json\n\napi_response = '{\"id\": 101, \"name\": \"Alice\", \"email\": \"alice@example.com\", \"role\": \"admin\"}'\n\n# Parse and print name and email\n",
+    "solution_code": "import json\n\napi_response = '{\"id\": 101, \"name\": \"Alice\", \"email\": \"alice@example.com\", \"role\": \"admin\"}'\n\ndata = json.loads(api_response)\nprint(data[\"name\"])\nprint(data[\"email\"])\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "Alice\nalice@example.com\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 2
+  },
+  {
+    "slug": "validate-required-keys",
+    "title": "Validate required keys before sending",
+    "instruction": "Write a function called `validate_payload()` that takes a dictionary and checks it has all the required keys: 'name', 'email', and 'age'. If any key is missing, print 'Missing key: X' (where X is the missing key name) and return False. If all keys are present, print 'Payload valid' and return True.\n\nTest it with the payload: `{\"name\": \"Bob\", \"age\": 30}` (missing 'email').",
+    "starter_code": "import json\n\ndef validate_payload(payload):\n    required = [\"name\", \"email\", \"age\"]\n    # Your validation code here\n\n# Test with missing email\npayload = {\"name\": \"Bob\", \"age\": 30}\nvalidate_payload(payload)\n",
+    "solution_code": "import json\n\ndef validate_payload(payload):\n    required = [\"name\", \"email\", \"age\"]\n    for key in required:\n        if key not in payload:\n            print(f\"Missing key: {key}\")\n            return False\n    print(\"Payload valid\")\n    return True\n\npayload = {\"name\": \"Bob\", \"age\": 30}\nvalidate_payload(payload)\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "Missing key: email\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 3
+  },
+  {
+    "slug": "safe-nested-access",
+    "title": "Safely access nested fields from an API response",
+    "instruction": "Parse the JSON string below (simulating an API response) and safely print:\n1. The 'city' from the 'address' object (or 'Unknown city' if missing)\n2. The 'name' of the first tag (or 'No tags' if the list is empty)\n3. The 'theme' from 'preferences' (or 'default' if missing)\n\nUse `.get()` for safe access.\n\nJSON:\n```json\n{\n  \"name\": \"Alice\",\n  \"address\": {\"city\": \"Paris\", \"zip\": \"75001\"},\n  \"tags\": [\"premium\", \"active\"],\n  \"preferences\": {\"notifications\": true}\n}\n```\n\nNote: 'preferences' exists but has no 'theme' key.",
+    "starter_code": "import json\n\ndata = json.loads('''{\n  \"name\": \"Alice\",\n  \"address\": {\"city\": \"Paris\", \"zip\": \"75001\"},\n  \"tags\": [\"premium\", \"active\"],\n  \"preferences\": {\"notifications\": true}\n}''')\n\n# Safely print city, first tag, and theme\n",
+    "solution_code": "import json\n\ndata = json.loads('''{\n  \"name\": \"Alice\",\n  \"address\": {\"city\": \"Paris\", \"zip\": \"75001\"},\n  \"tags\": [\"premium\", \"active\"],\n  \"preferences\": {\"notifications\": true}\n}''')\n\naddress = data.get(\"address\", {})\ncity = address.get(\"city\", \"Unknown city\")\nprint(f\"City: {city}\")\n\ntags = data.get(\"tags\", [])\nfirst_tag = tags[0] if tags else \"No tags\"\nprint(f\"First tag: {first_tag}\")\n\nprefs = data.get(\"preferences\", {})\ntheme = prefs.get(\"theme\", \"default\")\nprint(f\"Theme: {theme}\")\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "City: Paris\nFirst tag: premium\nTheme: default\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 4
+  },
+  {
+    "slug": "build-nested-payload",
+    "title": "Build a nested payload programmatically",
+    "instruction": "Build a nested dictionary for an order in an e-commerce API. Start with an empty dict and add keys step by step:\n\n1. Set 'order_id' to 1001\n2. Set 'customer' to a dict with 'name' ('Alice') and 'email' ('alice@example.com')\n3. Set 'items' to a list of two items, each with 'product' (str) and 'quantity' (int)\n   - Item 1: product='Widget', quantity=2\n   - Item 2: product='Gadget', quantity=1\n4. Set 'shipping' to a dict with 'method' ('express') and 'cost' (9.99)\n\nSerialize with `json.dumps(indent=2)` and print.",
+    "starter_code": "import json\n\norder = {}\n\n# Build the nested structure step by step\n\nprint(json.dumps(order, indent=2))\n",
+    "solution_code": "import json\n\norder = {}\norder[\"order_id\"] = 1001\norder[\"customer\"] = {\"name\": \"Alice\", \"email\": \"alice@example.com\"}\norder[\"items\"] = [\n    {\"product\": \"Widget\", \"quantity\": 2},\n    {\"product\": \"Gadget\", \"quantity\": 1}\n]\norder[\"shipping\"] = {\"method\": \"express\", \"cost\": 9.99}\n\nprint(json.dumps(order, indent=2))\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "{\n  \"order_id\": 1001,\n  \"customer\": {\n    \"name\": \"Alice\",\n    \"email\": \"alice@example.com\"\n  },\n  \"items\": [\n    {\n      \"product\": \"Widget\",\n      \"quantity\": 2\n    },\n    {\n      \"product\": \"Gadget\",\n      \"quantity\": 1\n    }\n  ],\n  \"shipping\": {\n    \"method\": \"express\",\n    \"cost\": 9.99\n  }\n}\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 5
+  },
+  {
+    "slug": "validate-data-types",
+    "title": "Validate data types in a payload",
+    "instruction": "Write a function `validate_types(payload)` that checks:\n- 'age' must be an int or float (if present)\n- 'tags' must be a list (if present)\n- 'email' must be a string (if present)\n- 'active' must be a bool (if present)\n\nIf a type check fails, print 'X must be Y' (e.g., 'age must be a number'). If all checks pass, print 'All types valid'.\n\nTest with: `{\"name\": \"Bob\", \"age\": \"thirty\", \"tags\": [\"user\"], \"active\": True}`",
+    "starter_code": "import json\n\ndef validate_types(payload):\n    # Your type validation code here\n\npayload = {\"name\": \"Bob\", \"age\": \"thirty\", \"tags\": [\"user\"], \"active\": True}\nvalidate_types(payload)\n",
+    "solution_code": "import json\n\ndef validate_types(payload):\n    if \"age\" in payload and not isinstance(payload[\"age\"], (int, float)):\n        print(\"age must be a number\")\n        return\n    if \"tags\" in payload and not isinstance(payload[\"tags\"], list):\n        print(\"tags must be a list\")\n        return\n    if \"email\" in payload and not isinstance(payload[\"email\"], str):\n        print(\"email must be a string\")\n        return\n    if \"active\" in payload and not isinstance(payload[\"active\"], bool):\n        print(\"active must be a bool\")\n        return\n    print(\"All types valid\")\n\npayload = {\"name\": \"Bob\", \"age\": \"thirty\", \"tags\": [\"user\"], \"active\": True}\nvalidate_types(payload)\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "age must be a number\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 6
+  },
+  {
+    "slug": "handle-json-parse-error",
+    "title": "Handle a malformed JSON response",
+    "instruction": "The variable `bad_response` contains invalid JSON (simulating a broken API response). Use a try/except block with `json.JSONDecodeError` to catch the error and print 'Invalid JSON response'. If parsing succeeds, print the parsed data.\n\nBad JSON: `{\"name\": \"Alice\", \"age\": 25,}` (trailing comma)",
+    "starter_code": "import json\n\nbad_response = '{\"name\": \"Alice\", \"age\": 25,}'\n\n# Parse safely with try/except\n",
+    "solution_code": "import json\n\nbad_response = '{\"name\": \"Alice\", \"age\": 25,}'\n\ntry:\n    data = json.loads(bad_response)\n    print(data)\nexcept json.JSONDecodeError:\n    print(\"Invalid JSON response\")\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "Invalid JSON response\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 7
+  },
+  {
+    "slug": "api-client-function",
+    "title": "Write a reusable API client function",
+    "instruction": "Write a function `create_item(name, price)` that builds a payload dict with 'name' and 'price' keys, then simulates sending it by serializing with `json.dumps(indent=2)`. Call it twice:\n- First with name='Laptop', price=999.99\n- Second with name='Mouse', price=25.50\n\nPrint the JSON output of each call separated by a line of 5 dashes ('-----').",
+    "starter_code": "import json\n\ndef create_item(name, price):\n    # Build payload and serialize\n\n# Create Laptop\n\nprint('-----')\n\n# Create Mouse\n",
+    "solution_code": "import json\n\ndef create_item(name, price):\n    payload = {\"name\": name, \"price\": price}\n    print(json.dumps(payload, indent=2))\n\ncreate_item(\"Laptop\", 999.99)\nprint('-----')\ncreate_item(\"Mouse\", 25.50)\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "{\n  \"name\": \"Laptop\",\n  \"price\": 999.99\n}\n-----\n{\n  \"name\": \"Mouse\",\n  \"price\": 25.5\n}\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 8
+  }
+]

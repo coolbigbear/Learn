@@ -56,8 +56,11 @@ def _run_single(input_data, expected, comparison, test_name=None, message=None):
     sys.stderr = io.StringIO()
 
     # Build restricted builtins for user code (exec can't see open/exec/...)
+    # Note: __import__ is NOT restricted — user code needs to import stdlib modules
+    # (csv, io, json, re, math, etc.) for exercises. The subprocess + resource limits
+    # provide adequate isolation.
     user_builtins = dict(_builtins)
-    for _name in ('__import__', 'exec', 'eval', 'compile', 'open'):
+    for _name in ('exec', 'eval', 'compile', 'open'):
         user_builtins.pop(_name, None)
 
     try:
@@ -184,7 +187,8 @@ if results:
 else:
     # No test cases -- just run the code
     user_builtins = dict(_builtins)
-    for _name in ('__import__', 'exec', 'eval', 'compile', 'open'):
+    # __import__ is NOT restricted — user code needs stdlib imports
+    for _name in ('exec', 'eval', 'compile', 'open'):
         user_builtins.pop(_name, None)
     old_stdout = sys.stdout
     sys.stdout = io.StringIO()

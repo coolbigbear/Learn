@@ -27,9 +27,13 @@ services:
       - DATABASE_URL=sqlite+aiosqlite:///./data/tutorials.db
       - ROOT_DIR=/app
       - FRONTEND_DIST=/app/frontend/dist
+      - DOCKER_ENABLED=true
+      - DOCKER_TEMP_DIR=/tmp/sandbox-work
     volumes:
       - qa-db:/app/data
       - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/sandbox-work:/tmp/sandbox-work
+      - ./content:/app/content:ro
     restart: unless-stopped
 
   # ── Production environment ───────────────────────────────────────────────────
@@ -46,9 +50,13 @@ services:
       - DATABASE_URL=sqlite+aiosqlite:///./data/tutorials.db
       - ROOT_DIR=/app
       - FRONTEND_DIST=/app/frontend/dist
+      - DOCKER_ENABLED=true
+      - DOCKER_TEMP_DIR=/tmp/sandbox-work
     volumes:
       - prod-db:/app/data
       - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/sandbox-work:/tmp/sandbox-work
+      - ./content:/app/content:ro
     restart: unless-stopped
 
   # ── Self-hosted GitHub Actions Runner ─────────────────────────────────────────

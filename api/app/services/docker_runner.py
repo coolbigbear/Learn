@@ -6,15 +6,18 @@ with strict resource limits and security constraints. Offloads synchronous
 Docker SDK calls to a thread pool executor so the FastAPI event loop is never
 blocked.
 
+Uses ``put_archive`` to deliver the harness script to the container (avoiding
+volume mount path-resolution issues when the app itself runs in Docker / DinD
+environments). See https://docker-py.readthedocs.io/ for the SDK reference.
+
 On timeout, the container is force-killed to prevent dangling resources.
 """
 
 import asyncio
+import io
 import json
 import logging
-import os
-import shutil
-import tempfile
+import tarfile
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -77,6 +80,71 @@ def _truncate_output(result: dict) -> dict:
             if isinstance(tr.get(key), str) and len(tr[key]) > MAX_OUTPUT_CHARS:
                 tr[key] = tr[key][:MAX_OUTPUT_CHARS] + "... (truncated)"
     return result
+
+
+def _get_container_logs(container) -> bytes:
+    """Safely retrieve container logs, returning empty bytes on failure.
+
+    The Docker API can return 409 Conflict when a container exits and its
+    state transitions to 'dead' or 'removed' between ``wait()`` and
+    ``logs()``. This helper prevents that race condition from propagating
+    as an unhandled exception.
+    """
+    try:
+        return container.logs(stdout=True, stderr=True)
+    except Exception:
+        return b""
+
+
+def _remove_container_with_retry(container, max_attempts: int = 5):
+    """Remove a container with retry + backoff for Docker daemon races.
+
+    On ARM/Pi the Docker daemon sometimes returns "removal of container
+    ... is already in progress" when a container transitions between
+    states.  Retrying after a short delay resolves the issue.
+
+    Falls back to ``docker rm -f`` via subprocess as a last resort,
+    because the Docker SDK's ``remove(force=True)`` can get stuck on
+    state transitions on this platform.
+    """
+    import subprocess as sp
+    import time
+
+    cid = ""
+    for attempt in range(max_attempts):
+        try:
+            cid = container.id
+            container.remove(force=True)
+            return
+        except Exception:
+            if attempt < max_attempts - 1:
+                time.sleep(0.5 * (attempt + 1))
+
+    # Last resort: use Docker CLI directly
+    if cid:
+        try:
+            sp.run(
+                ["docker", "rm", "-f", cid],
+                capture_output=True, text=True, timeout=10,
+            )
+        except Exception:
+            pass
+
+    # Log warning if still cant remove
+    try:
+        remaining = sp.run(
+            ["docker", "ps", "-a", "-q", "--filter", f"id={cid}"],
+            capture_output=True, text=True, timeout=5,
+        )
+        if remaining.stdout.strip():
+            logger.warning(
+                "Container %s still present after all removal attempts",
+                cid[:12],
+            )
+        else:
+            logger.info("Container %s removed via docker CLI fallback", cid[:12])
+    except Exception:
+        pass
 
 
 class DockerRunner:
@@ -168,6 +236,10 @@ class DockerRunner:
     ) -> dict:
         """Run user code inside a Docker container.
 
+        Uses container.create() + put_archive() + start() instead of volume
+        mounts so it works correctly when the API runs inside a Docker
+        container (Docker-in-Docker path resolution issue).
+
         Args:
             user_code: The user's source code as a string.
             test_cases: List of test case dicts with keys: input, expected_output,
@@ -183,15 +255,6 @@ class DockerRunner:
         # Render the harness script
         harness_script = _render_harness(user_code, test_cases)
 
-        # Create tempdir with the harness file
-        tmpdir = tempfile.mkdtemp(prefix="docker_runner_")
-        harness_path = Path(tmpdir) / cfg.get("harness_filename", "runner.py")
-        harness_path.write_text(harness_script)
-        # Make file + directory world-accessible so container's sandbox user
-        # (UID 1001) can traverse the path and read the file
-        os.chmod(tmpdir, 0o755)
-        harness_path.chmod(0o644)
-
         try:
             # Run container synchronously in a thread pool.
             # The timeout is enforced BOTH inside the thread (container.wait timeout)
@@ -199,7 +262,7 @@ class DockerRunner:
             # force-killed before the result dict is returned.
             result = await asyncio.wait_for(
                 asyncio.get_event_loop().run_in_executor(
-                    None, self._run_container, cfg, tmpdir
+                    None, self._run_container, cfg, harness_script
                 ),
                 timeout=cfg["timeout_seconds"] + 5,
             )
@@ -215,47 +278,62 @@ class DockerRunner:
         except DockerUnavailableError:
             raise  # Re-raise for the caller to handle fallback
         except Exception as e:
-            return {
-                "passed": False,
-                "actual_output": "",
-                "expected_output": "",
-                "errors": f"Docker execution error: {type(e).__name__}: {e}",
-                "test_results": [],
-            }
-        finally:
-            shutil.rmtree(tmpdir, ignore_errors=True)
+            logger.error(
+                "Docker runner unexpected error: %s: %s. "
+                "Raising exception for subprocess fallback.",
+                type(e).__name__,
+                e,
+            )
+            raise
 
-    def _run_container(self, cfg: dict, tmpdir: str) -> dict:
+    def _run_container(self, cfg: dict, harness_script: str) -> dict:
         """Synchronous container execution in a thread pool.
 
-        Uses detach=True so the container object is available for force-kill
-        on timeout. Container.wait() has its own internal timeout as first
-        line of defence; if exceeded the container is killed locally before
-        the async safety net fires.
+        Uses put_archive() to copy the harness script into the container
+        filesystem instead of a host-volume bind mount. This solves the
+        Docker-in-Docker path mismatch that occurs when the API runs inside
+        a container (the Docker daemon on the host can't resolve paths that
+        only exist inside the API container).
+
+        The harness is written via the Docker API to /tmp/runner/runner.py
+        on the container's overlay layer before the container starts. No
+        tmpfs is mounted on /tmp because that would hide the injected file;
+        the ephemeral overlay layer provides sufficient isolation (container
+        is auto-removed after use, runs as non-root, has no capabilities,
+        and no network access).
         """
         harness_filename = cfg.get("harness_filename", "runner.py")
-        volumes = {tmpdir: {"bind": "/tmp/runner", "mode": "ro"}}
-        tmpfs_config = {"/tmp": "size=10M,noexec,nosuid,uid=1001,gid=1001"}
+        # put_archive(path="/tmp", data=tar) extracts the tar into /tmp,
+        # so the tar entry "runner/runner.py" lands at /tmp/runner/runner.py.
+        # Docker's API creates parent directories automatically.
+        tar_entry = f"runner/{harness_filename}"
+
+        # Build a tar archive containing the harness file
+        tar_buffer = io.BytesIO()
+        with tarfile.open(fileobj=tar_buffer, mode="w") as tar:
+            file_info = tarfile.TarInfo(name=tar_entry)
+            script_bytes = harness_script.encode("utf-8")
+            file_info.size = len(script_bytes)
+            file_info.mode = 0o644
+            tar.addfile(file_info, io.BytesIO(script_bytes))
+        tar_buffer.seek(0)
+        tar_data = tar_buffer.getvalue()
 
         import docker as docker_sdk
 
         try:
-            container = self.client.containers.run(
+            # Step 1: Create container (stopped) — no volume mounts.
+            # No tmpfs on /tmp so the put_archive files survive into runtime.
+            container = self.client.containers.create(
                 image=cfg["image"],
                 command=cfg["run_command"],
-                volumes=volumes,
                 network_disabled=True,
-                read_only=True,
-                tmpfs=tmpfs_config,
+                read_only=False,  # Required for put_archive (filesystem write)
                 mem_limit=cfg["memory_limit"],
                 nano_cpus=cfg["cpu_limit"],
                 pids_limit=cfg["pids_limit"],
                 user="sandbox",
                 cap_drop=["ALL"],
-                detach=True,
-                remove=False,
-                stdout=True,
-                stderr=True,
             )
         except docker_sdk.errors.ImageNotFound:
             return {
@@ -279,50 +357,59 @@ class DockerRunner:
                 }
             raise
 
-        # Wait for completion with Docker-level timeout, then collect output
         try:
-            container.wait(timeout=cfg["timeout_seconds"])
-            # Container exited normally — collect logs
-            logs_bytes = container.logs(stdout=True, stderr=True)
-        except (requests.ReadTimeout, requests.ConnectionError):
-            # Container did not finish within the timeout — force-kill
+            # Step 2: Copy harness file into the container via Docker API.
+            # put_archive on a stopped container writes to the overlay layer.
+            # Docker creates parent directories (runner/) inside /tmp
+            # automatically, so the file lands at /tmp/runner/runner.py.
             try:
-                container.kill()
-            except Exception:
-                pass
-            logs_bytes = container.logs(stdout=True, stderr=True)
-            # Normalise timeout to our standard error dict
-            output = self._parse_container_output(logs_bytes)
-            return {
-                "passed": False,
-                "actual_output": output.get("actual_output", ""),
-                "expected_output": "",
-                "errors": "Execution timed out",
-                "test_results": [],
-            }
-        except docker_sdk.errors.APIError as e:
-            # Some API errors are also timeout-like (e.g. container not responding)
-            try:
-                container.kill()
-            except Exception:
-                pass
-            logs_bytes = container.logs(stdout=True, stderr=True)
-            output = self._parse_container_output(logs_bytes)
-            return {
-                "passed": False,
-                "actual_output": output.get("actual_output", ""),
-                "expected_output": "",
-                "errors": f"Docker API error: {e}",
-                "test_results": [],
-            }
-        finally:
-            # Always remove the container to prevent dangling instances
-            try:
-                container.remove(force=True)
-            except Exception:
-                pass
+                container.put_archive(path="/tmp", data=tar_data)
+            except docker_sdk.errors.APIError:
+                raise DockerUnavailableError(
+                    "Failed to copy harness into sandbox container"
+                )
 
-        # Parse the container output
+            # Step 3: Start the container — /tmp is the overlay's /tmp (not
+            # tmpfs), so /tmp/runner/runner.py is visible to the process.
+            try:
+                container.start()
+            except docker_sdk.errors.APIError as e:
+                raise DockerUnavailableError(
+                    f"Failed to start sandbox container: {e}"
+                )
+
+            # Step 4: Wait for completion with Docker-level timeout
+            try:
+                container.wait(timeout=cfg["timeout_seconds"])
+                logs_bytes = _get_container_logs(container)
+            except (requests.ReadTimeout, requests.ConnectionError):
+                # Container did not finish within the timeout.
+                # The finally block handles kill + removal atomically.
+                logs_bytes = _get_container_logs(container)
+                parsed = self._parse_container_output(logs_bytes)
+                return {
+                    "passed": False,
+                    "actual_output": parsed.get("actual_output", ""),
+                    "expected_output": "",
+                    "errors": "Execution timed out",
+                    "test_results": [],
+                }
+            except docker_sdk.errors.APIError as e:
+                # Some API errors are also timeout-like
+                logs_bytes = _get_container_logs(container)
+                parsed = self._parse_container_output(logs_bytes)
+                return {
+                    "passed": False,
+                    "actual_output": parsed.get("actual_output", ""),
+                    "expected_output": "",
+                    "errors": f"Docker API error: {e}",
+                    "test_results": [],
+                }
+        finally:
+            # Best-effort: remove(force=True) atomically kills + removes.
+            # Single removal point — avoids "already in progress" 409 races.
+            _remove_container_with_retry(container)
+
         return self._parse_container_output(logs_bytes)
 
     def _parse_container_output(self, logs_bytes: bytes) -> dict:
@@ -330,13 +417,18 @@ class DockerRunner:
 
         The harness prints a JSON line to stdout which we parse.
         If parsing fails, fall back to raw output.
+
+        Raises DockerUnavailableError when the raw output indicates a Docker
+        sandbox infrastructure failure (e.g. the harness file was not
+        injected, Python bootstrap failed) rather than a user-code error.
+        This allows the caller to fall through to the subprocess runner.
         """
         if isinstance(logs_bytes, bytes):
             output = logs_bytes.decode("utf-8", errors="replace")
         else:
             output = str(logs_bytes)
 
-        lines = output.strip().split("\n")
+        lines = [l.strip() for l in output.strip().split("\n") if l.strip()]
         if not lines:
             return {
                 "passed": False,
@@ -346,11 +438,26 @@ class DockerRunner:
                 "test_results": [],
             }
 
-        first_line = lines[0].strip()
+        first_line = lines[0]
         try:
             result = json.loads(first_line)
             return result
         except (json.JSONDecodeError, TypeError):
+            # Check for Docker infrastructure failure patterns.
+            # These indicate the sandbox container itself failed to bootstrap
+            # (e.g. harness file not injected, Python not found, missing
+            # dependencies) rather than user code producing bad output.
+            infra_errors = (
+                "can't open file",
+                "No such file or directory",
+                "ModuleNotFoundError",
+                "ImportError",
+            )
+            if any(pattern in first_line for pattern in infra_errors):
+                raise DockerUnavailableError(
+                    f"Docker sandbox infrastructure failure: {first_line}"
+                )
+
             return {
                 "passed": False,
                 "actual_output": first_line,

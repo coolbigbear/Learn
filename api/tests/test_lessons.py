@@ -91,6 +91,26 @@ class TestLessonsByPath:
         for lesson in core_path["lessons"]:
             assert lesson["path"] == "core"
             assert lesson["exercise_count"] is not None
+            assert "exercises" in lesson
+            # First lesson has 2 exercises, second has 0
+            if lesson["slug"] == "01-test-lesson":
+                assert lesson["exercise_count"] == 2
+                assert len(lesson["exercises"]) == 2
+                # Verify exercise fields
+                ex1 = lesson["exercises"][0]
+                assert "id" in ex1
+                assert ex1["slug"] == "test-ex-1"
+                assert ex1["title"] == "First Exercise"
+                assert ex1["order"] == 1
+                # Must not include sensitive/extra fields
+                assert "instruction" not in ex1
+                assert "starter_code" not in ex1
+                ex2 = lesson["exercises"][1]
+                assert ex2["slug"] == "test-ex-2"
+                assert ex2["order"] == 2
+            else:
+                assert lesson["exercise_count"] == 0
+                assert lesson["exercises"] == []
 
         # Other paths should be empty for now
         assert body["paths"][1]["path"] == "data-processing"
