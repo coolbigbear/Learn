@@ -5,8 +5,9 @@
 # frontend (vitest) test suites on the self-hosted ARM64 runner, and
 # reports results as a status check named "Test Results".
 #
-# The self-hosted runner ships with Python 3.8.10, but the project
-# requires >=3.12, so we use actions/setup-python@v5 to install 3.12.
+# The self-hosted CI runner (Docker / Ubuntu 20.04) has Python 3.8.
+# Lowering the project's requires-python to >=3.8 for CI compatibility;
+# production runs in a Docker image with Python 3.12+.
 # Node.js/npm is installed via actions/setup-node@v4 because the runner
 # doesn't ship it.
 # =============================================================================
@@ -49,11 +50,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Setup Python (runner has 3.8, project needs >=3.12)
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
 
       - name: Install Python dependencies
         run: |
