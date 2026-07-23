@@ -1,4 +1,4 @@
-# Lesson 20: Mini API Project
+# Lesson 22: Mini API Project
 
 ## Learning Objectives
 
