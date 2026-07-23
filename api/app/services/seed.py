@@ -25,6 +25,7 @@ PROFILE_USERS = [
     "architect",
     "user",
     "testuser",
+    "developer",
 ]
 
 
