@@ -10,6 +10,21 @@
         "input": "",
         "expected_output": "",
         "comparison_type": "exact"
+      },
+      {
+        "input": "",
+        "expected_output": "@app.get(\"/\")",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "return {\"message\": \"Hello, FastAPI!\"}",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "async def root",
+        "comparison_type": "code_contains"
       }
     ],
     "order": 1
@@ -25,6 +40,21 @@
         "input": "",
         "expected_output": "",
         "comparison_type": "exact"
+      },
+      {
+        "input": "",
+        "expected_output": "@app.get(\"/echo/{message}\")",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "def echo(message: str)",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "return {\"you_said\": message}",
+        "comparison_type": "code_contains"
       }
     ],
     "order": 2
@@ -40,6 +70,21 @@
         "input": "",
         "expected_output": "",
         "comparison_type": "exact"
+      },
+      {
+        "input": "",
+        "expected_output": "@app.get(\"/greet\")",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "def greet(name: str",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "return {\"greeting\":",
+        "comparison_type": "code_contains"
       }
     ],
     "order": 3

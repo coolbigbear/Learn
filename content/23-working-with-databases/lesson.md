@@ -1,4 +1,4 @@
-# Lesson 19: Working with Databases
+# Lesson 23: Working with Databases
 
 ## Learning Objectives
 
@@ -16,7 +16,7 @@
 
 ## Why Databases?
 
-Think about the Task Manager API you built in Lesson 18. It worked, but it had a big problem: **every time you restarted the server, all your tasks disappeared!**
+Think about the Task Manager API you built in Lesson 22. It worked, but it had a big problem: **every time you restarted the server, all your tasks disappeared!**
 
 The data lived in a Python list inside the process memory. When the process stopped, the memory was reclaimed and your data was gone.
 
@@ -377,7 +377,7 @@ async def safe_query():
 
 ## End-to-End: Task Manager with SQLite
 
-Let's bring everything together by converting the Lesson 18 Task Manager to use a real SQLite database.
+Let's bring everything together by converting the Lesson 22 Task Manager to use a real SQLite database.
 
 Create `main.py`:
 
@@ -516,7 +516,7 @@ async def delete_task(task_id: int, db: AsyncSession = Depends(get_db)):
 
 ### What Changed from the In-Memory Version?
 
-| Before (Lesson 18) | After (Lesson 19) |
+| Before (Lesson 22) | After (Lesson 23) |
 |--------------------|--------------------|
 | `tasks = []` — a Python list | `TaskDB` — a SQLAlchemy model |
 | `next_id` counter | Auto-incrementing `id` column |

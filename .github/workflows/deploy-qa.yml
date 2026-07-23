@@ -20,6 +20,11 @@ jobs:
         with:
           ref: QA
 
+      - name: Build sandbox image (exercise execution runtime)
+        run: |
+          echo "Building tutorial-runner-python:latest (sandbox for exercise execution)..."
+          docker build -t tutorial-runner-python:latest api/docker/images/python
+
       - name: Build Docker image
         run: |
           docker compose build qa
