@@ -154,3 +154,5 @@ Run the seed script to load it into the database:
 ```bash
 python scripts/seed_db.py
 ```
+
+<!-- CI test PR #12 verification - dummy change -->
