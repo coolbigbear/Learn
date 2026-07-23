@@ -5,8 +5,9 @@
 # frontend (vitest) test suites on the self-hosted ARM64 runner, and
 # reports results as a status check named "Test Results".
 #
-# The self-hosted runner already has Python 3.13.5 and Node 20.18.0
-# pre-installed, so we skip setup-python / setup-node for speed.
+# The self-hosted runner already has Python 3.13.5 pre-installed, so we
+# skip setup-python for speed.  Node.js/npm is installed via
+# actions/setup-node@v4 because the runner doesn't ship it.
 # =============================================================================
 
 name: CI - Test Results
@@ -83,6 +84,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Install Node.js (self-hosted runner doesn't ship npm)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
       - name: Install frontend dependencies
         run: npm ci
