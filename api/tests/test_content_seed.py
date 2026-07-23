@@ -25,6 +25,47 @@ from app.services.content_seed import seed_content
 
 
 # ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+
+def _lesson_dir(base: Path, path_key: str, slug: str) -> Path:
+    """Return the lesson directory under a path-based content structure."""
+    return base / path_key / slug
+
+
+def _write_lesson(base: Path, lesson: dict) -> None:
+    """Create lesson files (lesson.md + exercises.json) under the path-based dir."""
+    pth = lesson.get("path", "python")
+    slug = lesson["slug"]
+    lesson_dir = _lesson_dir(base, pth, slug)
+    lesson_dir.mkdir(parents=True)
+    (lesson_dir / "lesson.md").write_text(
+        f"# {lesson['title']}\n\nLesson content.\n", encoding="utf-8"
+    )
+    exercises = [
+        {
+            "slug": f"{slug}-ex1",
+            "title": f"{lesson['title']} Exercise",
+            "instruction": "Do something.",
+            "starter_code": "# Write\n",
+            "solution_code": "print('done')\n",
+            "test_cases": [
+                {
+                    "input": "",
+                    "expected_output": "done\n",
+                    "comparison_type": "exact",
+                }
+            ],
+            "order": 1,
+        }
+    ]
+    (lesson_dir / "exercises.json").write_text(
+        json.dumps(exercises), encoding="utf-8"
+    )
+
+
+# ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
 
@@ -33,40 +74,15 @@ from app.services.content_seed import seed_content
 async def content_dir(tmp_path: Path) -> Path:
     """Build a temporary content directory with a manifest and lesson files."""
     lessons = [
-        {"slug": "lesson-1", "title": "Getting Started", "order": 1, "path": "core"},
-        {"slug": "lesson-2", "title": "Variables", "order": 2, "path": "core"},
-        {"slug": "lesson-3", "title": "Loops", "order": 3, "path": "core"},
+        {"slug": "lesson-1", "title": "Getting Started", "order": 1, "path": "python"},
+        {"slug": "lesson-2", "title": "Variables", "order": 2, "path": "python"},
+        {"slug": "lesson-3", "title": "Loops", "order": 3, "path": "python"},
     ]
     manifest_path = tmp_path / "manifest.json"
     manifest_path.write_text(json.dumps(lessons), encoding="utf-8")
 
     for lesson in lessons:
-        slug = lesson["slug"]
-        lesson_dir = tmp_path / slug
-        lesson_dir.mkdir()
-        (lesson_dir / "lesson.md").write_text(
-            f"# {lesson['title']}\n\nLesson content.\n", encoding="utf-8"
-        )
-        exercises = [
-            {
-                "slug": f"{slug}-ex1",
-                "title": f"{lesson['title']} Exercise",
-                "instruction": "Do something.",
-                "starter_code": "# Write\n",
-                "solution_code": "print('done')\n",
-                "test_cases": [
-                    {
-                        "input": "",
-                        "expected_output": "done\n",
-                        "comparison_type": "exact",
-                    }
-                ],
-                "order": 1,
-            }
-        ]
-        (lesson_dir / "exercises.json").write_text(
-            json.dumps(exercises), encoding="utf-8"
-        )
+        _write_lesson(tmp_path, lesson)
 
     return tmp_path
 
@@ -105,7 +121,7 @@ async def test_seed_incremental_add_new_lessons(content_dir: Path, db_session: A
         "slug": "lesson-4",
         "title": "Functions",
         "order": 4,
-        "path": "core",
+        "path": "python",
     }
     manifest_path = content_dir / "manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -113,24 +129,7 @@ async def test_seed_incremental_add_new_lessons(content_dir: Path, db_session: A
     manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
 
     # Create content for the new lesson
-    lesson_dir = content_dir / "lesson-4"
-    lesson_dir.mkdir()
-    (lesson_dir / "lesson.md").write_text("# Functions\n\nContent.\n", encoding="utf-8")
-
-    extra_exercises = [
-        {
-            "slug": "lesson-4-ex1",
-            "title": "Functions Exercise",
-            "instruction": "Write a function.",
-            "starter_code": "# code\n",
-            "solution_code": "def f(): pass\n",
-            "test_cases": [],
-            "order": 1,
-        }
-    ]
-    (lesson_dir / "exercises.json").write_text(
-        json.dumps(extra_exercises), encoding="utf-8"
-    )
+    _write_lesson(content_dir, extra_lesson)
 
     # Second seed: should detect the new lesson and add it
     result2 = await seed_content(session=db_session, content_dir=content_dir)
@@ -155,25 +154,9 @@ async def test_seed_multiple_new_lessons_incremental(content_dir: Path, db_sessi
     manifest_path = content_dir / "manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     for i in (4, 5):
-        lesson = {"slug": f"lesson-{i}", "title": f"Lesson {i}", "order": i, "path": "core"}
+        lesson = {"slug": f"lesson-{i}", "title": f"Lesson {i}", "order": i, "path": "python"}
         manifest.append(lesson)
-        lesson_dir = content_dir / f"lesson-{i}"
-        lesson_dir.mkdir()
-        (lesson_dir / "lesson.md").write_text(f"# Lesson {i}\n\nContent.\n", encoding="utf-8")
-        (lesson_dir / "exercises.json").write_text(
-            json.dumps([
-                {
-                    "slug": f"lesson-{i}-ex1",
-                    "title": f"Ex {i}",
-                    "instruction": "Do it.",
-                    "starter_code": "# code\n",
-                    "solution_code": "print('ok')\n",
-                    "test_cases": [],
-                    "order": 1,
-                }
-            ]),
-            encoding="utf-8",
-        )
+        _write_lesson(content_dir, lesson)
     manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
 
     result = await seed_content(session=db_session, content_dir=content_dir)
@@ -203,7 +186,7 @@ async def test_seed_syncs_test_cases_on_existing(content_dir: Path, db_session: 
     await seed_content(session=db_session, content_dir=content_dir)
 
     # Modify test_cases in the content file
-    ex_path = content_dir / "lesson-1" / "exercises.json"
+    ex_path = content_dir / "python" / "lesson-1" / "exercises.json"
     exercises = json.loads(ex_path.read_text(encoding="utf-8"))
     exercises[0]["test_cases"][0]["expected_output"] = "modified\n"
     ex_path.write_text(json.dumps(exercises), encoding="utf-8")
@@ -244,15 +227,11 @@ async def test_seed_lesson_without_exercises(content_dir: Path, db_session: Asyn
     manifest_path = content_dir / "manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     # Add a lesson with no exercises file
-    manifest.append({
-        "slug": "no-ex-lesson",
-        "title": "No Exercises",
-        "order": 10,
-        "path": "core",
-    })
+    no_ex = {"slug": "no-ex-lesson", "title": "No Exercises", "order": 10, "path": "python"}
+    manifest.append(no_ex)
     manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
-    lesson_dir = content_dir / "no-ex-lesson"
-    lesson_dir.mkdir()
+    lesson_dir = content_dir / "python" / "no-ex-lesson"
+    lesson_dir.mkdir(parents=True)
     (lesson_dir / "lesson.md").write_text("# No Exercises\n\nNo exercises here.\n", encoding="utf-8")
     # Deliberately no exercises.json
 
@@ -273,15 +252,11 @@ async def test_seed_empty_exercises_list(content_dir: Path, db_session: AsyncSes
     """A lesson with an empty exercises list should seed correctly."""
     manifest_path = content_dir / "manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    manifest.append({
-        "slug": "empty-ex-lesson",
-        "title": "Empty Exercises",
-        "order": 10,
-        "path": "core",
-    })
+    empty_ex = {"slug": "empty-ex-lesson", "title": "Empty Exercises", "order": 10, "path": "python"}
+    manifest.append(empty_ex)
     manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
-    lesson_dir = content_dir / "empty-ex-lesson"
-    lesson_dir.mkdir()
+    lesson_dir = content_dir / "python" / "empty-ex-lesson"
+    lesson_dir.mkdir(parents=True)
     (lesson_dir / "lesson.md").write_text("# Empty\n\nContent.\n", encoding="utf-8")
     (lesson_dir / "exercises.json").write_text("[]", encoding="utf-8")
 
@@ -305,23 +280,20 @@ async def test_seed_skips_already_existing_when_adding_new(content_dir: Path, db
         "slug": "lesson-1",  # Already exists!
         "title": "Duplicate",
         "order": 99,
-        "path": "core",
+        "path": "python",
     })
     manifest.append({
         "slug": "brand-new",
         "title": "Brand New",
         "order": 100,
-        "path": "core",
+        "path": "python",
     })
     manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
 
-    lesson_dir = content_dir / "brand-new"
-    lesson_dir.mkdir()
-    (lesson_dir / "lesson.md").write_text("# New\n\nContent.\n", encoding="utf-8")
-    (lesson_dir / "exercises.json").write_text("[]", encoding="utf-8")
+    _write_lesson(content_dir, {"slug": "brand-new", "title": "Brand New", "order": 100, "path": "python"})
 
     result = await seed_content(session=db_session, content_dir=content_dir)
 
     assert result["status"] == "synced_with_new"
     assert result["lessons_added"] == 1  # Only brand-new, not lesson-1 duplicate
-    assert result["exercises_added"] == 0
+    assert result["exercises_added"] == 1  # _write_lesson creates 1 exercise per lesson

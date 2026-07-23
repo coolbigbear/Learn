@@ -3,17 +3,17 @@
 import json, sys, io, traceback
 
 lessons = [
-    '21-intro-to-ml',
-    '22-data-preprocessing',
-    '23-supervised-learning',
-    '24-unsupervised-learning',
+    '24-intro-to-ml',
+    '25-data-preprocessing',
+    '26-supervised-learning',
+    '27-unsupervised-learning',
 ]
 
 passed = 0
 failed = 0
 
 for slug in lessons:
-    path = f'/home/pi2/.hermes/projects/python-tutorials/content/{slug}/exercises.json'
+    path = f'/home/pi2/.hermes/projects/python-tutorials/content/python/{slug}/exercises.json'
     with open(path) as f:
         exercises = json.load(f)
     
