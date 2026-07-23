@@ -76,9 +76,16 @@ async def lifespan(app: FastAPI):
                     f"[content_seed] Seeded {seed_result['lessons_added']} lessons "
                     f"and {seed_result['exercises_added']} exercises"
                 )
-            elif status == "skipped":
-                # Normal — lessons already exist
-                pass
+            elif status == "synced":
+                synced = seed_result.get("exercises_synced", 0)
+                if synced:
+                    print(f"[content_seed] Synced {synced} exercise test cases")
+            elif status == "synced_with_new":
+                print(
+                    f"[content_seed] Added {seed_result['lessons_added']} new lesson(s) "
+                    f"with {seed_result['exercises_added']} exercise(s), "
+                    f"synced {seed_result.get('exercises_synced', 0)} test case(s)"
+                )
             else:
                 error = seed_result.get("error", "unknown")
                 print(f"[content_seed] Warning: could not seed content: {error}")
