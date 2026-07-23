@@ -40,7 +40,9 @@ const coreLessons = [
 ];
 
 const dataProcessingLessons = [
-  { id: 16, slug: '16-data-processing', title: 'Data Processing — CSV, JSON, and APIs', order: 16, path: 'data-processing', exercise_count: 2, exercises: [{ id: 50, slug: 'dp1', title: 'Read CSV', order: 1 }, { id: 51, slug: 'dp2', title: 'Parse JSON', order: 2 }] },
+  { id: 16, slug: '16-csv-processing', title: 'CSV Processing', order: 16, path: 'data-processing', exercise_count: 2, exercises: [{ id: 50, slug: 'csv-read-dict', title: 'Read a CSV file with DictReader', order: 1 }, { id: 51, slug: 'csv-write-students', title: 'Write student data to CSV', order: 2 }] },
+  { id: 17, slug: '17-json-processing', title: 'JSON Processing', order: 17, path: 'data-processing', exercise_count: 2, exercises: [{ id: 52, slug: 'json-parse-people', title: 'Parse JSON data', order: 1 }, { id: 53, slug: 'json-write-friends', title: 'Write JSON to a file', order: 2 }] },
+  { id: 18, slug: '18-data-processing-libraries', title: 'Data Processing Libraries', order: 18, path: 'data-processing', exercise_count: 2, exercises: [{ id: 54, slug: 'dpl-fetch-repo', title: 'Fetch repo info from GitHub API', order: 1 }, { id: 55, slug: 'dpl-save-to-json', title: 'Save API data to JSON', order: 2 }] },
 ];
 
 const apiLessons = [
@@ -126,8 +128,10 @@ describe('Lessons page', () => {
     expect(screen.getByText('Print Multiple Items')).toBeInTheDocument();
     expect(screen.getByText('Modules and Packages')).toBeInTheDocument();
 
-    // Data processing
-    expect(screen.getByText('Data Processing — CSV, JSON, and APIs')).toBeInTheDocument();
+    // Data processing lessons
+    expect(screen.getByText('CSV Processing')).toBeInTheDocument();
+    expect(screen.getByText('JSON Processing')).toBeInTheDocument();
+    expect(screen.getByText('Data Processing Libraries')).toBeInTheDocument();
 
     // API lessons
     expect(screen.getByText('Introduction to FastAPI')).toBeInTheDocument();
@@ -187,7 +191,9 @@ describe('Lessons page', () => {
     mockGetLessons.mockResolvedValue({
       lessons: [
         { id: 1, slug: '01-print-strings', title: 'Print Strings', order: 1, path: 'core', exercise_count: 2 },
-        { id: 16, slug: '16-data-processing', title: 'Data Processing — CSV, JSON, and APIs', order: 16, path: 'data-processing', exercise_count: 2 },
+        { id: 16, slug: '16-csv-processing', title: 'CSV Processing', order: 16, path: 'data-processing', exercise_count: 2 },
+        { id: 17, slug: '17-json-processing', title: 'JSON Processing', order: 17, path: 'data-processing', exercise_count: 2 },
+        { id: 18, slug: '18-data-processing-libraries', title: 'Data Processing Libraries', order: 18, path: 'data-processing', exercise_count: 2 },
       ],
     });
 

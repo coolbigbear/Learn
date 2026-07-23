@@ -10,7 +10,9 @@ const sampleLessons = {
     { id: 15, slug: '15-modules', title: 'Modules and Packages', order: 15, exercise_count: 3 },
   ],
   'data-processing': [
-    { id: 16, slug: '16-data-processing', title: 'Data Processing \u2014 CSV, JSON, and APIs', order: 16, exercise_count: 2 },
+    { id: 16, slug: '16-csv-processing', title: 'CSV Processing', order: 16, exercise_count: 2 },
+    { id: 17, slug: '17-json-processing', title: 'JSON Processing', order: 17, exercise_count: 2 },
+    { id: 18, slug: '18-data-processing-libraries', title: 'Data Processing Libraries', order: 18, exercise_count: 2 },
   ],
   api: [
     { id: 17, slug: '17-fastapi-intro', title: 'Introduction to FastAPI', order: 17, exercise_count: 2 },
@@ -60,8 +62,9 @@ describe('LessonsPoc - overview state (selectedPath === null)', () => {
 
   it('renders lesson counts on each card', () => {
     renderPoc();
-    expect(screen.getByText('3 lessons')).toBeInTheDocument();  // core
-    expect(screen.getByText('1 lesson')).toBeInTheDocument();   // data-processing
+    // core has 3, data-processing has 3, api has 2, ml has 0
+    const threeLessonCards = screen.getAllByText('3 lessons');
+    expect(threeLessonCards.length).toBe(2);
     expect(screen.getByText('2 lessons')).toBeInTheDocument();  // api
     expect(screen.getByText('0 lessons')).toBeInTheDocument();  // machine-learning
   });
@@ -162,8 +165,8 @@ describe('LessonsPoc - path detail state', () => {
 
     // Core lessons should no longer be visible
     expect(screen.queryByText('Print Strings')).not.toBeInTheDocument();
-    // Data processing lesson should be visible
-    expect(screen.getByText('Data Processing \u2014 CSV, JSON, and APIs')).toBeInTheDocument();
+    // Data processing lessons should be visible
+    expect(screen.getByText('CSV Processing')).toBeInTheDocument();
 
     // Active tab should switch
     expect(screen.getByTestId('tab-data-processing').getAttribute('data-active')).toBe('true');
@@ -283,8 +286,12 @@ describe('LessonsPoc - edge cases', () => {
   });
 
   it('shows singular "lesson" for exactly one lesson', () => {
-    renderPoc();
-    // data-processing has exactly 1 lesson
+    const singleLessonPath = [
+      { path: 'core', display_name: 'Core', description: 'Test', color: 'indigo', lessons: [
+        { id: 1, slug: '01-print-strings', title: 'Print Strings', order: 1, exercise_count: 2 },
+      ] },
+    ];
+    renderPoc({ paths: singleLessonPath });
     expect(screen.getByText('1 lesson')).toBeInTheDocument();
   });
 

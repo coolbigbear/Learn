@@ -40,7 +40,9 @@ const coreLessons = [
 ];
 
 const dataProcessingLessons = [
-  { id: 16, slug: '16-data-processing', title: 'Data Processing — CSV, JSON, and APIs', order: 16, path: 'data-processing', exercise_count: 2, exercises: [{ id: 50, slug: 'dp1', title: 'Read CSV', order: 1 }, { id: 51, slug: 'dp2', title: 'Parse JSON', order: 2 }] },
+  { id: 16, slug: '16-csv-processing', title: 'CSV Processing', order: 16, path: 'data-processing', exercise_count: 2, exercises: [{ id: 50, slug: 'csv-read-dict', title: 'Read a CSV file with DictReader', order: 1 }, { id: 51, slug: 'csv-write-students', title: 'Write student data to CSV', order: 2 }] },
+  { id: 17, slug: '17-json-processing', title: 'JSON Processing', order: 17, path: 'data-processing', exercise_count: 2, exercises: [{ id: 52, slug: 'json-parse-people', title: 'Parse JSON data', order: 1 }, { id: 53, slug: 'json-write-friends', title: 'Write JSON to a file', order: 2 }] },
+  { id: 18, slug: '18-data-processing-libraries', title: 'Data Processing Libraries', order: 18, path: 'data-processing', exercise_count: 2, exercises: [{ id: 54, slug: 'dpl-fetch-repo', title: 'Fetch repo info from GitHub API', order: 1 }, { id: 55, slug: 'dpl-save-to-json', title: 'Save API data to JSON', order: 2 }] },
 ];
 
 const pathsData = [
@@ -59,7 +61,9 @@ const sampleProgressData = {
     '01-print-strings': 2,
     '02-print-multiple': 1,
     '03-variables': 3,
-    '16-data-processing': 2,
+    '16-csv-processing': 2,
+    '17-json-processing': 2,
+    '18-data-processing-libraries': 2,
   },
   progress: [
     {
@@ -143,9 +147,9 @@ describe('Progress page', () => {
     expect(screen.getByText('In Progress')).toBeInTheDocument();
     // Print Multiple Items has 1/1 completed — should be Complete
     expect(screen.getByText('Complete')).toBeInTheDocument();
-    // There are 2 lessons with "Not Started" status (Variables + Data Processing)
+    // There are 4 lessons with "Not Started" status (Variables + CSV + JSON + Data Processing Libraries)
     const notStarted = screen.getAllByText('Not Started');
-    expect(notStarted.length).toBe(2);
+    expect(notStarted.length).toBe(4);
   });
 
   it('shows "All exercises passed" badge for completed lessons', async () => {
