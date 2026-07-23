@@ -1,4 +1,4 @@
-# Lesson 23: Supervised Learning — Regression & Classification
+# Lesson 25: Supervised Learning — Regression & Classification
 
 ## Learning Objectives
 

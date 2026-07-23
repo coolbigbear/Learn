@@ -1,4 +1,4 @@
-# Lesson 25: API Authentication Methods
+# Lesson 27: API Authentication Methods
 
 ## Learning Objectives
 

@@ -1,4 +1,4 @@
-# Lesson 26: API Capstone Project — Full-Stack Task Manager
+# Lesson 28: API Capstone Project — Full-Stack Task Manager
 
 ## Learning Objectives
 
