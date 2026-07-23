@@ -1,21 +1,6 @@
 [
   {
-    "slug": "dp-csv-read",
-    "title": "Read a CSV file",
-    "instruction": "Write a program that reads the CSV data below (using io.StringIO to simulate a file) and prints each person's name and age on one line.\n\nCSV data (pretend it's a file):\nname,age\nAlice,25\nBob,30\nCharlie,35",
-    "starter_code": "import csv\nimport io\n\ndata = \"\"\"name,age\nAlice,25\nBob,30\nCharlie,35\"\"\"\n\n# Read CSV and print name and age\n",
-    "solution_code": "import csv\nimport io\n\ndata = \"\"\"name,age\nAlice,25\nBob,30\nCharlie,35\"\"\"\n\nreader = csv.DictReader(io.StringIO(data))\nfor row in reader:\n    print(f\"{row['name']} is {row['age']} years old\")\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Alice is 25 years old\nBob is 30 years old\nCharlie is 35 years old\n",
-        "comparison_type": "exact"
-      }
-    ],
-    "order": 1
-  },
-  {
-    "slug": "dp-json-parse",
+    "slug": "json-parse-people",
     "title": "Parse JSON data",
     "instruction": "Write a program that takes the JSON string below, parses it, and prints each person's name and city.\n\nJSON: [{\"name\": \"Alice\", \"city\": \"New York\"}, {\"name\": \"Bob\", \"city\": \"London\"}]",
     "starter_code": "import json\n\ndata = '[{\"name\": \"Alice\", \"city\": \"New York\"}, {\"name\": \"Bob\", \"city\": \"London\"}]'\n\n# Your code here\n",
@@ -27,12 +12,12 @@
         "comparison_type": "exact"
       }
     ],
-    "order": 2
+    "order": 1
   },
   {
-    "slug": "dp-write-json",
+    "slug": "json-write-friends",
     "title": "Write JSON to a file",
-    "instruction": "Write a program that creates a list of dictionaries representing three friends (each with 'name' and 'age'), then writes it as JSON to a file called 'friends.json'.",
+    "instruction": "Write a program that creates a list of dictionaries representing three friends (each with 'name' and 'age'), then writes it as JSON to a file called 'friends.json' with indent=2.",
     "starter_code": "friends = [\n    {\"name\": \"Alice\", \"age\": 25},\n    {\"name\": \"Bob\", \"age\": 30},\n    {\"name\": \"Charlie\", \"age\": 35}\n]\n\n# Write to friends.json\n",
     "solution_code": "import json\n\nfriends = [\n    {\"name\": \"Alice\", \"age\": 25},\n    {\"name\": \"Bob\", \"age\": 30},\n    {\"name\": \"Charlie\", \"age\": 35}\n]\n\nwith open(\"friends.json\", \"w\") as f:\n    json.dump(friends, f, indent=2)\nprint(\"Saved friends.json\")\n",
     "test_cases": [
@@ -42,6 +27,6 @@
         "comparison_type": "exact"
       }
     ],
-    "order": 3
+    "order": 2
   }
 ]

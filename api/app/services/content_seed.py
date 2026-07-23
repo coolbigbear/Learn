@@ -19,22 +19,7 @@ from app.database import async_session_factory
 from app.models.exercise import Exercise
 from app.models.lesson import Lesson
 
-# Resolve the content directory path.
-# Supports three strategies in priority order:
-#   1. CONTENT_DIR env var (explicit override, e.g. in docker-compose)
-#   2. Derive from this file's location — works in both Docker and local dev
-#   3. Hardcoded fallback (/app/content for backward compat with older images)
-_content_env = os.environ.get("CONTENT_DIR")
-if _content_env:
-    CONTENT_DIR = Path(_content_env)
-else:
-    # File is at api/app/services/content_seed.py (or /app/app/services/ in Docker)
-    _root = Path(__file__).resolve().parent.parent.parent.parent  # project root
-    if not (_root / "api").is_dir():
-        # Running inside Docker: /app/app/services/ → /app
-        _root = Path(__file__).resolve().parent.parent.parent
-    _candidate = _root / "content"
-    CONTENT_DIR = _candidate if _candidate.is_dir() else Path("/app/content")
+CONTENT_DIR = Path(os.environ.get("CONTENT_DIR", "/app/content"))
 
 
 async def _get_existing_lesson_slugs(session: AsyncSession) -> set[str]:
@@ -43,14 +28,16 @@ async def _get_existing_lesson_slugs(session: AsyncSession) -> set[str]:
     return {row[0] for row in result.all()}
 
 
-async def _sync_exercise_test_cases(session: AsyncSession) -> int:
+async def _sync_exercise_test_cases(
+    session: AsyncSession, content_dir: Path
+) -> int:
     """Sync exercise test_cases from content files to DB.
 
     Reads content/<lesson>/exercises.json for each lesson in the manifest and
     updates the database if any exercise's test_cases differ. Returns count of
     updates made.
     """
-    manifest_path = CONTENT_DIR / "manifest.json"
+    manifest_path = content_dir / "manifest.json"
     if not manifest_path.is_file():
         return 0
 
@@ -59,7 +46,7 @@ async def _sync_exercise_test_cases(session: AsyncSession) -> int:
 
     for entry in manifest:
         slug = entry["slug"]
-        exercises_json_path = CONTENT_DIR / slug / "exercises.json"
+        exercises_json_path = content_dir / slug / "exercises.json"
         if not exercises_json_path.is_file():
             continue
 
@@ -85,7 +72,7 @@ async def _sync_exercise_test_cases(session: AsyncSession) -> int:
 
 
 async def _seed_lesson(
-    session: AsyncSession, entry: dict
+    session: AsyncSession, content_dir: Path, entry: dict
 ) -> tuple[int, int]:
     """Insert a single lesson and its exercises from the manifest entry.
 
@@ -97,15 +84,15 @@ async def _seed_lesson(
     path_key = entry.get("path", "core")
 
     # Read lesson content
-    lesson_md = CONTENT_DIR / slug / "lesson.md"
+    lesson_md = content_dir / slug / "lesson.md"
     if not lesson_md.is_file():
         return 0, 0
-    content = lesson_md.read_text(encoding="utf-8")
+    md_content = lesson_md.read_text(encoding="utf-8")
 
     lesson = Lesson(
         slug=slug,
         title=title,
-        content=content,
+        content=md_content,
         path=path_key,
         order=order,
     )
@@ -113,7 +100,7 @@ async def _seed_lesson(
     await session.flush()  # Get lesson.id
 
     # Read exercises
-    exercises_json = CONTENT_DIR / slug / "exercises.json"
+    exercises_json = content_dir / slug / "exercises.json"
     if not exercises_json.is_file():
         return 1, 0
 
@@ -168,8 +155,8 @@ async def seed_content(
 
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
 
-    async def _work(session: AsyncSession) -> dict:
-        existing_slugs = await _get_existing_lesson_slugs(session)
+    async def _work(db: AsyncSession) -> dict:
+        existing_slugs = await _get_existing_lesson_slugs(db)
         new_entries = [e for e in manifest if e["slug"] not in existing_slugs]
 
         lessons_added = 0
@@ -177,12 +164,12 @@ async def seed_content(
 
         # Add new lessons
         for entry in new_entries:
-            added_l, added_e = await _seed_lesson(session, entry)
+            added_l, added_e = await _seed_lesson(db, content_dir, entry)
             lessons_added += added_l
             exercises_added += added_e
 
         # Sync test cases for all existing exercises
-        synced = await _sync_exercise_test_cases(session)
+        synced = await _sync_exercise_test_cases(db, content_dir)
 
         if existing_slugs and not new_entries:
             # Existing data, nothing new to add
@@ -215,12 +202,3 @@ async def seed_content(
     async with async_session_factory() as new_session:
         async with new_session.begin():
             return await _work(new_session)
-
-
-async def _seed_all(session: AsyncSession) -> dict:
-    """Legacy helper: seed all lessons from manifest (for fresh databases).
-
-    Deprecated in favour of seed_content(). Kept for backward compatibility
-    in case external callers reference it by name.
-    """
-    return await seed_content(session=session)
