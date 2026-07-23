@@ -16,5 +16,6 @@
   {"slug": "15-modules", "title": "Modules and Packages", "order": 15, "path": "core"},
   {"slug": "16-data-processing", "title": "Data Processing — CSV, JSON, and APIs", "order": 16, "path": "data-processing"},
   {"slug": "17-fastapi-intro", "title": "Introduction to FastAPI", "order": 17, "path": "api"},
-  {"slug": "18-mini-api-project", "title": "Mini API Project", "order": 18, "path": "api"}
+  {"slug": "18-mini-api-project", "title": "Mini API Project", "order": 18, "path": "api"},
+  {"slug": "xml-handling-in-apis", "title": "Handling XML in APIs", "order": 19, "path": "api"}
 ]
