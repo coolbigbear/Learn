@@ -64,7 +64,8 @@ async def _sync_exercise_test_cases(
 
     for entry in manifest:
         slug = entry["slug"]
-        exercises_json_path = content_dir / slug / "exercises.json"
+        path_key = entry.get("path", "python")
+        exercises_json_path = content_dir / path_key / slug / "exercises.json"
         if not exercises_json_path.is_file():
             continue
 
@@ -110,10 +111,10 @@ async def _seed_lesson(
     slug = entry["slug"]
     title = entry["title"]
     order = entry["order"]
-    path_key = entry.get("path", "core")
+    path_key = entry.get("path", "python")
 
     # Read lesson content
-    lesson_md = content_dir / slug / "lesson.md"
+    lesson_md = content_dir / path_key / slug / "lesson.md"
     if not lesson_md.is_file():
         return 0, 0
     md_content = lesson_md.read_text(encoding="utf-8")
@@ -129,7 +130,7 @@ async def _seed_lesson(
     await session.flush()  # Get lesson.id
 
     # Read exercises
-    exercises_json = content_dir / slug / "exercises.json"
+    exercises_json = content_dir / path_key / slug / "exercises.json"
     if not exercises_json.is_file():
         return 1, 0
 

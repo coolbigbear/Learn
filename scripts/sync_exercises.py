@@ -73,7 +73,8 @@ async def sync() -> int:
     async with session_factory() as session:
         for entry in manifest:
             slug = entry["slug"]
-            exercises_json_path = CONTENT_DIR / slug / "exercises.json"
+            path_key = entry.get("path", "python")
+            exercises_json_path = CONTENT_DIR / path_key / slug / "exercises.json"
             if not exercises_json_path.exists():
                 continue
 
