@@ -11,16 +11,18 @@ from jose import JWTError, jwt
 from app.config import ACCESS_TOKEN_EXPIRE_MINUTES, JWT_ALGORITHM, JWT_SECRET_KEY
 
 
-def create_access_token(user_id: int) -> str:
-    """Create a signed JWT access token for the given user ID.
+def create_access_token(user_id: int, username: str = "") -> str:
+    """Create a signed JWT access token for the given user.
 
-    The token encodes the user ID as the 'sub' (subject) claim and
-    includes an 'exp' (expiration) claim set to now + configured minutes.
+    The token encodes the user ID as the 'sub' (subject) claim, the
+    username as the 'username' claim, and includes an 'exp' (expiration)
+    claim set to now + configured minutes.
     """
     now = datetime.now(timezone.utc)
     expire = now + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     payload = {
         "sub": str(user_id),
+        "username": username,
         "iat": now,
         "exp": expire,
     }

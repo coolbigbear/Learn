@@ -52,7 +52,7 @@ async def seed_progress_data(db_session: AsyncSession):
     await db_session.flush()
 
     # Generate a JWT token for the test user (stateless — no token column)
-    token = create_access_token(user.id)
+    token = create_access_token(user.id, username=user.username)
 
     up = UserProgress(
         user_id=user.id,
