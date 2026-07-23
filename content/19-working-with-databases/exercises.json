@@ -8,7 +8,11 @@
     "test_cases": [
       {
         "input": "",
+<<<<<<< HEAD
         "expected_output": "[(1, 'Widget', 9.99)]\n",
+=======
+        "expected_output": "",
+>>>>>>> 2b19516 (feat: add Lesson 19 — Working with Databases)
         "comparison_type": "exact"
       }
     ],
@@ -25,6 +29,7 @@
         "input": "",
         "expected_output": "",
         "comparison_type": "exact"
+<<<<<<< HEAD
       },
       {
         "input": "",
@@ -55,6 +60,8 @@
         "input": "",
         "expected_output": "Column(Boolean, default=True)",
         "comparison_type": "code_contains"
+=======
+>>>>>>> 2b19516 (feat: add Lesson 19 — Working with Databases)
       }
     ],
     "order": 2
@@ -62,6 +69,7 @@
   {
     "slug": "db-create-session",
     "title": "Create and use an async session",
+<<<<<<< HEAD
     "instruction": "Complete the code to set up an async SQLAlchemy engine for `sqlite+aiosqlite:///./school.db`, create a session factory, define a `Course` model (with `id` Integer primary key and `title` String(100) not null), then create a new course titled 'Python 101' and print \"Course created!\" after commit. Use `async_session_factory` as your session maker variable name.",
     "starter_code": "from sqlalchemy.ext.asyncio import (\n    AsyncSession, async_sessionmaker, create_async_engine\n)\nfrom sqlalchemy.orm import DeclarativeBase\nfrom sqlalchemy import Column, Integer, String\nimport asyncio\n\nengine = create_async_engine(\"sqlite+aiosqlite:///./school.db\")\n\nasync_session_factory = async_sessionmaker(\n    engine, class_=AsyncSession, expire_on_commit=False\n)\n\nclass Base(DeclarativeBase):\n    pass\n\n# Define Course model and write the create_and_print function\n\nasync def create_and_print():\n    # Your code here\n    pass\n\nasyncio.run(create_and_print())\n",
     "solution_code": "from sqlalchemy.ext.asyncio import (\n    AsyncSession, async_sessionmaker, create_async_engine\n)\nfrom sqlalchemy.orm import DeclarativeBase\nfrom sqlalchemy import Column, Integer, String\nimport asyncio\n\nengine = create_async_engine(\"sqlite+aiosqlite:///./school.db\")\n\nasync_session_factory = async_sessionmaker(\n    engine, class_=AsyncSession, expire_on_commit=False\n)\n\nclass Base(DeclarativeBase):\n    pass\n\nclass Course(Base):\n    __tablename__ = \"courses\"\n    id = Column(Integer, primary_key=True, autoincrement=True)\n    title = Column(String(100), nullable=False)\n\nasync def create_and_print():\n    async with engine.begin() as conn:\n        await conn.run_sync(Base.metadata.create_all)\n\n    async with async_session_factory() as session:\n        course = Course(title=\"Python 101\")\n        session.add(course)\n        await session.commit()\n        await session.refresh(course)\n        print(\"Course created!\")\n\nasyncio.run(create_and_print())\n",
@@ -69,6 +77,15 @@
       {
         "input": "",
         "expected_output": "Course created!\n",
+=======
+    "instruction": "Complete the code to set up an async SQLAlchemy engine for `sqlite+aiosqlite:///./school.db`, create a session factory, define a `Course` model (with `id` Integer primary key and `title` String(100) not null), then create a new course titled 'Python 101' and print its id after commit. Use `async_session_factory` as your session maker variable name.",
+    "starter_code": "from sqlalchemy.ext.asyncio import (\n    AsyncSession, async_sessionmaker, create_async_engine\n)\nfrom sqlalchemy.orm import DeclarativeBase\nfrom sqlalchemy import Column, Integer, String\nimport asyncio\n\nengine = create_async_engine(\"sqlite+aiosqlite:///./school.db\")\n\nasync_session_factory = async_sessionmaker(\n    engine, class_=AsyncSession, expire_on_commit=False\n)\n\nclass Base(DeclarativeBase):\n    pass\n\n# Define Course model and write the create_and_print function\n\nasync def create_and_print():\n    # Your code here\n    pass\n\nasyncio.run(create_and_print())\n",
+    "solution_code": "from sqlalchemy.ext.asyncio import (\n    AsyncSession, async_sessionmaker, create_async_engine\n)\nfrom sqlalchemy.orm import DeclarativeBase\nfrom sqlalchemy import Column, Integer, String\nimport asyncio\n\nengine = create_async_engine(\"sqlite+aiosqlite:///./school.db\")\n\nasync_session_factory = async_sessionmaker(\n    engine, class_=AsyncSession, expire_on_commit=False\n)\n\nclass Base(DeclarativeBase):\n    pass\n\nclass Course(Base):\n    __tablename__ = \"courses\"\n    id = Column(Integer, primary_key=True, autoincrement=True)\n    title = Column(String(100), nullable=False)\n\nasync def create_and_print():\n    async with engine.begin() as conn:\n        await conn.run_sync(Base.metadata.create_all)\n\n    async with async_session_factory() as session:\n        course = Course(title=\"Python 101\")\n        session.add(course)\n        await session.commit()\n        await session.refresh(course)\n        print(course.id)\n\nasyncio.run(create_and_print())\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "",
+>>>>>>> 2b19516 (feat: add Lesson 19 — Working with Databases)
         "comparison_type": "exact"
       }
     ],
@@ -78,6 +95,7 @@
     "slug": "db-query-filter",
     "title": "Query with a filter",
     "instruction": "Complete the `find_expensive_items` function that takes a `min_price` parameter and returns all products with price >= min_price. Use the existing `Product` model and `async_session_factory`. The function should return a list of Product objects.",
+<<<<<<< HEAD
     "starter_code": "from sqlalchemy import Column, Integer, String, Float, select\nfrom sqlalchemy.ext.asyncio import (\n    AsyncSession, async_sessionmaker, create_async_engine\n)\nfrom sqlalchemy.orm import DeclarativeBase\nimport asyncio\n\nengine = create_async_engine(\"sqlite+aiosqlite:///./test_products.db\")\n\nasync_session_factory = async_sessionmaker(\n    engine, class_=AsyncSession, expire_on_commit=False\n)\n\nclass Base(DeclarativeBase):\n    pass\n\nclass Product(Base):\n    __tablename__ = \"products\"\n    id = Column(Integer, primary_key=True, autoincrement=True)\n    name = Column(String(100), nullable=False)\n    price = Column(Float, nullable=False)\n\nasync def find_expensive_items(min_price: float) -> list[Product]:\n    # Your code here\n    pass\n\n# Test harness\nasync def _test():\n    async with engine.begin() as conn:\n        await conn.run_sync(Base.metadata.create_all)\n    async with async_session_factory() as session:\n        session.add_all([\n            Product(name=\"Cheap Gadget\", price=9.99),\n            Product(name=\"Expensive Widget\", price=99.99),\n            Product(name=\"Premium Device\", price=199.99),\n        ])\n        await session.commit()\n    expensive = await find_expensive_items(50.0)\n    for p in expensive:\n        print(f\"{p.name}: ${p.price:.2f}\")\n\nasyncio.run(_test())",
     "solution_code": "from sqlalchemy import Column, Integer, String, Float, select\nfrom sqlalchemy.ext.asyncio import (\n    AsyncSession, async_sessionmaker, create_async_engine\n)\nfrom sqlalchemy.orm import DeclarativeBase\nimport asyncio\n\nengine = create_async_engine(\"sqlite+aiosqlite:///./test_products.db\")\n\nasync_session_factory = async_sessionmaker(\n    engine, class_=AsyncSession, expire_on_commit=False\n)\n\nclass Base(DeclarativeBase):\n    pass\n\nclass Product(Base):\n    __tablename__ = \"products\"\n    id = Column(Integer, primary_key=True, autoincrement=True)\n    name = Column(String(100), nullable=False)\n    price = Column(Float, nullable=False)\n\nasync def find_expensive_items(min_price: float) -> list[Product]:\n    async with async_session_factory() as session:\n        stmt = select(Product).where(Product.price >= min_price)\n        result = await session.execute(stmt)\n        return result.scalars().all()\n\n# Test harness\nasync def _test():\n    async with engine.begin() as conn:\n        await conn.run_sync(Base.metadata.create_all)\n    async with async_session_factory() as session:\n        session.add_all([\n            Product(name=\"Cheap Gadget\", price=9.99),\n            Product(name=\"Expensive Widget\", price=99.99),\n            Product(name=\"Premium Device\", price=199.99),\n        ])\n        await session.commit()\n    expensive = await find_expensive_items(50.0)\n    for p in expensive:\n        print(f\"{p.name}: ${p.price:.2f}\")\n\nasyncio.run(_test())",
     "test_cases": [
@@ -105,6 +123,15 @@
         "input": "",
         "expected_output": ".scalars()",
         "comparison_type": "code_contains"
+=======
+    "starter_code": "from sqlalchemy import Column, Integer, String, Float, select\nfrom sqlalchemy.ext.asyncio import AsyncSession\nfrom sqlalchemy.orm import DeclarativeBase\n\nclass Base(DeclarativeBase):\n    pass\n\nclass Product(Base):\n    __tablename__ = \"products\"\n    id = Column(Integer, primary_key=True, autoincrement=True)\n    name = Column(String(100), nullable=False)\n    price = Column(Float, nullable=False)\n\n# async_session_factory is already available\n\nasync def find_expensive_items(min_price: float) -> list[Product]:\n    # Your code here\n    pass\n",
+    "solution_code": "from sqlalchemy import Column, Integer, String, Float, select\nfrom sqlalchemy.ext.asyncio import AsyncSession\nfrom sqlalchemy.orm import DeclarativeBase\n\nclass Base(DeclarativeBase):\n    pass\n\nclass Product(Base):\n    __tablename__ = \"products\"\n    id = Column(Integer, primary_key=True, autoincrement=True)\n    name = Column(String(100), nullable=False)\n    price = Column(Float, nullable=False)\n\nasync def find_expensive_items(min_price: float) -> list[Product]:\n    async with async_session_factory() as session:\n        stmt = select(Product).where(Product.price >= min_price)\n        result = await session.execute(stmt)\n        return result.scalars().all()\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "",
+        "comparison_type": "exact"
+>>>>>>> 2b19516 (feat: add Lesson 19 — Working with Databases)
       }
     ],
     "order": 4
@@ -113,6 +140,7 @@
     "slug": "db-update-record",
     "title": "Update a record",
     "instruction": "Write an async function `mark_completed(task_id: int)` that fetches a `Todo` by id, sets its `completed` field to True, commits, and returns the updated task. Return None if the task doesn't exist.",
+<<<<<<< HEAD
     "starter_code": "from sqlalchemy import Column, Integer, String, Boolean\nfrom sqlalchemy.ext.asyncio import (\n    AsyncSession, async_sessionmaker, create_async_engine\n)\nfrom sqlalchemy.orm import DeclarativeBase\nimport asyncio\n\nengine = create_async_engine(\"sqlite+aiosqlite:///./test_todos.db\")\n\nasync_session_factory = async_sessionmaker(\n    engine, class_=AsyncSession, expire_on_commit=False\n)\n\nclass Base(DeclarativeBase):\n    pass\n\nclass Todo(Base):\n    __tablename__ = \"todos\"\n    id = Column(Integer, primary_key=True, autoincrement=True)\n    title = Column(String(200), nullable=False)\n    completed = Column(Boolean, default=False)\n\nasync def mark_completed(task_id: int) -> Todo | None:\n    # Your code here\n    pass\n\n# Test harness\nasync def _test():\n    async with engine.begin() as conn:\n        await conn.run_sync(Base.metadata.create_all)\n    async with async_session_factory() as session:\n        session.add(Todo(title=\"Learn SQLAlchemy\"))\n        await session.commit()\n    updated = await mark_completed(1)\n    if updated:\n        print(f\"Task {updated.id}: {updated.title} - Completed: {updated.completed}\")\n    else:\n        print(\"Task not found\")\n\nasyncio.run(_test())",
     "solution_code": "from sqlalchemy import Column, Integer, String, Boolean\nfrom sqlalchemy.ext.asyncio import (\n    AsyncSession, async_sessionmaker, create_async_engine\n)\nfrom sqlalchemy.orm import DeclarativeBase\nimport asyncio\n\nengine = create_async_engine(\"sqlite+aiosqlite:///./test_todos.db\")\n\nasync_session_factory = async_sessionmaker(\n    engine, class_=AsyncSession, expire_on_commit=False\n)\n\nclass Base(DeclarativeBase):\n    pass\n\nclass Todo(Base):\n    __tablename__ = \"todos\"\n    id = Column(Integer, primary_key=True, autoincrement=True)\n    title = Column(String(200), nullable=False)\n    completed = Column(Boolean, default=False)\n\nasync def mark_completed(task_id: int) -> Todo | None:\n    async with async_session_factory() as session:\n        task = await session.get(Todo, task_id)\n        if task is None:\n            return None\n        task.completed = True\n        await session.commit()\n        return task\n\n# Test harness\nasync def _test():\n    async with engine.begin() as conn:\n        await conn.run_sync(Base.metadata.create_all)\n    async with async_session_factory() as session:\n        session.add(Todo(title=\"Learn SQLAlchemy\"))\n        await session.commit()\n    updated = await mark_completed(1)\n    if updated:\n        print(f\"Task {updated.id}: {updated.title} - Completed: {updated.completed}\")\n    else:\n        print(\"Task not found\")\n\nasyncio.run(_test())",
     "test_cases": [
@@ -130,6 +158,15 @@
         "input": "",
         "expected_output": "task.completed = True",
         "comparison_type": "code_contains"
+=======
+    "starter_code": "from sqlalchemy import Column, Integer, String, Boolean\nfrom sqlalchemy.ext.asyncio import AsyncSession\nfrom sqlalchemy.orm import DeclarativeBase\n\nclass Base(DeclarativeBase):\n    pass\n\nclass Todo(Base):\n    __tablename__ = \"todos\"\n    id = Column(Integer, primary_key=True, autoincrement=True)\n    title = Column(String(200), nullable=False)\n    completed = Column(Boolean, default=False)\n\n# async_session_factory is already available\n\nasync def mark_completed(task_id: int) -> Todo | None:\n    # Your code here\n    pass\n",
+    "solution_code": "from sqlalchemy import Column, Integer, String, Boolean\nfrom sqlalchemy.ext.asyncio import AsyncSession\nfrom sqlalchemy.orm import DeclarativeBase\n\nclass Base(DeclarativeBase):\n    pass\n\nclass Todo(Base):\n    __tablename__ = \"todos\"\n    id = Column(Integer, primary_key=True, autoincrement=True)\n    title = Column(String(200), nullable=False)\n    completed = Column(Boolean, default=False)\n\nasync def mark_completed(task_id: int) -> Todo | None:\n    async with async_session_factory() as session:\n        task = await session.get(Todo, task_id)\n        if task is None:\n            return None\n        task.completed = True\n        await session.commit()\n        return task\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "",
+        "comparison_type": "exact"
+>>>>>>> 2b19516 (feat: add Lesson 19 — Working with Databases)
       }
     ],
     "order": 5
@@ -138,6 +175,7 @@
     "slug": "db-delete-record",
     "title": "Delete a record safely",
     "instruction": "Write an async function `delete_product(product_id: int) -> bool` that deletes a product by id and returns True if deleted, False if not found. Handle exceptions by calling `await session.rollback()` and returning False if an error occurs.",
+<<<<<<< HEAD
     "starter_code": "from sqlalchemy import Column, Integer, String, Float\nfrom sqlalchemy.ext.asyncio import (\n    AsyncSession, async_sessionmaker, create_async_engine\n)\nfrom sqlalchemy.orm import DeclarativeBase\nimport asyncio\n\nengine = create_async_engine(\"sqlite+aiosqlite:///./test_deletes.db\")\n\nasync_session_factory = async_sessionmaker(\n    engine, class_=AsyncSession, expire_on_commit=False\n)\n\nclass Base(DeclarativeBase):\n    pass\n\nclass Product(Base):\n    __tablename__ = \"products\"\n    id = Column(Integer, primary_key=True, autoincrement=True)\n    name = Column(String(100), nullable=False)\n    price = Column(Float, nullable=False)\n\nasync def delete_product(product_id: int) -> bool:\n    # Your code here\n    pass\n\n# Test harness\nasync def _test():\n    async with engine.begin() as conn:\n        await conn.run_sync(Base.metadata.create_all)\n    async with async_session_factory() as session:\n        session.add(Product(name=\"Test Product\", price=25.0))\n        await session.commit()\n    result = await delete_product(1)\n    print(f\"Deleted: {result}\")\n    result2 = await delete_product(999)\n    print(f\"Non-existent: {result2}\")\n\nasyncio.run(_test())",
     "solution_code": "from sqlalchemy import Column, Integer, String, Float\nfrom sqlalchemy.ext.asyncio import (\n    AsyncSession, async_sessionmaker, create_async_engine\n)\nfrom sqlalchemy.orm import DeclarativeBase\nimport asyncio\n\nengine = create_async_engine(\"sqlite+aiosqlite:///./test_deletes.db\")\n\nasync_session_factory = async_sessionmaker(\n    engine, class_=AsyncSession, expire_on_commit=False\n)\n\nclass Base(DeclarativeBase):\n    pass\n\nclass Product(Base):\n    __tablename__ = \"products\"\n    id = Column(Integer, primary_key=True, autoincrement=True)\n    name = Column(String(100), nullable=False)\n    price = Column(Float, nullable=False)\n\nasync def delete_product(product_id: int) -> bool:\n    try:\n        async with async_session_factory() as session:\n            product = await session.get(Product, product_id)\n            if product is None:\n                return False\n            await session.delete(product)\n            await session.commit()\n            return True\n    except Exception:\n        await session.rollback()\n        return False\n\n# Test harness\nasync def _test():\n    async with engine.begin() as conn:\n        await conn.run_sync(Base.metadata.create_all)\n    async with async_session_factory() as session:\n        session.add(Product(name=\"Test Product\", price=25.0))\n        await session.commit()\n    result = await delete_product(1)\n    print(f\"Deleted: {result}\")\n    result2 = await delete_product(999)\n    print(f\"Non-existent: {result2}\")\n\nasyncio.run(_test())",
     "test_cases": [
@@ -160,6 +198,15 @@
         "input": "",
         "expected_output": "await session.rollback()",
         "comparison_type": "code_contains"
+=======
+    "starter_code": "from sqlalchemy import Column, Integer, String, Float\nfrom sqlalchemy.ext.asyncio import AsyncSession\nfrom sqlalchemy.orm import DeclarativeBase\n\nclass Base(DeclarativeBase):\n    pass\n\nclass Product(Base):\n    __tablename__ = \"products\"\n    id = Column(Integer, primary_key=True, autoincrement=True)\n    name = Column(String(100), nullable=False)\n    price = Column(Float, nullable=False)\n\n# async_session_factory is already available\n\nasync def delete_product(product_id: int) -> bool:\n    # Your code here\n    pass\n",
+    "solution_code": "from sqlalchemy import Column, Integer, String, Float\nfrom sqlalchemy.ext.asyncio import AsyncSession\nfrom sqlalchemy.orm import DeclarativeBase\n\nclass Base(DeclarativeBase):\n    pass\n\nclass Product(Base):\n    __tablename__ = \"products\"\n    id = Column(Integer, primary_key=True, autoincrement=True)\n    name = Column(String(100), nullable=False)\n    price = Column(Float, nullable=False)\n\nasync def delete_product(product_id: int) -> bool:\n    try:\n        async with async_session_factory() as session:\n            product = await session.get(Product, product_id)\n            if product is None:\n                return False\n            await session.delete(product)\n            await session.commit()\n            return True\n    except Exception:\n        await session.rollback()\n        return False\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "",
+        "comparison_type": "exact"
+>>>>>>> 2b19516 (feat: add Lesson 19 — Working with Databases)
       }
     ],
     "order": 6
@@ -175,6 +222,7 @@
         "input": "",
         "expected_output": "",
         "comparison_type": "exact"
+<<<<<<< HEAD
       },
       {
         "input": "",
@@ -195,8 +243,14 @@
         "input": "",
         "expected_output": "conn.run_sync(Base.metadata.create_all)",
         "comparison_type": "code_contains"
+=======
+>>>>>>> 2b19516 (feat: add Lesson 19 — Working with Databases)
       }
     ],
     "order": 7
   }
+<<<<<<< HEAD
 ]
+=======
+]
+>>>>>>> 2b19516 (feat: add Lesson 19 — Working with Databases)
