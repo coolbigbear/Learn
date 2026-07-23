@@ -19,7 +19,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-CONTENT_FILE = Path(__file__).resolve().parent.parent / "content" / "21-intro-to-ml" / "exercises.json"
+CONTENT_FILE = Path(__file__).resolve().parent.parent / "content" / "python" / "24-intro-to-ml" / "exercises.json"
 EXERCISE_SLUG = "random-data"
 
 
