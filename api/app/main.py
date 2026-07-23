@@ -94,6 +94,18 @@ async def lifespan(app: FastAPI):
 
     yield  # Always yield — every code path must reach this
 
+    # ── Graceful shutdown ──────────────────────────────────────────────
+    # Clean up any in-flight Docker runner containers that may have been
+    # created but not started/removed before the server stops.
+    try:
+        from app.services.docker_runner import get_runner
+
+        runner = get_runner()
+        if runner is not None and runner._client is not None:
+            runner._clean_orphans()
+    except Exception:
+        pass
+
 
 def create_app() -> FastAPI:
     app = FastAPI(

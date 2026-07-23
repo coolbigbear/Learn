@@ -29,7 +29,17 @@ jobs:
           docker rm -f python-tutorials-qa 2>/dev/null || true
           docker compose up -d qa
 
-      - name: Health check
+      - name: Health check — wait for API to be ready
         run: |
-          sleep 5
-          curl -sf http://localhost:8081 > /dev/null && echo "✅ QA is responding on port 8081" || echo "⚠ QA not responding yet"
+          echo "Waiting for QA API to be healthy..."
+          for i in $(seq 1 12); do
+            if curl -sf http://localhost:8081/api/health > /dev/null 2>&1; then
+              echo "✅ QA is healthy after ~${i}s"
+              exit 0
+            fi
+            echo "Attempt $i/12 — not ready, waiting 5s..."
+            sleep 5
+          done
+          echo "❌ QA failed to become healthy within 60 seconds"
+          docker logs python-tutorials-qa --tail 30
+          exit 1

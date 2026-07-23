@@ -185,6 +185,9 @@ class DockerRunner:
                         "hierarchy. The mem_limit setting will be silently ignored. "
                         "CPU and PIDs limits are unaffected."
                     )
+
+                # Clean orphaned runner containers from previous crashed runs
+                self._clean_orphans()
             except Exception as e:
                 self._client = None
                 logger.warning(
@@ -196,6 +199,40 @@ class DockerRunner:
                     f"Docker daemon unreachable: {e}"
                 ) from e
         return self._client
+
+    def _clean_orphans(self):
+        """Remove runner containers stuck in 'created' state from crashed runs.
+
+        When the API server shuts down unexpectedly (e.g. container restart,
+        process kill), any in-flight ``container.create()`` calls leave the
+        container in 'created' state with no cleanup.
+        """
+        cleaned = 0
+        for lang, cfg in self.languages.items():
+            image = cfg.get("image", "")
+            if not image:
+                continue
+            try:
+                orphans = self.client.containers.list(
+                    all=True,
+                    filters={"ancestor": image, "status": "created"},
+                )
+                for c in orphans:
+                    try:
+                        c.remove(force=True)
+                        logger.info(
+                            "Cleaned orphaned runner container %s (image: %s)",
+                            c.id[:12], image,
+                        )
+                        cleaned += 1
+                    except Exception:
+                        logger.warning(
+                            "Failed to remove orphaned container %s", c.id[:12],
+                        )
+            except Exception as exc:
+                logger.debug("Orphan cleanup for '%s' skipped: %s", image, exc)
+        if cleaned:
+            logger.info("Startup: cleaned %d orphaned runner container(s)", cleaned)
 
     def _load_config(self, config_path: str | Path):
         """Load and validate language configuration."""
@@ -376,6 +413,22 @@ class DockerRunner:
             except docker_sdk.errors.APIError as e:
                 raise DockerUnavailableError(
                     f"Failed to start sandbox container: {e}"
+                )
+
+            # Verify the container actually transitioned to 'running'.
+            # On some platforms (ARM / resource-constrained hosts) the
+            # start() call can return without the container transitioning,
+            # leaving it stuck in 'created' state.  A quick reload detects
+            # this so we can fail fast instead of waiting for a timeout.
+            container.reload()
+            if container.status == "created":
+                logger.warning(
+                    "Container %s stayed in 'created' state after start() — "
+                    "failing fast instead of hanging on wait()",
+                    container.id[:12],
+                )
+                raise DockerUnavailableError(
+                    "Sandbox container failed to transition to 'running' state"
                 )
 
             # Step 4: Wait for completion with Docker-level timeout
