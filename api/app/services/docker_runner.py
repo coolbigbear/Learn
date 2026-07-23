@@ -111,16 +111,29 @@ def _remove_container_with_retry(container, max_attempts: int = 5):
     import time
 
     cid = ""
+    try:
+        cid = container.id
+    except Exception:
+        return
+
+    # Step 1: Ensure the container is stopped (kill if running).
+    # remove(force=True) should do this atomically, but on some
+    # platforms the SDK's force-remove times out on running containers.
+    try:
+        container.kill()
+    except Exception:
+        pass  # Already stopped or inaccessible — proceed to remove
+
+    # Step 2: Try SDK remove with retry
     for attempt in range(max_attempts):
         try:
-            cid = container.id
             container.remove(force=True)
             return
         except Exception:
             if attempt < max_attempts - 1:
                 time.sleep(0.5 * (attempt + 1))
 
-    # Last resort: use Docker CLI directly
+    # Step 3: Last resort: use Docker CLI directly
     if cid:
         try:
             sp.run(
@@ -130,19 +143,34 @@ def _remove_container_with_retry(container, max_attempts: int = 5):
         except Exception:
             pass
 
-    # Log warning if still cant remove
+    # Step 4: Fallback: hard-kill via CLI if still present
     try:
         remaining = sp.run(
             ["docker", "ps", "-a", "-q", "--filter", f"id={cid}"],
             capture_output=True, text=True, timeout=5,
         )
         if remaining.stdout.strip():
-            logger.warning(
-                "Container %s still present after all removal attempts",
-                cid[:12],
+            # Container still exists — one more hard kill
+            sp.run(
+                ["docker", "rm", "-f", cid],
+                capture_output=True, text=True, timeout=10,
             )
+            # Final check
+            remaining = sp.run(
+                ["docker", "ps", "-a", "-q", "--filter", f"id={cid}"],
+                capture_output=True, text=True, timeout=5,
+            )
+            if remaining.stdout.strip():
+                logger.warning(
+                    "Container %s still present after all removal attempts",
+                    cid[:12],
+                )
+            else:
+                logger.info(
+                    "Container %s removed via docker CLI fallback", cid[:12]
+                )
         else:
-            logger.info("Container %s removed via docker CLI fallback", cid[:12])
+            logger.info("Container %s already removed", cid[:12])
     except Exception:
         pass
 

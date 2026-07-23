@@ -31,16 +31,18 @@ jobs:
 
       - name: Health check — wait for API to be ready
         run: |
-          echo "Waiting for QA API to be healthy..."
+          echo "Waiting for QA API to be healthy (via Docker HEALTHCHECK)..."
           for i in $(seq 1 24); do
-            if curl -sf http://localhost:8081/api/health > /dev/null 2>&1; then
-              echo "✅ QA is healthy after ~${i}s"
+            STATUS=$(docker inspect python-tutorials-qa --format '{{.State.Health.Status}}' 2>/dev/null)
+            if [ "$STATUS" = "healthy" ]; then
+              echo "✅ QA is healthy after ~${i}s (Docker HEALTHCHECK: $STATUS)"
+              docker exec python-tutorials-qa python -c "import urllib.request; r=urllib.request.urlopen('http://localhost:8080/api/health',timeout=5); print(f'API responds: HTTP {r.status}')" 2>/dev/null || true
               exit 0
             fi
-            echo "Attempt $i/24 — not ready, waiting 5s..."
+            echo "Attempt $i/24 — status=$STATUS, waiting 5s..."
             sleep 5
           done
           echo "❌ QA failed to become healthy within 120 seconds"
-          docker logs python-tutorials-qa --tail 50
-          docker inspect python-tutorials-qa --format '{{.State.Status}} (health: {{.State.Health.Status}})'
+          docker inspect python-tutorials-qa --format 'Status: {{.State.Status}}, Health: {{.State.Health.Status}}' 2>/dev/null || echo "Container not found"
+          docker logs python-tutorials-qa --tail 50 2>/dev/null || true
           exit 1
