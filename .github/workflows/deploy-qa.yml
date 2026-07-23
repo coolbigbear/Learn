@@ -32,14 +32,15 @@ jobs:
       - name: Health check — wait for API to be ready
         run: |
           echo "Waiting for QA API to be healthy..."
-          for i in $(seq 1 12); do
+          for i in $(seq 1 24); do
             if curl -sf http://localhost:8081/api/health > /dev/null 2>&1; then
               echo "✅ QA is healthy after ~${i}s"
               exit 0
             fi
-            echo "Attempt $i/12 — not ready, waiting 5s..."
+            echo "Attempt $i/24 — not ready, waiting 5s..."
             sleep 5
           done
-          echo "❌ QA failed to become healthy within 60 seconds"
-          docker logs python-tutorials-qa --tail 30
+          echo "❌ QA failed to become healthy within 120 seconds"
+          docker logs python-tutorials-qa --tail 50
+          docker inspect python-tutorials-qa --format '{{.State.Status}} (health: {{.State.Health.Status}})'
           exit 1
