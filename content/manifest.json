@@ -14,7 +14,14 @@
   {"slug": "13-error-handling", "title": "Error Handling and Exceptions", "order": 13, "path": "core"},
   {"slug": "14-oop", "title": "Object-Oriented Programming", "order": 14, "path": "core"},
   {"slug": "15-modules", "title": "Modules and Packages", "order": 15, "path": "core"},
-  {"slug": "16-data-processing", "title": "Data Processing — CSV, JSON, and APIs", "order": 16, "path": "data-processing"},
-  {"slug": "17-fastapi-intro", "title": "Introduction to FastAPI", "order": 17, "path": "api"},
-  {"slug": "18-mini-api-project", "title": "Mini API Project", "order": 18, "path": "api"}
+  {"slug": "16-csv-processing", "title": "CSV Processing", "order": 16, "path": "data-processing"},
+  {"slug": "17-json-processing", "title": "JSON Processing", "order": 17, "path": "data-processing"},
+  {"slug": "18-data-processing-libraries", "title": "Data Processing Libraries", "order": 18, "path": "data-processing"},
+  {"slug": "json-api-payloads", "title": "Handling JSON Payloads in APIs", "order": 19, "path": "api"},
+  {"slug": "19-fastapi-intro", "title": "Introduction to FastAPI", "order": 20, "path": "api"},
+  {"slug": "20-mini-api-project", "title": "Mini API Project", "order": 21, "path": "api"},
+  {"slug": "21-intro-to-ml", "title": "Introduction to Machine Learning & NumPy", "order": 22, "path": "machine-learning"},
+  {"slug": "22-data-preprocessing", "title": "Data Preprocessing", "order": 23, "path": "machine-learning"},
+  {"slug": "23-supervised-learning", "title": "Supervised Learning: Regression & Classification", "order": 24, "path": "machine-learning"},
+  {"slug": "24-unsupervised-learning", "title": "Unsupervised Learning & Mini ML Project", "order": 25, "path": "machine-learning"}
 ]
