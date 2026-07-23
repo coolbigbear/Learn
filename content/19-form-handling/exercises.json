@@ -10,6 +10,26 @@
         "input": "",
         "expected_output": "",
         "comparison_type": "exact"
+      },
+      {
+        "input": "",
+        "expected_output": "@app.post(\"/login\")",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "def login(username: str = Form()",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "password: str = Form()",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "return {\"message\":",
+        "comparison_type": "code_contains"
       }
     ],
     "order": 1
@@ -25,6 +45,26 @@
         "input": "",
         "expected_output": "",
         "comparison_type": "exact"
+      },
+      {
+        "input": "",
+        "expected_output": "@app.post(\"/upload\")",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "UploadFile = File()",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "await file.read()",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "return {\"filename\": file.filename, \"size_bytes\": len(contents)}",
+        "comparison_type": "code_contains"
       }
     ],
     "order": 2
@@ -40,6 +80,31 @@
         "input": "",
         "expected_output": "",
         "comparison_type": "exact"
+      },
+      {
+        "input": "",
+        "expected_output": "@app.post(\"/signup\")",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "def signup(",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "Form(min_length=3, max_length=20)",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "Form(ge=13, le=120)",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "return {\"username\": username, \"email\": email, \"age\": age}",
+        "comparison_type": "code_contains"
       }
     ],
     "order": 3
@@ -55,6 +120,36 @@
         "input": "",
         "expected_output": "",
         "comparison_type": "exact"
+      },
+      {
+        "input": "",
+        "expected_output": "@app.post(\"/profile\")",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "def create_profile(",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "name: str = Form()",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "bio: str = Form(max_length=200)",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "avatar: UploadFile = File()",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "await avatar.read()",
+        "comparison_type": "code_contains"
       }
     ],
     "order": 4
