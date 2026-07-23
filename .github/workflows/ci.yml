@@ -51,7 +51,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           pip install --quiet -r requirements.txt
-          pip install --quiet -e ".[dev]"
+          pip install --quiet ".[dev]"
 
       - name: Run backend tests with pytest
         run: |
@@ -158,8 +158,6 @@ jobs:
             echo "**❌ Some tests failed — check the individual job logs for details.**" >> $GITHUB_STEP_SUMMARY
           fi
 
-<<<<<<< HEAD
-=======
       - name: Create kanban review task (on test success)
         if: needs.test-backend.result == 'success' && needs.test-frontend.result == 'success'
         env:
@@ -184,7 +182,6 @@ jobs:
             "$TASK_TITLE" \
             2>&1 || echo "⚠ kanban create returned non-zero (may be a duplicate)"
 
->>>>>>> pr-13
       - name: Fail if any test suite failed
         if: needs.test-backend.result != 'success' || needs.test-frontend.result != 'success'
         run: |
