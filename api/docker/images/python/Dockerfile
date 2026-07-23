@@ -5,7 +5,7 @@ RUN addgroup --system --gid 1001 sandbox \
     && adduser --system --uid 1001 --ingroup sandbox --disabled-password --no-create-home sandbox
 
 # Install packages for exercises: ML libs and API libs
-RUN pip install --no-cache-dir numpy pandas scikit-learn fastapi pydantic uvicorn sqlalchemy[asyncio] aiosqlite passlib[bcrypt] python-jose[cryptography] httpx xmltodict
+RUN pip install --no-cache-dir numpy pandas scikit-learn fastapi pydantic uvicorn sqlalchemy[asyncio] aiosqlite passlib[bcrypt] python-jose[cryptography] httpx xmltodict python-multipart
 
 USER sandbox
 WORKDIR /home/sandbox

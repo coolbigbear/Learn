@@ -37,6 +37,29 @@ else:
     CONTENT_DIR = _candidate if _candidate.is_dir() else Path("/app/content")
 
 
+def _find_manifest(content_dir: Path) -> Path | None:
+    """Locate manifest.json in the content directory.
+
+    Tries the direct path first, then falls back to looking inside
+    language-subdirectories (e.g. ``content/python/manifest.json``) to
+    support restructured content layouts where lessons were grouped
+    under language folders.
+
+    Returns the manifest Path if found, otherwise None.
+    """
+    direct = content_dir / "manifest.json"
+    if direct.is_file():
+        return direct
+    # Fallback: scan immediate subdirectories for one that contains manifest.json
+    if content_dir.is_dir():
+        for sub in sorted(content_dir.iterdir()):
+            if sub.is_dir():
+                nested = sub / "manifest.json"
+                if nested.is_file():
+                    return nested
+    return None
+
+
 async def _get_existing_lesson_slugs(session: AsyncSession) -> set[str]:
     """Return the set of lesson slugs already in the database."""
     result = await session.execute(select(Lesson.slug))
@@ -55,8 +78,8 @@ async def _sync_exercise_test_cases(
     Uses lesson slug + exercise slug to uniquely identify exercises (the
     Exercise.slug is unique per lesson, not globally).
     """
-    manifest_path = content_dir / "manifest.json"
-    if not manifest_path.is_file():
+    manifest_path = _find_manifest(content_dir)
+    if manifest_path is None:
         return 0
 
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -179,9 +202,9 @@ async def seed_content(
     if not content_dir.is_dir():
         return {"error": f"Content directory not found: {content_dir}"}
 
-    manifest_path = content_dir / "manifest.json"
-    if not manifest_path.is_file():
-        return {"error": f"Manifest not found: {manifest_path}"}
+    manifest_path = _find_manifest(content_dir)
+    if manifest_path is None:
+        return {"error": f"Manifest not found in {content_dir} (tried direct and python/ subdirectory)"}
 
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
 
