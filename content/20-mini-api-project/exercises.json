@@ -10,6 +10,21 @@
         "input": "",
         "expected_output": "",
         "comparison_type": "exact"
+      },
+      {
+        "input": "",
+        "expected_output": "@app.get(\"/items\")",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "def list_items",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "return {\"items\": items}",
+        "comparison_type": "code_contains"
       }
     ],
     "order": 1
@@ -25,6 +40,26 @@
         "input": "",
         "expected_output": "",
         "comparison_type": "exact"
+      },
+      {
+        "input": "",
+        "expected_output": "@app.post(\"/items\"",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "def add_item(body: NewItem)",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "status_code=201",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "items.append(body.item)",
+        "comparison_type": "code_contains"
       }
     ],
     "order": 2
@@ -40,6 +75,26 @@
         "input": "",
         "expected_output": "",
         "comparison_type": "exact"
+      },
+      {
+        "input": "",
+        "expected_output": "@app.delete(\"/items/{index}\")",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "def delete_item(index: int)",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "HTTPException(status_code=404",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "items.pop(index)",
+        "comparison_type": "code_contains"
       }
     ],
     "order": 3
