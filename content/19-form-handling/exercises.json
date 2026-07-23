@@ -1,0 +1,62 @@
+[
+  {
+    "slug": "form-login",
+    "title": "Login form endpoint",
+    "instruction": "Create a FastAPI POST endpoint at `/login` that accepts two URL-encoded form fields: `username` (str) and `password` (str). Return `{\"message\": \"Welcome, {username}!\"}`.",
+    "starter_code": "from fastapi import FastAPI, Form\n\napp = FastAPI()\n\n# Your code here\n",
+    "solution_code": "from fastapi import FastAPI, Form\n\napp = FastAPI()\n\n@app.post(\"/login\")\nasync def login(username: str = Form(), password: str = Form()):\n    return {\"message\": f\"Welcome, {username}!\"}\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 1
+  },
+  {
+    "slug": "file-upload-size",
+    "title": "File upload with size check",
+    "instruction": "Create a POST endpoint at `/upload` that accepts a file via `UploadFile`. Read the file, and return its filename and size in bytes as `{\"filename\": \"...\", \"size_bytes\": 123}`.",
+    "starter_code": "from fastapi import FastAPI, File, UploadFile\n\napp = FastAPI()\n\n# Your code here\n",
+    "solution_code": "from fastapi import FastAPI, File, UploadFile\n\napp = FastAPI()\n\n@app.post(\"/upload\")\nasync def upload(file: UploadFile = File()):\n    contents = await file.read()\n    return {\"filename\": file.filename, \"size_bytes\": len(contents)}\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 2
+  },
+  {
+    "slug": "validated-registration",
+    "title": "Validated registration form",
+    "instruction": "Create a POST endpoint at `/signup` with the following form fields and validation:\n- `username`: str, Form, min_length=3, max_length=20\n- `email`: str, Form\n- `age`: int, Form, ge=13, le=120\n\nReturn the submitted data as a dictionary.",
+    "starter_code": "from fastapi import FastAPI, Form\n\napp = FastAPI()\n\n# Your code here\n",
+    "solution_code": "from fastapi import FastAPI, Form\n\napp = FastAPI()\n\n@app.post(\"/signup\")\nasync def signup(\n    username: str = Form(min_length=3, max_length=20),\n    email: str = Form(),\n    age: int = Form(ge=13, le=120)\n):\n    return {\"username\": username, \"email\": email, \"age\": age}\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 3
+  },
+  {
+    "slug": "profile-with-avatar",
+    "title": "Profile with avatar upload",
+    "instruction": "Create a POST endpoint at `/profile` that accepts:\n- `name`: str, Form\n- `bio`: str, Form, max_length=200\n- `avatar`: UploadFile\n\nRead the avatar file and return `{\"name\": name, \"bio\": bio, \"avatar_filename\": avatar.filename, \"avatar_size\": len(contents)}`.",
+    "starter_code": "from fastapi import FastAPI, Form, File, UploadFile\n\napp = FastAPI()\n\n# Your code here\n",
+    "solution_code": "from fastapi import FastAPI, Form, File, UploadFile\n\napp = FastAPI()\n\n@app.post(\"/profile\")\nasync def create_profile(\n    name: str = Form(),\n    bio: str = Form(max_length=200),\n    avatar: UploadFile = File()\n):\n    contents = await avatar.read()\n    return {\n        \"name\": name,\n        \"bio\": bio,\n        \"avatar_filename\": avatar.filename,\n        \"avatar_size\": len(contents)\n    }\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 4
+  }
+]
