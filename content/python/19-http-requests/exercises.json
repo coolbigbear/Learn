@@ -1,0 +1,122 @@
+[
+  {
+    "slug": "http-url-with-path",
+    "title": "Construct a URL with a path variable",
+    "instruction": "Write code that builds a URL by inserting a user ID into the path. Given the base URL `https://api.example.com/users/` and a variable `user_id = 42`, construct the full URL using an f-string and print it.\n\nThe output should be: `https://api.example.com/users/42`",
+    "starter_code": "base_url = \"https://api.example.com/users/\"\nuser_id = 42\n\n# Construct the full URL with path variable using an f-string\n# Print the result\n",
+    "solution_code": "base_url = \"https://api.example.com/users/\"\nuser_id = 42\n\nurl = f\"{base_url}{user_id}\"\nprint(url)\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "https://api.example.com/users/42\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 1
+  },
+  {
+    "slug": "http-headers-dict",
+    "title": "Build a headers dictionary with Accept",
+    "instruction": "Create a dictionary called `headers` with the keys `Accept` (set to `application/json`) and `User-Agent` (set to `PythonRequests/1.0`). Then print the dictionary.",
+    "starter_code": "# Create the headers dictionary and print it\n",
+    "solution_code": "headers = {\n    \"Accept\": \"application/json\",\n    \"User-Agent\": \"PythonRequests/1.0\"\n}\nprint(headers)\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "{'Accept': 'application/json', 'User-Agent': 'PythonRequests/1.0'}\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 2
+  },
+  {
+    "slug": "http-get-path-variable",
+    "title": "GET request with a path variable",
+    "instruction": "Write a program that sets `user_id = 3`, then uses an f-string to build the URL `https://jsonplaceholder.typicode.com/users/{user_id}` and prints it.\n\nThe output should be: `https://jsonplaceholder.typicode.com/users/3`",
+    "starter_code": "user_id = 3\n\n# Build the URL with f-string\n# Print the URL\n",
+    "solution_code": "user_id = 3\nurl = f\"https://jsonplaceholder.typicode.com/users/{user_id}\"\nprint(url)\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "https://jsonplaceholder.typicode.com/users/3\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 3
+  },
+  {
+    "slug": "http-multiple-path-vars",
+    "title": "URL with multiple path variables",
+    "instruction": "Write code that constructs a URL with two path variables: `user_id = 7` and `post_id = 15`. The URL pattern is `https://jsonplaceholder.typicode.com/users/{user_id}/posts/{post_id}`. Use an f-string and print the resulting URL.",
+    "starter_code": "user_id = 7\npost_id = 15\n\n# Construct the URL with both path variables\n# Print the URL\n",
+    "solution_code": "user_id = 7\npost_id = 15\n\nurl = f\"https://jsonplaceholder.typicode.com/users/{user_id}/posts/{post_id}\"\nprint(url)\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "https://jsonplaceholder.typicode.com/users/7/posts/15\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 4
+  },
+  {
+    "slug": "http-post-with-json",
+    "title": "POST request with JSON body",
+    "instruction": "Write a program that creates the data dictionary and URL for a POST request. Use:\n- URL: `https://jsonplaceholder.typicode.com/posts`\n- JSON body: `{\"title\": \"My Post\", \"body\": \"Post content\", \"userId\": 1}`\n\nPrint the URL and the data dict (one per line). The output should be:\n```\nhttps://jsonplaceholder.typicode.com/posts\n{'title': 'My Post', 'body': 'Post content', 'userId': 1}\n```",
+    "starter_code": "# Create URL, data dict, and print them\n",
+    "solution_code": "url = \"https://jsonplaceholder.typicode.com/posts\"\ndata = {\"title\": \"My Post\", \"body\": \"Post content\", \"userId\": 1}\nprint(url)\nprint(data)\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "https://jsonplaceholder.typicode.com/posts\n{'title': 'My Post', 'body': 'Post content', 'userId': 1}\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 5
+  },
+  {
+    "slug": "http-auth-header",
+    "title": "GET request with Authorization header",
+    "instruction": "Write a program that creates a headers dictionary with an `Authorization` header set to `Bearer my-secret-token` and an `Accept` header set to `application/json`. Print the headers dictionary.",
+    "starter_code": "# Build headers with Authorization (Bearer) and Accept\n# Print the headers dict\n",
+    "solution_code": "headers = {\n    \"Authorization\": \"Bearer my-secret-token\",\n    \"Accept\": \"application/json\"\n}\nprint(headers)\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "{'Authorization': 'Bearer my-secret-token', 'Accept': 'application/json'}\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 6
+  },
+  {
+    "slug": "http-content-type-form",
+    "title": "POST request with form data",
+    "instruction": "Write a program that shows how to send form-encoded data. Create:\n- A variable `form_data` with the dict `{\"username\": \"alice\", \"password\": \"secret\"}`\n- A variable `url` set to `https://httpbin.org/post`\n\nPrint the URL and the form data dict (one per line).\n\nThe output should be:\n```\nhttps://httpbin.org/post\n{'username': 'alice', 'password': 'secret'}\n```\n\nRemember: when using `data=` with `requests.post()`, the `Content-Type` header is automatically set to `application/x-www-form-urlencoded`.",
+    "starter_code": "# Create URL and form data dict, print both\n",
+    "solution_code": "url = \"https://httpbin.org/post\"\nform_data = {\"username\": \"alice\", \"password\": \"secret\"}\nprint(url)\nprint(form_data)\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "https://httpbin.org/post\n{'username': 'alice', 'password': 'secret'}\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 7
+  },
+  {
+    "slug": "http-put-with-headers",
+    "title": "PUT request with path variable and headers",
+    "instruction": "Write a program that prepares a PUT request to update a post. Create:\n- `post_id = 1`\n- A URL variable using f-string: `https://jsonplaceholder.typicode.com/posts/{post_id}`\n- A headers dict with `Content-Type` and `Accept` both set to `application/json`\n- A data dict with `{\"id\": 1, \"title\": \"Updated\", \"body\": \"Updated body\", \"userId\": 1}`\n\nPrint the URL, then the headers dict, then the data dict (one per line, in that order).",
+    "starter_code": "post_id = 1\n\n# Build URL, headers, and data dict\n# Print them one per line\n",
+    "solution_code": "post_id = 1\nurl = f\"https://jsonplaceholder.typicode.com/posts/{post_id}\"\nheaders = {\n    \"Content-Type\": \"application/json\",\n    \"Accept\": \"application/json\"\n}\ndata = {\"id\": 1, \"title\": \"Updated\", \"body\": \"Updated body\", \"userId\": 1}\nprint(url)\nprint(headers)\nprint(data)\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "https://jsonplaceholder.typicode.com/posts/1\n{'Content-Type': 'application/json', 'Accept': 'application/json'}\n{'id': 1, 'title': 'Updated', 'body': 'Updated body', 'userId': 1}\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 8
+  }
+]

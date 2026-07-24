@@ -1,0 +1,122 @@
+[
+  {
+    "slug": "status-check-ok",
+    "title": "Check if a response is successful using .ok",
+    "instruction": "You have a response object stored in the variable `resp`. Write code that checks `resp.ok` and prints \"Success!\" if it's True, or prints the status code if it's False.\n\nExpected output (example):\n- If resp.ok is True: `Success!`\n- If resp.ok is False: `Failed with status 404`",
+    "starter_code": "import requests\n\nresp = requests.get(\"https://jsonplaceholder.typicode.com/posts/1\")\n\n# Check resp.ok and print the result\n",
+    "solution_code": "import requests\n\nresp = requests.get(\"https://jsonplaceholder.typicode.com/posts/1\")\n\nif resp.ok:\n    print(\"Success!\")\nelse:\n    print(f\"Failed with status {resp.status_code}\")\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "Success!\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 1
+  },
+  {
+    "slug": "status-201-created",
+    "title": "Identify a 201 Created response",
+    "instruction": "A POST request to create a resource returned a response. The status code is stored in a variable `status_code`. Write code that prints \"Resource created!\" if the status code is 201, or \"Unexpected status\" otherwise.\n\nTest with `status_code = 201`.",
+    "starter_code": "status_code = 201  # This would come from response.status_code in real code\n\n# Check if status_code is 201 and print the right message\n",
+    "solution_code": "status_code = 201\n\nif status_code == 201:\n    print(\"Resource created!\")\nelse:\n    print(\"Unexpected status\")\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "Resource created!\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 2
+  },
+  {
+    "slug": "status-404-handling",
+    "title": "Handle a 404 Not Found response",
+    "instruction": "A GET request to `https://jsonplaceholder.typicode.com/posts/99999` will return 404. Write code that makes the request, checks the status code, and prints 'Post not found' if it's 404, or the JSON data if it's 200.",
+    "starter_code": "import requests\n\nresponse = requests.get(\"https://jsonplaceholder.typicode.com/posts/99999\")\n\n# Check the status code and handle it\n",
+    "solution_code": "import requests\n\nresponse = requests.get(\"https://jsonplaceholder.typicode.com/posts/99999\")\n\nif response.status_code == 404:\n    print(\"Post not found\")\nelse:\n    print(response.json())\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "Post not found\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 3
+  },
+  {
+    "slug": "status-class-identifier",
+    "title": "Classify a status code by its class",
+    "instruction": "Write a function called `classify_status(code)` that takes an integer status code and returns a string describing its class:\n- 1xx: \"Informational\"\n- 2xx: \"Success\"\n- 3xx: \"Redirection\"\n- 4xx: \"Client Error\"\n- 5xx: \"Server Error\"\n- Anything else: \"Unknown\"\n\nCall the function with `code = 403` and print the result.",
+    "starter_code": "def classify_status(code):\n    # Return the class name based on the first digit\n    pass\n\n# Test with 403\nprint(classify_status(403))\n",
+    "solution_code": "def classify_status(code):\n    if 100 <= code < 200:\n        return \"Informational\"\n    elif 200 <= code < 300:\n        return \"Success\"\n    elif 300 <= code < 400:\n        return \"Redirection\"\n    elif 400 <= code < 500:\n        return \"Client Error\"\n    elif 500 <= code < 600:\n        return \"Server Error\"\n    else:\n        return \"Unknown\"\n\nprint(classify_status(403))\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "Client Error\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 4
+  },
+  {
+    "slug": "status-exponential-backoff",
+    "title": "Implement retry with exponential backoff",
+    "instruction": "Write a loop that retries a request up to 3 times when the status code is 429 (rate limited). Use an exponential backoff delay: 1 second for the first retry, 2 for the second, 4 for the third. Print \"Waiting {n} seconds...\" before each retry.\n\nSimulate with a function `fake_request()` that returns a mock response with status code 429 for the first 2 calls, then 200 on the 3rd.",
+    "starter_code": "attempt = 0\nmax_retries = 3\n\n# Simulate a rate-limited API\nresponses = [429, 429, 200]\n\ndef fake_request():\n    global attempt\n    result = responses[attempt]\n    attempt += 1\n    # Return an object with .status_code\n    class MockResponse:\n        pass\n    r = MockResponse()\n    r.status_code = result\n    return r\n\n# Call fake_request(), check status, retry with backoff if 429\n",
+    "solution_code": "attempt = 0\nmax_retries = 3\nresponses = [429, 429, 200]\n\ndef fake_request():\n    global attempt\n    result = responses[attempt]\n    attempt += 1\n    class MockResponse:\n        pass\n    r = MockResponse()\n    r.status_code = result\n    return r\n\nfor i in range(max_retries):\n    response = fake_request()\n    if response.status_code == 200:\n        print(\"Success!\")\n        break\n    elif response.status_code == 429:\n        wait = 2 ** i\n        print(f\"Waiting {wait} seconds...\")\n    else:\n        print(f\"Error: {response.status_code}\")\n        break\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "Waiting 1 seconds...\nWaiting 2 seconds...\nSuccess!\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 5
+  },
+  {
+    "slug": "status-raise-for-status",
+    "title": "Use raise_for_status() correctly",
+    "instruction": "Write code that makes a GET request to `https://jsonplaceholder.typicode.com/posts/1`, uses `raise_for_status()` to check for errors, and if successful, parses the JSON and prints the `title` field.\n\nWrap the call in a try/except that catches `requests.exceptions.HTTPError` and prints \"HTTP error occurred\".",
+    "starter_code": "import requests\n\ntry:\n    response = requests.get(\"https://jsonplaceholder.typicode.com/posts/1\")\n    # Use raise_for_status() here\n    # Parse and print the title\nexcept requests.exceptions.HTTPError:\n    print(\"HTTP error occurred\")\n",
+    "solution_code": "import requests\n\ntry:\n    response = requests.get(\"https://jsonplaceholder.typicode.com/posts/1\")\n    response.raise_for_status()\n    data = response.json()\n    print(data[\"title\"])\nexcept requests.exceptions.HTTPError:\n    print(\"HTTP error occurred\")\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "sunt aut facere repellat provident occaecati excepturi optio reprehenderit\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 6
+  },
+  {
+    "slug": "status-redirect-follow",
+    "title": "Understand automatic redirect following",
+    "instruction": "Many APIs redirect HTTP to HTTPS (status 301). Python's `requests` library follows redirects automatically. Use `allow_redirects=False` to see the original 301 response.\n\nMake a GET request to `http://httpbin.org/redirect/1` (which returns a 302 redirect) with `allow_redirects=False`. Print the status code and the `Location` header.\n\nIf you can't access httpbin.org, simulate: set `response.status_code = 302` and `response.headers = {\"Location\": \"https://new-url.com\"}`.",
+    "starter_code": "import requests\n\nresponse = requests.get(\"http://httpbin.org/redirect/1\", allow_redirects=False)\n\n# Print the status code and Location header\n",
+    "solution_code": "import requests\n\ntry:\n    response = requests.get(\"http://httpbin.org/redirect/1\", allow_redirects=False, timeout=5)\n    print(f\"Status: {response.status_code}\")\n    print(f\"Location: {response.headers.get('Location')}\")\nexcept requests.exceptions.ConnectionError:\n    # Fallback for offline: simulate\n    class MockResponse:\n        status_code = 302\n        headers = {\"Location\": \"https://new-url.com\"}\n    response = MockResponse()\n    print(f\"Status: {response.status_code}\")\n    print(f\"Location: {response.headers.get('Location')}\")\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 7
+  },
+  {
+    "slug": "status-401-vs-403",
+    "title": "Distinguish 401 Unauthorized from 403 Forbidden",
+    "instruction": "Write a function called `check_auth_status(status_code)` that prints:\n- \"Please log in\" for 401\n- \"Access denied\" for 403\n- \"Something else\" for any other code\n\nTest it with `status_code = 401` and `status_code = 403`.",
+    "starter_code": "def check_auth_status(status_code):\n    # Print the right message for 401 and 403\n    pass\n\n# Test both codes\ncheck_auth_status(401)\ncheck_auth_status(403)\n",
+    "solution_code": "def check_auth_status(status_code):\n    if status_code == 401:\n        print(\"Please log in\")\n    elif status_code == 403:\n        print(\"Access denied\")\n    else:\n        print(\"Something else\")\n\ncheck_auth_status(401)\ncheck_auth_status(403)\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "Please log in\nAccess denied\n",
+        "comparison_type": "exact"
+      }
+    ],
+    "order": 8
+  }
+]
