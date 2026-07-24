@@ -6,6 +6,9 @@ that don't already exist in the database. Safe to call on every container start.
 When lessons already exist, the function detects new lessons in the manifest
 that haven't been seeded yet, adds them, and syncs exercise test_cases for
 existing lessons.
+
+Supports both flat content layouts (content/manifest.json) and language-nested
+layouts (content/python/manifest.json). Auto-detects the structure at runtime.
 """
 
 import json
@@ -35,6 +38,41 @@ else:
         _root = Path(__file__).resolve().parent.parent.parent
     _candidate = _root / "content"
     CONTENT_DIR = _candidate if _candidate.is_dir() else Path("/app/content")
+
+# Language subdirectories to probe when looking for nested content
+# (e.g., content/python/, content/javascript/).
+_LANGUAGE_SUBDIRS = ["python"]
+
+
+def resolve_content_base(content_dir: Path) -> tuple[Path, Path]:
+    """Resolve the base content directory and manifest path.
+
+    Checks for manifest.json in both flat and language-nested layouts:
+
+        Flat layout:   content/manifest.json
+        Nested layout: content/python/manifest.json
+
+    Returns (base_content_dir, manifest_path) where:
+        base_content_dir — the directory containing lesson subdirectories
+        manifest_path    — the full path to manifest.json
+
+    Raises FileNotFoundError if no manifest is found.
+    """
+    # Check flat layout first (content/manifest.json)
+    flat_manifest = content_dir / "manifest.json"
+    if flat_manifest.is_file():
+        return content_dir, flat_manifest
+
+    # Check language-nested layouts (content/<lang>/manifest.json)
+    for lang_dir in _LANGUAGE_SUBDIRS:
+        nested_manifest = content_dir / lang_dir / "manifest.json"
+        if nested_manifest.is_file():
+            return content_dir / lang_dir, nested_manifest
+
+    raise FileNotFoundError(
+        f"Manifest not found in {content_dir} or any language subdirectory"
+        f" ({', '.join(_LANGUAGE_SUBDIRS)})"
+    )
 
 
 def _find_manifest(content_dir: Path) -> Path | None:
@@ -72,7 +110,7 @@ async def _sync_existing_lesson_paths(
     """Update existing lessons' path column to match the manifest.
 
     When manifest paths are corrected (e.g. after a restructure that flattened
-    all paths to ``\"python\"``), existing lessons in the database that were
+    all paths to ``"python"``), existing lessons in the database that were
     seeded with wrong or outdated paths get corrected. Returns count of
     updates made.
     """
@@ -99,28 +137,27 @@ async def _sync_existing_lesson_paths(
 
 
 async def _sync_exercise_test_cases(
-    session: AsyncSession, content_dir: Path
+    session: AsyncSession, base_dir: Path, manifest: list[dict]
 ) -> int:
     """Sync exercise test_cases from content files to DB.
 
-    Reads content/<lesson>/exercises.json for each lesson in the manifest and
+    Reads base_dir/<lesson>/exercises.json for each lesson in the manifest and
     updates the database if any exercise's test_cases differ. Returns count of
     updates made.
 
     Uses lesson slug + exercise slug to uniquely identify exercises (the
     Exercise.slug is unique per lesson, not globally).
-    """
-    manifest_path = _find_manifest(content_dir)
-    if manifest_path is None:
-        return 0
 
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    Args:
+        session: Database session.
+        base_dir: The directory containing lesson subdirectories.
+        manifest: Parsed manifest list of lesson entries.
+    """
     update_count = 0
 
     for entry in manifest:
         slug = entry["slug"]
-        path_key = entry.get("path", "python")
-        exercises_json_path = content_dir / path_key / slug / "exercises.json"
+        exercises_json_path = base_dir / slug / "exercises.json"
         if not exercises_json_path.is_file():
             continue
 
@@ -157,9 +194,14 @@ async def _sync_exercise_test_cases(
 
 
 async def _seed_lesson(
-    session: AsyncSession, content_dir: Path, entry: dict
+    session: AsyncSession, base_dir: Path, entry: dict
 ) -> tuple[int, int]:
     """Insert a single lesson and its exercises from the manifest entry.
+
+    Args:
+        session: Database session.
+        base_dir: The directory containing lesson subdirectories.
+        entry: A manifest entry dict with slug, title, order, path keys.
 
     Returns (lessons_added, exercises_added).
     """
@@ -169,7 +211,7 @@ async def _seed_lesson(
     path_key = entry.get("path", "python")
 
     # Read lesson content
-    lesson_md = content_dir / path_key / slug / "lesson.md"
+    lesson_md = base_dir / slug / "lesson.md"
     if not lesson_md.is_file():
         return 0, 0
     md_content = lesson_md.read_text(encoding="utf-8")
@@ -185,7 +227,7 @@ async def _seed_lesson(
     await session.flush()  # Get lesson.id
 
     # Read exercises
-    exercises_json = content_dir / path_key / slug / "exercises.json"
+    exercises_json = base_dir / slug / "exercises.json"
     if not exercises_json.is_file():
         return 1, 0
 
@@ -212,6 +254,8 @@ async def _seed_lesson(
 async def seed_content(
     session: AsyncSession | None = None,
     content_dir: Path | None = None,
+    *,
+    reimport: bool = False,
 ) -> dict:
     """Import lesson content from content directory into the database.
 
@@ -220,8 +264,15 @@ async def seed_content(
                  session is created from ``async_session_factory``.
         content_dir: Optional override for the content directory path. When
                      omitted, uses ``CONTENT_DIR`` global.
+        reimport: If True, delete all existing lessons and exercises before
+                  re-importing from the manifest. Useful for a full re-seed.
 
     Returns a dict with counts of what was inserted/seeded/synced.
+
+    Supports both flat and language-nested content directory structures:
+
+        Flat:   content/manifest.json, content/<slug>/lesson.md
+        Nested: content/python/manifest.json, content/python/<slug>/lesson.md
 
     On first run: inserts all lessons and exercises from the content files.
     On subsequent runs: detects new lessons in the manifest, adds them, and
@@ -234,14 +285,27 @@ async def seed_content(
     if not content_dir.is_dir():
         return {"error": f"Content directory not found: {content_dir}"}
 
-    manifest_path = _find_manifest(content_dir)
-    if manifest_path is None:
-        return {"error": f"Manifest not found in {content_dir} (tried direct and python/ subdirectory)"}
+    # Resolve manifest location (flat vs language-nested layout)
+    try:
+        base_dir, manifest_path = resolve_content_base(content_dir)
+    except FileNotFoundError as e:
+        return {"error": str(e)}
 
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
 
     async def _work(db: AsyncSession) -> dict:
-        existing_slugs = await _get_existing_lesson_slugs(db)
+        if reimport:
+            # Full re-import: delete existing exercises and lessons.
+            # Bulk DELETE bypasses ORM cascade, so we delete exercises first,
+            # then lessons, to avoid FK / UNIQUE constraint violations.
+            from sqlalchemy import delete as sa_delete
+
+            await db.execute(sa_delete(Exercise))
+            await db.execute(sa_delete(Lesson))
+            existing_slugs: set[str] = set()
+        else:
+            existing_slugs = await _get_existing_lesson_slugs(db)
+
         new_entries = [e for e in manifest if e["slug"] not in existing_slugs]
 
         lessons_added = 0
@@ -249,12 +313,21 @@ async def seed_content(
 
         # Add new lessons
         for entry in new_entries:
-            added_l, added_e = await _seed_lesson(db, content_dir, entry)
+            added_l, added_e = await _seed_lesson(db, base_dir, entry)
             lessons_added += added_l
             exercises_added += added_e
 
-        # Sync test cases for all existing exercises
-        synced = await _sync_exercise_test_cases(db, content_dir)
+        # Sync test cases for existing exercises (skip on full reimport)
+        synced = 0
+        if not reimport:
+            synced = await _sync_exercise_test_cases(db, base_dir, manifest)
+
+        if reimport:
+            return {
+                "status": "reimported",
+                "lessons_added": lessons_added,
+                "exercises_added": exercises_added,
+            }
 
         # Sync paths for existing lessons (e.g. after manifest path corrections)
         paths_synced = await _sync_existing_lesson_paths(db, content_dir)

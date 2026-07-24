@@ -12,7 +12,7 @@ from starlette.responses import FileResponse
 
 from app.config import ALLOWED_ORIGINS
 from app.database import check_database_integrity, create_tables
-from app.routers import auth, exercises, lessons, progress
+from app.routers import admin, auth, exercises, lessons, progress
 
 # Single source of truth for the app version
 __version__ = "0.1.0"
@@ -133,6 +133,7 @@ def create_app() -> FastAPI:
     )
 
     # Routers (all mounted under /api prefix if they don't already have it)
+    app.include_router(admin.router)
     app.include_router(auth.router)
     app.include_router(lessons.router)
     app.include_router(exercises.router)
