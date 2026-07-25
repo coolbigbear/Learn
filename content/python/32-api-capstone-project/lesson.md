@@ -1,4 +1,4 @@
-# Lesson 31: API Capstone Project — Full-Stack Task Manager
+# Lesson 32: API Capstone Project — Full-Stack Task Manager
 
 ## Learning Objectives
 
@@ -485,7 +485,93 @@ print("Deleted:", r.status_code)
 
 ---
 
-## 8. Key Design Decisions
+## 8. Stretch Goal: XML Export Endpoint
+
+You just learned how to handle XML in APIs (Lesson 31). Now let's put that knowledge to work by adding an XML export endpoint to your Task Manager API!
+
+### The Goal
+
+Add a new endpoint `GET /tasks/export/xml` that returns all tasks for the current user as an XML document instead of JSON.
+
+### What It Should Return
+
+```xml
+<?xml version='1.0' encoding='UTF-8'?>
+<tasks>
+  <task>
+    <id>1</id>
+    <title>Learn FastAPI</title>
+    <completed>false</completed>
+    <owner_id>1</owner_id>
+  </task>
+  <task>
+    <id>2</id>
+    <title>Build capstone</title>
+    <completed>true</completed>
+    <owner_id>1</owner_id>
+  </task>
+</tasks>
+```
+
+### Implementation Steps
+
+1. **Import `xml.etree.ElementTree as ET`** in `main.py`
+2. **Add a new endpoint** after the existing `GET /tasks` list endpoint:
+
+```python
+@app.get("/tasks/export/xml")
+async def export_tasks_xml(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    \"\"\"Export all tasks as XML.\"\"\"
+    result = await db.execute(
+        select(Task).where(Task.owner_id == current_user.id).order_by(Task.id)
+    )
+    tasks = result.scalars().all()
+
+    # Build XML
+    root = ET.Element("tasks")
+    for task in tasks:
+        task_elem = ET.SubElement(root, "task")
+        ET.SubElement(task_elem, "id").text = str(task.id)
+        ET.SubElement(task_elem, "title").text = task.title
+        ET.SubElement(task_elem, "completed").text = str(task.completed).lower()
+        ET.SubElement(task_elem, "owner_id").text = str(task.owner_id)
+
+    xml_output = ET.tostring(root, encoding="unicode", xml_declaration=True)
+    return Response(content=xml_output, media_type="application/xml")
+```
+
+3. **Add the import** at the top of `main.py`:
+```python
+from fastapi.responses import Response
+```
+
+4. **Test it** by running your API and hitting the endpoint:
+```bash
+curl -H "Authorization: Bearer <token>" http://localhost:8000/tasks/export/xml
+```
+
+Or from the test script:
+```python
+r = requests.get(f"{BASE}/tasks/export/xml", headers=headers)
+print(r.status_code)
+print(r.text)  # Raw XML output
+```
+
+### Why This Matters
+
+- You're now producing **XML output** from a FastAPI endpoint — a skill needed when integrating with enterprise systems
+- You're using the exact `xml.etree.ElementTree` techniques from Lesson 31
+- The code follows the same patterns as your JSON endpoints (auth, DB query, ownership check) — the only difference is the output format
+- Adding `media_type="application/xml"` tells clients the response is XML, so they know how to parse it
+
+> **Try this:** Can you also build a `POST /tasks/import/xml` endpoint that accepts XML input and creates tasks from it? That would give you both XML import and export — a complete XML API layer!
+
+---
+
+## 9. Key Design Decisions
 
 ### Why async?
 
@@ -512,7 +598,7 @@ Every task query includes `Task.owner_id == current_user.id`. This ensures users
 
 ---
 
-## 9. Summary
+## 10. Summary
 
 In this capstone project, you built a complete, production-style API:
 
@@ -568,3 +654,5 @@ Consider exploring:
 - **Role-based access control** (admin vs regular users)
 - **Pagination** for large task lists
 - **Unit tests** with pytest and httpx
+- **XML import endpoint** — accept XML payloads to create tasks
+- **Content negotiation** — serve both JSON and XML from the same endpoints based on the `Accept` header

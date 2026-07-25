@@ -29,6 +29,6 @@
   {"slug": "28-supervised-learning", "title": "Supervised Learning: Regression & Classification", "order": 28, "path": "machine-learning"},
   {"slug": "29-unsupervised-learning", "title": "Unsupervised Learning & Mini ML Project", "order": 29, "path": "machine-learning"},
   {"slug": "30-api-authentication", "title": "API Authentication Methods", "order": 30, "path": "api"},
-  {"slug": "31-api-capstone-project", "title": "API Capstone Project — Full-Stack Task Manager", "order": 31, "path": "api"},
-  {"slug": "32-xml-handling-in-apis", "title": "Handling XML in APIs", "order": 32, "path": "api"}
+  {"slug": "31-xml-handling-in-apis", "title": "Handling XML in APIs", "order": 31, "path": "api"},
+  {"slug": "32-api-capstone-project", "title": "API Capstone Project — Full-Stack Task Manager", "order": 32, "path": "api"}
 ]

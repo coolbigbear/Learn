@@ -1,4 +1,4 @@
-# Lesson 32: Handling XML in APIs
+# Lesson 31: Handling XML in APIs
 
 ## Learning Objectives
 
@@ -666,7 +666,7 @@ print("Raw XML:", xml_data[:200])
 
 ### What's Next?
 
-In the next lesson, you'll learn how to build your own API with FastAPI — handling JSON data, path parameters, query parameters, and more.
+In the next lesson (**API Capstone Project**), you'll apply your XML skills in a real project by building a complete Task Manager API — including an XML export endpoint powered by what you've learned here.
 
 ---
 
