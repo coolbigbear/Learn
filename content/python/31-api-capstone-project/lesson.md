@@ -1,4 +1,4 @@
-# Lesson 29: API Capstone Project — Full-Stack Task Manager
+# Lesson 31: API Capstone Project — Full-Stack Task Manager
 
 ## Learning Objectives
 
@@ -525,6 +525,35 @@ In this capstone project, you built a complete, production-style API:
 - **Error handling** — clear error messages and appropriate HTTP codes
 
 This architecture scales to real applications. The same patterns — async database, JWT auth, dependency injection, ownership checks — are used by production FastAPI services handling millions of requests.
+
+---
+
+## Common Mistakes
+
+- **Not hashing passwords** — Store password hashes (with bcrypt or similar), never plain text. A database breach would expose every user's password.
+- **Skipping input validation** — Always validate request data with Pydantic models. Missing validators can lead to SQL injection, broken queries, or data corruption.
+- **Exposing internal error details** — Don't return Python tracebacks or SQLAlchemy errors to the client. Use custom exception handlers for clean, safe error responses.
+- **Forgetting ownership checks** — A user should only see and modify their own tasks. Without ownership checks in every endpoint, users can access each other's data.
+- **Not handling database connection errors** — If the database is down, your API should return a 503 error, not crash with an unhandled exception.
+
+## Best Practices
+
+1. **Use dependency injection for auth and DB** — The `get_current_user` and `get_db` patterns keep your endpoints clean and testable.
+2. **Hash passwords with bcrypt** — Use `passlib` with the `bcrypt` scheme. It's the industry standard for password hashing.
+3. **Separate concerns into modules** — Keep `database.py`, `models.py`, `schemas.py`, and `auth.py` separate. It scales much better than one giant `main.py`.
+4. **Use environment variables for configuration** — Database URLs, secret keys, and API endpoints should all come from `os.getenv()`.
+5. **Test every endpoint** — Write tests for success cases (200, 201, 204) and error cases (401, 403, 404) for every endpoint in your API.
+
+---
+
+## Summary
+
+- You built a complete, production-style Task Manager API with user registration, JWT authentication, and database-backed CRUD
+- **SQLAlchemy** with async SQLite provides persistent storage that survives server restarts
+- **JWT tokens** enable stateless authentication — the server verifies the token without a database lookup
+- **Password hashing** with bcrypt ensures user credentials stay secure even if the database is compromised
+- **Ownership checks** isolate each user's data — users can only see and modify their own tasks
+- The project structure (`main.py`, `database.py`, `models.py`, `schemas.py`, `auth.py`) scales to real-world applications
 
 ### What's Next?
 

@@ -1,4 +1,4 @@
-# Lesson 30: Handling XML in APIs
+# Lesson 32: Handling XML in APIs
 
 ## Learning Objectives
 

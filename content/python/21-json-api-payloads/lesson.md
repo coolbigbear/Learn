@@ -1,4 +1,4 @@
-# Lesson 19: Handling JSON Payloads in APIs
+# Lesson 21: Handling JSON Payloads in APIs
 
 ## Learning Objectives
 
@@ -642,6 +642,14 @@ if user:
 - **Assuming nested keys always exist** — API responses can change, always validate or use `.get()`
 - **Catching too broadly** — don't catch all exceptions; be specific (`HTTPError`, `ConnectionError`, etc.)
 - **Not setting a timeout** — an API call could hang forever without `timeout=N`
+
+## Best Practices
+
+1. **Use the `json=` parameter** — It handles serialization and sets `Content-Type: application/json` automatically. Much cleaner than `data=json.dumps(...)` with manual headers.
+2. **Always validate payloads before sending** — Check required keys and data types client-side to catch errors early, before the API call.
+3. **Set reasonable timeouts** — Use `timeout=10` for most API calls. Without a timeout, a hanging request blocks your application indefinitely.
+4. **Use `.get()` for safe access to nested fields** — `data.get("address", {}).get("city", "Unknown")` never raises `KeyError`.
+5. **Handle errors at every layer** — Connection errors, HTTP errors, JSON decode errors, and missing fields each need their own handling strategy.
 
 ---
 
