@@ -193,5 +193,35 @@
       }
     ],
     "order": 7
+  },
+  {
+    "slug": "xml-export-tasks",
+    "title": "Stretch: Export tasks as XML",
+    "instruction": "Write a function `tasks_to_xml(tasks)` that converts a list of task dictionaries into an XML string using `xml.etree.ElementTree`.\n\nEach task dict has keys: `id`, `title`, `completed`, `owner_id`.\n\nThe output should be a valid XML document with:\n- Root element `<tasks>`\n- Each task as a `<task>` child element\n- Inside each `<task>`: `<id>`, `<title>`, `<completed>`, `<owner_id>` child elements\n\nSerialize with `ET.tostring(root, encoding=\"unicode\", xml_declaration=True)`.\n\nExample input:\n```python\ntasks = [\n    {\"id\": 1, \"title\": \"Learn FastAPI\", \"completed\": False, \"owner_id\": 1},\n    {\"id\": 2, \"title\": \"Build capstone\", \"completed\": True, \"owner_id\": 1},\n]\n```\n\nExpected output (exact format — compact, no indentation):\n```xml\n<?xml version='1.0' encoding='UTF-8'?>\n<tasks><task><id>1</id><title>Learn FastAPI</title><completed>false</completed><owner_id>1</owner_id></task><task><id>2</id><title>Build capstone</title><completed>true</completed><owner_id>1</owner_id></task></tasks>\n```\n\nPrint the result for the example input above.\n\nHint: convert `completed` to lowercase string with `str(value).lower()`.",
+    "starter_code": "import xml.etree.ElementTree as ET\n\ndef tasks_to_xml(tasks):\n    # Build XML from task list\n    pass\n\ntasks = [\n    {\"id\": 1, \"title\": \"Learn FastAPI\", \"completed\": False, \"owner_id\": 1},\n    {\"id\": 2, \"title\": \"Build capstone\", \"completed\": True, \"owner_id\": 1},\n]\n\nprint(tasks_to_xml(tasks))",
+    "solution_code": "import xml.etree.ElementTree as ET\n\ndef tasks_to_xml(tasks):\n    root = ET.Element(\"tasks\")\n    for task in tasks:\n        task_elem = ET.SubElement(root, \"task\")\n        ET.SubElement(task_elem, \"id\").text = str(task[\"id\"])\n        ET.SubElement(task_elem, \"title\").text = task[\"title\"]\n        ET.SubElement(task_elem, \"completed\").text = str(task[\"completed\"]).lower()\n        ET.SubElement(task_elem, \"owner_id\").text = str(task[\"owner_id\"])\n    return ET.tostring(root, encoding=\"unicode\", xml_declaration=True)\n\ntasks = [\n    {\"id\": 1, \"title\": \"Learn FastAPI\", \"completed\": False, \"owner_id\": 1},\n    {\"id\": 2, \"title\": \"Build capstone\", \"completed\": True, \"owner_id\": 1},\n]\n\nprint(tasks_to_xml(tasks))",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "<?xml version='1.0' encoding='UTF-8'?>\n<tasks><task><id>1</id><title>Learn FastAPI</title><completed>false</completed><owner_id>1</owner_id></task><task><id>2</id><title>Build capstone</title><completed>true</completed><owner_id>1</owner_id></task></tasks>\n",
+        "comparison_type": "exact"
+      },
+      {
+        "input": "",
+        "expected_output": "xml.etree.ElementTree",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "ET.SubElement",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "ET.tostring",
+        "comparison_type": "code_contains"
+      }
+    ],
+    "order": 8
   }
 ]
