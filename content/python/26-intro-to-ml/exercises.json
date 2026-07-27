@@ -1,32 +1,22 @@
 [
   {
     "slug": "ml-numpy-create",
-    "title": "Create and inspect a NumPy array",
-    "instruction": "Create a NumPy array from the list [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]. Print its type, shape, and the third element (index 2).",
-    "starter_code": "import numpy as np\n\ndata = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]\n# Your code here\n",
-    "solution_code": "import numpy as np\n\ndata = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]\narr = np.array(data)\nprint(type(arr))\nprint(arr.shape)\nprint(arr[2])\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "<class 'numpy.ndarray'>\n(10,)\n30\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "title": "Create a NumPy array",
+    "instruction": "Define a function `create_array(data)` that takes a list of numbers and returns a NumPy array.",
+    "starter_code": "import numpy as np\n\ndef create_array(data):\n    pass",
+    "solution_code": "import numpy as np\n\ndef create_array(data):\n    return np.array(data)",
+    "test_suite": "import numpy as np\n\ndef test_returns_ndarray():\n    result = exercise.create_array([1, 2, 3])\n    assert isinstance(result, np.ndarray), f\"Expected numpy.ndarray, got {type(result)}\"\n\ndef test_returns_correct_elements():\n    result = exercise.create_array([10, 20, 30, 40, 50])\n    expected = np.array([10, 20, 30, 40, 50])\n    assert np.array_equal(result, expected), f\"Expected {expected}, got {result}\"\n\ndef test_shape_is_correct():\n    result = exercise.create_array([10, 20, 30, 40, 50])\n    assert result.shape == (5,), f\"Expected shape (5,), got {result.shape}\"\n\ndef test_with_empty_list():\n    result = exercise.create_array([])\n    assert isinstance(result, np.ndarray), f\"Expected numpy.ndarray, got {type(result)}\"\n    assert result.shape == (0,), f\"Expected shape (0,), got {result.shape}\"\n\ndef test_preserves_order():\n    result = exercise.create_array([5, 1, 9, 3])\n    assert result[0] == 5, f\"First element should be 5, got {result[0]}\"\n    assert result[2] == 9, f\"Third element should be 9, got {result[2]}\"",
+    "test_cases": [],
     "order": 1
   },
   {
     "slug": "ml-numpy-operations",
     "title": "Array operations and boolean masking",
-    "instruction": "Create a NumPy array of integers from 1 to 20 (inclusive). Print:\n1. The array multiplied by 3\n2. The sum of all elements\n3. The mean of all elements\n4. All elements greater than 10",
-    "starter_code": "import numpy as np\n\narr = np.arange(1, 21)\n# Your code here\n",
-    "solution_code": "import numpy as np\n\narr = np.arange(1, 21)\nprint(arr * 3)\nprint(arr.sum())\nprint(arr.mean())\nprint(arr[arr > 10])\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "[ 3  6  9 12 15 18 21 24 27 30 33 36 39 42 45 48 51 54 57 60]\n210\n10.5\n[11 12 13 14 15 16 17 18 19 20]\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `analyze_array(arr)` that takes a NumPy array and returns a dict with 'multiplied', 'sum', 'mean', and 'filtered' (elements > 10).",
+    "starter_code": "import numpy as np\n\ndef analyze_array(arr):\n    pass",
+    "solution_code": "import numpy as np\n\ndef analyze_array(arr):\n    return {\n        'multiplied': arr * 3,\n        'sum': arr.sum(),\n        'mean': arr.mean(),\n        'filtered': arr[arr > 10]\n    }",
+    "test_suite": "import numpy as np\n\narr_1_20 = np.arange(1, 21)\n\ndef test_multiplied_result():\n    result = exercise.analyze_array(arr_1_20)\n    expected = np.arange(3, 61, 3)\n    assert np.array_equal(result['multiplied'], expected), f\"Expected {expected}, got {result['multiplied']}\"\n\ndef test_sum_result():\n    result = exercise.analyze_array(arr_1_20)\n    assert result['sum'] == 210, f\"Expected 210, got {result['sum']}\"\n\ndef test_mean_result():\n    result = exercise.analyze_array(arr_1_20)\n    assert result['mean'] == 10.5, f\"Expected 10.5, got {result['mean']}\"\n\ndef test_filtered_result():\n    result = exercise.analyze_array(arr_1_20)\n    expected = np.arange(11, 21)\n    assert np.array_equal(result['filtered'], expected), f\"Expected {expected}, got {result['filtered']}\"\n\ndef test_all_keys_present():\n    result = exercise.analyze_array(np.array([1, 2, 3]))\n    for key in 'multiplied', 'sum', 'mean', 'filtered':\n        assert key in result, f\"Missing key '{key}'\"\n\ndef test_small_array():\n    arr = np.array([5, 12, 3])\n    result = exercise.analyze_array(arr)\n    assert result['sum'] == 20, f\"Expected 20, got {result['sum']}\"\n    assert len(result['filtered']) == 1, f\"Expected 1 element > 10\"",
+    "test_cases": [],
     "order": 2
   }
 ]
