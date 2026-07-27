@@ -35,7 +35,7 @@ async def get_exercise(
         language=exercise.language,
         order=exercise.order,
         lesson_id=exercise.lesson_id,
-        test_suite=exercise.test_suite,
+        has_test_suite=bool(exercise.test_suite),
     )
 
 
@@ -50,9 +50,10 @@ async def run_exercise(
     if exercise is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Exercise not found")
 
+    test_cases = [] if exercise.test_suite else (exercise.test_cases or [])
     result = await run_code_with_docker_fallback(
         body.code,
-        exercise.test_cases or [],
+        test_cases,
         language=body.language,
         test_suite=exercise.test_suite,
     )
@@ -70,9 +71,10 @@ async def submit_exercise(
     if exercise is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Exercise not found")
 
+    test_cases = [] if exercise.test_suite else (exercise.test_cases or [])
     result = await run_code_with_docker_fallback(
         body.code,
-        exercise.test_cases or [],
+        test_cases,
         language=body.language,
         test_suite=exercise.test_suite,
     )
