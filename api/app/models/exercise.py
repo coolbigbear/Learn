@@ -21,6 +21,7 @@ class Exercise(Base):
     language = Column(String(20), nullable=False, default="python")
     order = Column(Integer, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    test_suite = Column(Text, nullable=True, default=None)
 
     lesson = relationship("Lesson", back_populates="exercises")
     progress = relationship("UserProgress", back_populates="exercise", cascade="all, delete-orphan")
