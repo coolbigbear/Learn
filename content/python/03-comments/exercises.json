@@ -5,7 +5,7 @@
     "instruction": "Add **# This program prints numbers** on line 1.",
     "starter_code": "# Add a comment on this line\nprint(10)\nprint(20)\n",
     "solution_code": "# This program prints numbers\nprint(10)\nprint(20)\n",
-    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == '10\\n20\\n'\n\ndef t2():\n    with open(\"exercise.py\") as f:\n        code = f.read()\n    assert '# This program prints numbers' in code\n",
+    "test_suite": "import io, sys\nimport re\n\ndef test_prints_numbers():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == '10\\n20\\n'\n\ndef test_has_comment_on_own_line():\n    with open(\"exercise.py\") as f:\n        code = f.read()\n    assert '# This program prints numbers' in code\n",
     "test_cases": [],
     "order": 1
   },
@@ -15,7 +15,7 @@
     "instruction": "Add an inline comment at the end of print().",
     "starter_code": "print(\"Hi there!\")\n",
     "solution_code": "print(\"Hi there!\")  # Prints a greeting",
-    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == 'Hi there!\\n'\n\ndef t2():\n    with open(\"exercise.py\") as f:\n        code = f.read()\n    h=False\n    for l in code.split(\"\\n\"):\n        s=l.strip()\n        if '#' in s and not s.startswith('#'):\n            h=True;break\n    assert h\n",
+    "test_suite": "import io, sys\nimport re\n\ndef test_prints_greeting_inline():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == 'Hi there!\\n'\n\ndef test_has_inline_comment():\n    with open(\"exercise.py\") as f:\n        code = f.read()\n    h=False\n    for l in code.split(\"\\n\"):\n        s=l.strip()\n        if '#' in s and not s.startswith('#'):\n            h=True;break\n    assert h\n",
     "test_cases": [],
     "order": 2
   },
@@ -25,7 +25,7 @@
     "instruction": "Comment out the first print() so only the second runs.",
     "starter_code": "print(\"This should not run\")\nprint(\"This should run\")\n",
     "solution_code": "# print(\"This should not run\")\nprint(\"This should run\")\n",
-    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == 'This should run\\n'\n\ndef t2():\n    with open(\"exercise.py\") as f:\n        code = f.read()\n    first = code.strip().split(\"\\n\")[0].strip()\n    assert first.startswith(\"#\")\n",
+    "test_suite": "import io, sys\nimport re\n\ndef test_prints_second_line_only():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == 'This should run\\n'\n\ndef test_first_line_commented():\n    with open(\"exercise.py\") as f:\n        code = f.read()\n    first = code.strip().split(\"\\n\")[0].strip()\n    assert first.startswith(\"#\")\n",
     "test_cases": [],
     "order": 3
   },
@@ -35,7 +35,7 @@
     "instruction": "Add a comment above a print() that prints **Learning Python is fun!**",
     "starter_code": "# Write your comment here\n",
     "solution_code": "# Tell the user Python is fun\nprint(\"Learning Python is fun!\")",
-    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == 'Learning Python is fun!\\n'\n\ndef t2():\n    with open(\"exercise.py\") as f:\n        code = f.read()\n    assert '#' in code\n",
+    "test_suite": "import io, sys\nimport re\n\ndef test_prints_learning_fun():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == 'Learning Python is fun!\\n'\n\ndef test_has_comment():\n    with open(\"exercise.py\") as f:\n        code = f.read()\n    assert '#' in code\n",
     "test_cases": [],
     "order": 4
   },
@@ -45,7 +45,7 @@
     "instruction": "Add **# TODO: Add more features later** above print().",
     "starter_code": "# Add a TODO comment\n",
     "solution_code": "# TODO: Add more features later\nprint(\"Hello, world!\")",
-    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == 'Hello, world!\\n'\n\ndef t2():\n    with open(\"exercise.py\") as f:\n        code = f.read()\n    assert '# TODO: Add more features later' in code\n",
+    "test_suite": "import io, sys\nimport re\n\ndef test_prints_hello_world_todo():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == 'Hello, world!\\n'\n\ndef test_has_todo_comment():\n    with open(\"exercise.py\") as f:\n        code = f.read()\n    assert '# TODO: Add more features later' in code\n",
     "test_cases": [],
     "order": 5
   }

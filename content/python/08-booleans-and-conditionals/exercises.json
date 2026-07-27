@@ -5,7 +5,7 @@
     "instruction": "number = -3. Print whether it's positive, negative, or zero.",
     "starter_code": "number = -3\n# Check positive/negative/zero and print\n",
     "solution_code": "number = -3\nif number > 0:\n    print(\"positive\")\nelse:\n    print(\"negative\")",
-    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output.strip() == \"negative\"",
+    "test_suite": "import io, sys\nimport re\n\ndef test_prints_negative():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output.strip() == \"negative\"",
     "test_cases": [],
     "order": 1
   },
@@ -15,7 +15,7 @@
     "instruction": "age = 14. Print **Wait 2 more years.**",
     "starter_code": "age = 14\n# Check driving age\n",
     "solution_code": "age = 14\nif age >= 16:\n    print(\"You can drive!\")\nelse:\n    print(f\"Wait {16 - age} more years.\")",
-    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output.strip() == \"Wait 2 more years.\"",
+    "test_suite": "import io, sys\nimport re\n\ndef test_prints_wait_message():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output.strip() == \"Wait 2 more years.\"",
     "test_cases": [],
     "order": 2
   },
@@ -25,7 +25,7 @@
     "instruction": "year = 2024. Print whether it's a leap year.",
     "starter_code": "year = 2024\n# Check if it's a leap year\n",
     "solution_code": "year = 2024\nif (year % 400 == 0) or (year % 4 == 0 and year % 100 != 0):\n    print(\"Leap year!\")\nelse:\n    print(\"Not a leap year.\")",
-    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output.strip() == \"Leap year!\"",
+    "test_suite": "import io, sys\nimport re\n\ndef test_prints_leap_year():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output.strip() == \"Leap year!\"",
     "test_cases": [],
     "order": 3
   },
@@ -35,7 +35,7 @@
     "instruction": "Check admin/secret123 credentials. Print **Welcome, admin!** if they match.",
     "starter_code": "username = \"admin\"\npassword = \"secret123\"\n# Check login credentials\n",
     "solution_code": "username = \"admin\"\npassword = \"secret123\"\nif username == \"admin\" and password == \"secret123\":\n    print(\"Welcome, admin!\")\nelse:\n    print(\"Access denied.\")",
-    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output.strip() == \"Welcome, admin!\"",
+    "test_suite": "import io, sys\nimport re\n\ndef test_prints_welcome_admin():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output.strip() == \"Welcome, admin!\"",
     "test_cases": [],
     "order": 4
   }

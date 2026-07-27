@@ -5,7 +5,7 @@
     "instruction": "Compute and print `(15 + 23) * 3`.",
     "starter_code": "# Compute (15 + 23) * 3 and print it\n",
     "solution_code": "print((15 + 23) * 3)",
-    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"114\\n\"",
+    "test_suite": "import io, sys\nimport re\n\ndef test_prints_114():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"114\\n\"",
     "test_cases": [],
     "order": 1
   },
@@ -15,7 +15,7 @@
     "instruction": "Print the result of **42 - 17**.",
     "starter_code": "# Print the result of 42 - 17\n",
     "solution_code": "print(42 - 17)",
-    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"25\\n\"",
+    "test_suite": "import io, sys\nimport re\n\ndef test_prints_25():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"25\\n\"",
     "test_cases": [],
     "order": 2
   },
@@ -25,7 +25,7 @@
     "instruction": "Calculate area of circle radius 7, pi=3.14159.",
     "starter_code": "radius = 7\npi = 3.14159\n# Calculate and print the area\n",
     "solution_code": "radius = 7\npi = 3.14159\narea = pi * (radius ** 2)\nprint(area)",
-    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"153.93791\\n\"",
+    "test_suite": "import io, sys\nimport re\n\ndef test_prints_area_15393791():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"153.93791\\n\"",
     "test_cases": [],
     "order": 3
   },
@@ -35,7 +35,7 @@
     "instruction": "Print **Twelve squared is** then `12 ** 2`.",
     "starter_code": "# Print: Twelve squared is 144\n",
     "solution_code": "print(\"Twelve squared is\", 12 ** 2)",
-    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"Twelve squared is 144\\n\"",
+    "test_suite": "import io, sys\nimport re\n\ndef test_prints_twelve_squared():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"Twelve squared is 144\\n\"",
     "test_cases": [],
     "order": 4
   },
@@ -45,7 +45,7 @@
     "instruction": "Print **odd** then **even** on separate lines.",
     "starter_code": "# Check if 47 is even or odd, print result\n# Then check 64\n",
     "solution_code": "print(\"odd\")\nprint(\"even\")",
-    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"odd\\neven\\n\"",
+    "test_suite": "import io, sys\nimport re\n\ndef test_prints_odd_even():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"odd\\neven\\n\"",
     "test_cases": [],
     "order": 5
   }
