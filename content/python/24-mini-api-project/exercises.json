@@ -5,28 +5,8 @@
     "instruction": "Write a FastAPI app with an in-memory list `items` and a GET endpoint at `/items` that returns the list. Start with two initial items: 'Learn Python' and 'Build API'.",
     "starter_code": "from fastapi import FastAPI\n\napp = FastAPI()\nitems = [\"Learn Python\", \"Build API\"]\n\n# Your code here\n",
     "solution_code": "from fastapi import FastAPI\n\napp = FastAPI()\nitems = [\"Learn Python\", \"Build API\"]\n\n@app.get(\"/items\")\nasync def list_items():\n    return {\"items\": items}\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "",
-        "comparison_type": "exact"
-      },
-      {
-        "input": "",
-        "expected_output": "@app.get(\"/items\")",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "def list_items",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "return {\"items\": items}",
-        "comparison_type": "code_contains"
-      }
-    ],
+    "test_suite": "from fastapi.testclient import TestClient\n\ndef test_list_items_returns_200():\n    client = TestClient(exercise.app)\n    response = client.get(\"/items\")\n    assert response.status_code == 200\n\ndef test_list_items_has_items_key():\n    client = TestClient(exercise.app)\n    response = client.get(\"/items\")\n    data = response.json()\n    assert \"items\" in data\n\ndef test_initial_items():\n    client = TestClient(exercise.app)\n    response = client.get(\"/items\")\n    data = response.json()\n    assert data[\"items\"] == [\"Learn Python\", \"Build API\"]\n\ndef test_returns_list_of_strings():\n    client = TestClient(exercise.app)\n    response = client.get(\"/items\")\n    data = response.json()\n    assert isinstance(data[\"items\"], list)\n    for item in data[\"items\"]:\n        assert isinstance(item, str)",
+    "test_cases": [],
     "order": 1
   },
   {
@@ -35,33 +15,8 @@
     "instruction": "Extend the previous app by adding a POST endpoint at `/items` that accepts a JSON body with an `item` field and appends it to the list. Return the updated list with status 201.",
     "starter_code": "from fastapi import FastAPI\nfrom pydantic import BaseModel\n\napp = FastAPI()\nitems = [\"Learn Python\", \"Build API\"]\n\nclass NewItem(BaseModel):\n    item: str\n\n# Add POST endpoint here\n",
     "solution_code": "from fastapi import FastAPI\nfrom pydantic import BaseModel\n\napp = FastAPI()\nitems = [\"Learn Python\", \"Build API\"]\n\nclass NewItem(BaseModel):\n    item: str\n\n@app.post(\"/items\", status_code=201)\nasync def add_item(body: NewItem):\n    items.append(body.item)\n    return {\"items\": items}\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "",
-        "comparison_type": "exact"
-      },
-      {
-        "input": "",
-        "expected_output": "@app.post(\"/items\"",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "def add_item(body: NewItem)",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "status_code=201",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "items.append(body.item)",
-        "comparison_type": "code_contains"
-      }
-    ],
+    "test_suite": "from fastapi.testclient import TestClient\n\ndef test_post_returns_201():\n    client = TestClient(exercise.app)\n    response = client.post(\"/items\", json={\"item\": \"Test Task\"})\n    assert response.status_code == 201\n\ndef test_add_item_returns_updated_list():\n    client = TestClient(exercise.app)\n    response = client.post(\"/items\", json={\"item\": \"New Task\"})\n    data = response.json()\n    assert \"items\" in data\n    assert \"New Task\" in data[\"items\"]\n\ndef test_add_item_includes_original_items():\n    client = TestClient(exercise.app)\n    response = client.post(\"/items\", json={\"item\": \"Third Task\"})\n    data = response.json()\n    assert \"Learn Python\" in data[\"items\"]\n    assert \"Build API\" in data[\"items\"]\n    assert \"Third Task\" in data[\"items\"]\n\ndef test_add_item_rejects_missing_item():\n    client = TestClient(exercise.app)\n    response = client.post(\"/items\", json={})\n    assert response.status_code == 422",
+    "test_cases": [],
     "order": 2
   },
   {
@@ -70,33 +25,8 @@
     "instruction": "Extend the app with a DELETE endpoint at `/items/{index}` that removes an item by its list index. Return a 404 if the index is out of range.",
     "starter_code": "from fastapi import FastAPI, HTTPException\n\napp = FastAPI()\nitems = [\"Learn Python\", \"Build API\", \"Deploy\"]\n\n# Add DELETE endpoint here\n",
     "solution_code": "from fastapi import FastAPI, HTTPException\n\napp = FastAPI()\nitems = [\"Learn Python\", \"Build API\", \"Deploy\"]\n\n@app.delete(\"/items/{index}\")\nasync def delete_item(index: int):\n    if index < 0 or index >= len(items):\n        raise HTTPException(status_code=404, detail=\"Index out of range\")\n    removed = items.pop(index)\n    return {\"removed\": removed, \"items\": items}\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "",
-        "comparison_type": "exact"
-      },
-      {
-        "input": "",
-        "expected_output": "@app.delete(\"/items/{index}\")",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "def delete_item(index: int)",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "HTTPException(status_code=404",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "items.pop(index)",
-        "comparison_type": "code_contains"
-      }
-    ],
+    "test_suite": "from fastapi.testclient import TestClient\n\ndef test_delete_valid_index():\n    client = TestClient(exercise.app)\n    response = client.delete(\"/items/0\")\n    assert response.status_code == 200\n    data = response.json()\n    assert \"removed\" in data\n    assert \"items\" in data\n    assert len(data[\"items\"]) == 2\n\ndef test_delete_invalid_index_404():\n    client = TestClient(exercise.app)\n    response = client.delete(\"/items/999\")\n    assert response.status_code == 404\n\ndef test_delete_negative_index_404():\n    client = TestClient(exercise.app)\n    response = client.delete(\"/items/-1\")\n    assert response.status_code == 404\n\ndef test_delete_all_items_sequentially():\n    client = TestClient(exercise.app)\n    assert client.delete(\"/items/0\").status_code == 200\n    assert client.delete(\"/items/0\").status_code == 200\n    r = client.delete(\"/items/0\")\n    assert r.status_code == 200\n    assert len(r.json()[\"items\"]) == 0",
+    "test_cases": [],
     "order": 3
   }
 ]
