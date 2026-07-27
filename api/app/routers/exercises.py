@@ -49,7 +49,12 @@ async def run_exercise(
     if exercise is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Exercise not found")
 
-    result = await run_code_with_docker_fallback(body.code, exercise.test_cases or [], language=body.language)
+    result = await run_code_with_docker_fallback(
+        body.code,
+        exercise.test_cases or [],
+        language=body.language,
+        test_suite=exercise.test_suite,
+    )
     return RunResult(**result)
 
 
@@ -64,7 +69,12 @@ async def submit_exercise(
     if exercise is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Exercise not found")
 
-    result = await run_code_with_docker_fallback(body.code, exercise.test_cases or [], language=body.language)
+    result = await run_code_with_docker_fallback(
+        body.code,
+        exercise.test_cases or [],
+        language=body.language,
+        test_suite=exercise.test_suite,
+    )
 
     progress = await get_or_create_progress(db, user, exercise_id)
     if progress is None:
