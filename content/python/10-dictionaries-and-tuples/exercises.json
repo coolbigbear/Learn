@@ -2,46 +2,31 @@
   {
     "slug": "dict-create-book",
     "title": "Create a book dictionary",
-    "instruction": "Create a dictionary called `book` with keys `title` and `author`. Set title to \"1984\" and author to \"George Orwell\". Then print the value of the `author` key.",
-    "starter_code": "# Create the book dictionary and print the author\n",
-    "solution_code": "book = {\"title\": \"1984\", \"author\": \"George Orwell\"}\nprint(book[\"author\"])",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "George Orwell\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `create_book()` that creates a dictionary with keys `title` (set to \"1984\") and `author` (set to \"George Orwell\"), then **returns** the dictionary.",
+    "starter_code": "def create_book():\n    # Create and return a dictionary with title and author keys\n    pass",
+    "solution_code": "def create_book():\n    book = {\"title\": \"1984\", \"author\": \"George Orwell\"}\n    return book",
+    "test_suite": "def test_returns_dictionary():\n    result = exercise.create_book()\n    assert isinstance(result, dict), f\"Expected a dict, got {type(result)}\"\n\ndef test_has_correct_keys():\n    result = exercise.create_book()\n    assert \"title\" in result, f\"Missing key 'title', got keys: {list(result.keys())}\"\n    assert \"author\" in result, f\"Missing key 'author', got keys: {list(result.keys())}\"\n\ndef test_has_correct_values():\n    result = exercise.create_book()\n    assert result[\"title\"] == \"1984\", f\"Expected title '1984', got {result['title']!r}\"\n    assert result[\"author\"] == \"George Orwell\", f\"Expected author 'George Orwell', got {result['author']!r}\"",
+    "test_cases": [],
     "order": 1
   },
   {
     "slug": "dict-update-stats",
     "title": "Update player stats",
-    "instruction": "Given the `player` dictionary, add a new key `\"level\"` with value 5, then update `\"score\"` to 1200. Print the final dictionary.",
-    "starter_code": "player = {\"name\": \"Hero\", \"score\": 950, \"health\": 100}\n# Add level, update score, then print\n",
-    "solution_code": "player = {\"name\": \"Hero\", \"score\": 950, \"health\": 100}\nplayer[\"level\"] = 5\nplayer[\"score\"] = 1200\nprint(player)",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "{'name': 'Hero', 'score': 1200, 'health': 100, 'level': 5}\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `update_player_stats(player)` that takes a player dictionary, adds a new key `\"level\"` with value 5, updates `\"score\"` to 1200, and **returns** the updated dictionary.",
+    "starter_code": "def update_player_stats(player):\n    # Add level, update score, and return the updated dict\n    pass",
+    "solution_code": "def update_player_stats(player):\n    player[\"level\"] = 5\n    player[\"score\"] = 1200\n    return player",
+    "test_suite": "def test_adds_level_key():\n    result = exercise.update_player_stats({\"name\": \"Hero\", \"score\": 950, \"health\": 100})\n    assert \"level\" in result, f\"Missing 'level' key, got keys: {list(result.keys())}\"\n    assert result[\"level\"] == 5, f\"Expected level 5, got {result['level']}\"\n\ndef test_updates_score():\n    result = exercise.update_player_stats({\"name\": \"Hero\", \"score\": 950, \"health\": 100})\n    assert result[\"score\"] == 1200, f\"Expected score 1200, got {result['score']}\"\n\ndef test_preserves_existing_keys():\n    result = exercise.update_player_stats({\"name\": \"Hero\", \"score\": 950, \"health\": 100})\n    assert \"name\" in result, f\"Missing original key 'name'\"\n    assert \"health\" in result, f\"Missing original key 'health'\"\n    assert result[\"name\"] == \"Hero\", f\"Expected name 'Hero', got {result['name']!r}\"\n    assert result[\"health\"] == 100, f\"Expected health 100, got {result['health']}\"\n\ndef test_works_with_different_data():\n    original = {\"name\": \"Test\", \"score\": 500, \"health\": 50}\n    result = exercise.update_player_stats(original)\n    assert result[\"level\"] == 5, f\"Expected level 5, got {result['level']}\"\n    assert result[\"score\"] == 1200, f\"Expected score 1200, got {result['score']}\"",
+    "test_cases": [],
     "order": 2
   },
   {
     "slug": "tuple-unpack",
     "title": "Tuple unpacking",
-    "instruction": "You have a tuple `rgb = (255, 128, 0)`. Unpack it into variables `red`, `green`, `blue` and print each on a separate line.",
-    "starter_code": "rgb = (255, 128, 0)\n# Unpack and print each value\n",
-    "solution_code": "rgb = (255, 128, 0)\nred, green, blue = rgb\nprint(red)\nprint(green)\nprint(blue)",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "255\n128\n0\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `describe_rgb(rgb)` that takes a tuple with three integers (red, green, blue), unpacks it into variables, and **returns** a dictionary with keys `\"red\"`, `\"green\"`, and `\"blue\"` mapped to the unpacked values.",
+    "starter_code": "def describe_rgb(rgb):\n    # Unpack the tuple and return a dictionary with red, green, blue keys\n    pass",
+    "solution_code": "def describe_rgb(rgb):\n    red, green, blue = rgb\n    return {\"red\": red, \"green\": green, \"blue\": blue}",
+    "test_suite": "def test_unpacks_standard_colors():\n    result = exercise.describe_rgb((255, 128, 0))\n    assert isinstance(result, dict), f\"Expected a dict, got {type(result)}\"\n    assert result == {\"red\": 255, \"green\": 128, \"blue\": 0}, f\"Expected expected dict, got {result}\"\n\ndef test_unpacks_black():\n    result = exercise.describe_rgb((0, 0, 0))\n    assert result == {\"red\": 0, \"green\": 0, \"blue\": 0}, f\"Expected all zeros, got {result}\"\n\ndef test_unpacks_white():\n    result = exercise.describe_rgb((255, 255, 255))\n    assert result[\"red\"] == 255 and result[\"green\"] == 255 and result[\"blue\"] == 255, f\"Expected all 255, got {result}\"\n\ndef test_unpacks_primary_colors():\n    result = exercise.describe_rgb((128, 64, 32))\n    assert result[\"red\"] == 128, f\"Expected red 128, got {result['red']}\"\n    assert result[\"green\"] == 64, f\"Expected green 64, got {result['green']}\"\n    assert result[\"blue\"] == 32, f\"Expected blue 32, got {result['blue']}\"",
+    "test_cases": [],
     "order": 3
   }
 ]
