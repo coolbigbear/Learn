@@ -247,6 +247,14 @@ async def create_tables():
         except Exception:
             pass
 
+        # Migrate: add `test_suite` column to exercises table if it doesn't exist
+        try:
+            await conn.execute(
+                text("ALTER TABLE exercises ADD COLUMN test_suite TEXT DEFAULT NULL")
+            )
+        except Exception:
+            pass  # Column already exists
+
     # Verify integrity after migrations
     try:
         integrity = await check_database_integrity()
