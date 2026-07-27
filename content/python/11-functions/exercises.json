@@ -2,61 +2,41 @@
   {
     "slug": "func-greet",
     "title": "Write a greet function",
-    "instruction": "Define a function called `greet` that takes one parameter `name` and prints a greeting. Then call it with \"Alice\".",
-    "starter_code": "# Define the greet function and call it with \"Alice\"\n",
-    "solution_code": "def greet(name):\n    print(f\"Hello, {name}!\")\n\ngreet(\"Alice\")",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Hello, Alice!\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `greet(name)` that takes a name and **returns** the greeting string `\"Hello, [name]!\"` (for example, `greet(\"Alice\")` returns `\"Hello, Alice!\"`).",
+    "starter_code": "def greet(name):\n    # Return the greeting string\n    pass",
+    "solution_code": "def greet(name):\n    return f\"Hello, {name}!\"",
+    "test_suite": "def test_greet_normal():\n    result = exercise.greet(\"Alice\")\n    assert result == \"Hello, Alice!\", f\"Expected 'Hello, Alice!', got {result!r}\"\n\ndef test_greet_different_name():\n    result = exercise.greet(\"Bob\")\n    assert result == \"Hello, Bob!\", f\"Expected 'Hello, Bob!', got {result!r}\"\n\ndef test_greet_empty_string():\n    result = exercise.greet(\"\")\n    assert result == \"Hello, !\", f\"Expected 'Hello, !', got {result!r}\"\n\ndef test_greet_with_numbers():\n    result = exercise.greet(\"User123\")\n    assert result == \"Hello, User123!\", f\"Expected 'Hello, User123!', got {result!r}\"",
+    "test_cases": [],
     "order": 1
   },
   {
     "slug": "func-add",
     "title": "Addition function with return",
-    "instruction": "Define a function `add(a, b)` that **returns** the sum of a and b. Call it with 7 and 12, store the result, and print it.",
-    "starter_code": "# Define add function and use it\n",
-    "solution_code": "def add(a, b):\n    return a + b\n\nresult = add(7, 12)\nprint(result)",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "19\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `add(a, b)` that **returns** the sum of `a` and `b`.",
+    "starter_code": "def add(a, b):\n    # Return the sum of a and b\n    pass",
+    "solution_code": "def add(a, b):\n    return a + b",
+    "test_suite": "def test_adds_two_positive():\n    result = exercise.add(7, 12)\n    assert result == 19, f\"Expected 19, got {result}\"\n\ndef test_adds_zeros():\n    result = exercise.add(0, 0)\n    assert result == 0, f\"Expected 0, got {result}\"\n\ndef test_adds_negative():\n    result = exercise.add(-5, 3)\n    assert result == -2, f\"Expected -2, got {result}\"\n\ndef test_adds_negative_both():\n    result = exercise.add(-10, -20)\n    assert result == -30, f\"Expected -30, got {result}\"\n\ndef test_adds_large_numbers():\n    result = exercise.add(1000000, 2000000)\n    assert result == 3000000, f\"Expected 3000000, got {result}\"",
+    "test_cases": [],
     "order": 2
   },
   {
     "slug": "func-is-even",
     "title": "Even number checker",
-    "instruction": "Define a function `is_even(n)` that returns `True` if n is even and `False` otherwise. Call it with 7 and 10, printing the results on separate lines.",
-    "starter_code": "# Define is_even and test with 7 and 10\n",
-    "solution_code": "def is_even(n):\n    return n % 2 == 0\n\nprint(is_even(7))\nprint(is_even(10))",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "False\nTrue\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `is_even(n)` that **returns** `True` if `n` is even and `False` otherwise.",
+    "starter_code": "def is_even(n):\n    # Return True if n is even, False otherwise\n    pass",
+    "solution_code": "def is_even(n):\n    return n % 2 == 0",
+    "test_suite": "def test_even_number():\n    result = exercise.is_even(10)\n    assert result == True, f\"Expected True for 10, got {result}\"\n\ndef test_odd_number():\n    result = exercise.is_even(7)\n    assert result == False, f\"Expected False for 7, got {result}\"\n\ndef test_zero_is_even():\n    result = exercise.is_even(0)\n    assert result == True, f\"Expected True for 0, got {result}\"\n\ndef test_negative_even():\n    result = exercise.is_even(-4)\n    assert result == True, f\"Expected True for -4, got {result}\"\n\ndef test_negative_odd():\n    result = exercise.is_even(-3)\n    assert result == False, f\"Expected False for -3, got {result}\"\n\ndef test_large_number():\n    result = exercise.is_even(9999998)\n    assert result == True, f\"Expected True for 9999998, got {result}\"",
+    "test_cases": [],
     "order": 3
   },
   {
     "slug": "func-convert-temp",
     "title": "Temperature converter",
-    "instruction": "Define a function `celsius_to_fahrenheit(celsius)` that converts Celsius to Fahrenheit using the formula (celsius * 9/5) + 32 and **returns** the result. Call it with 30 and print the result.",
-    "starter_code": "# Define the converter and call it with 30\n",
-    "solution_code": "def celsius_to_fahrenheit(celsius):\n    return (celsius * 9/5) + 32\n\nprint(celsius_to_fahrenheit(30))",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "86.0\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `celsius_to_fahrenheit(celsius)` that converts Celsius to Fahrenheit using the formula `(celsius * 9/5) + 32` and **returns** the result.",
+    "starter_code": "def celsius_to_fahrenheit(celsius):\n    # Convert Celsius to Fahrenheit and return the result\n    pass",
+    "solution_code": "def celsius_to_fahrenheit(celsius):\n    return (celsius * 9/5) + 32",
+    "test_suite": "def test_converts_thirty():\n    result = exercise.celsius_to_fahrenheit(30)\n    assert result == 86.0, f\"Expected 86.0, got {result}\"\n\ndef test_converts_freezing():\n    result = exercise.celsius_to_fahrenheit(0)\n    assert result == 32.0, f\"Expected 32.0, got {result}\"\n\ndef test_converts_boiling():\n    result = exercise.celsius_to_fahrenheit(100)\n    assert result == 212.0, f\"Expected 212.0, got {result}\"\n\ndef test_converts_negative():\n    result = exercise.celsius_to_fahrenheit(-10)\n    assert result == 14.0, f\"Expected 14.0, got {result}\"\n\ndef test_converts_body_temp():\n    result = exercise.celsius_to_fahrenheit(37)\n    assert abs(result - 98.6) < 0.1, f\"Expected around 98.6, got {result}\"",
+    "test_cases": [],
     "order": 4
   }
 ]

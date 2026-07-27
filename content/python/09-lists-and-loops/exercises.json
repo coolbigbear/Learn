@@ -1,62 +1,42 @@
 [
   {
     "slug": "list-create-print",
-    "title": "Create a list and print items",
-    "instruction": "Create a list called `animals` containing \"cat\", \"dog\", and \"rabbit\". Use a `for` loop to print each animal on its own line.",
-    "starter_code": "# Create the list and print each item\n",
-    "solution_code": "animals = [\"cat\", \"dog\", \"rabbit\"]\nfor animal in animals:\n    print(animal)",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "cat\ndog\nrabbit\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "title": "Create a function that returns a list of animals",
+    "instruction": "Define a function `get_animals()` that returns a list containing `\"cat\"`, `\"dog\"`, and `\"rabbit\"` (in that order).",
+    "starter_code": "def get_animals():\n    # Return a list of three animals\n    pass",
+    "solution_code": "def get_animals():\n    return [\"cat\", \"dog\", \"rabbit\"]",
+    "test_suite": "def test_returns_list():\n    result = exercise.get_animals()\n    assert isinstance(result, list), f\"Expected a list, got {type(result)}\"\n    assert len(result) == 3, f\"Expected 3 items, got {len(result)}\"\n    assert result[0] == \"cat\", f\"First item should be 'cat', got {result[0]!r}\"\n    assert result[1] == \"dog\", f\"Second item should be 'dog', got {result[1]!r}\"\n    assert result[2] == \"rabbit\", f\"Third item should be 'rabbit', got {result[2]!r}\"\n\ndef test_order_preserved():\n    result = exercise.get_animals()\n    assert result == [\"cat\", \"dog\", \"rabbit\"], f\"Expected exact list, got {result}\"",
+    "test_cases": [],
     "order": 1
   },
   {
     "slug": "list-sum-loop",
     "title": "Sum numbers with a loop",
-    "instruction": "Given the list `nums`, use a `for` loop to calculate the sum of all numbers. Print the total.",
-    "starter_code": "nums = [12, 7, 9, 22, 15]\n# Calculate and print the sum\n",
-    "solution_code": "nums = [12, 7, 9, 22, 15]\ntotal = 0\nfor n in nums:\n    total += n\nprint(total)",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "65\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `sum_numbers(nums)` that takes a list of numbers and returns their sum using a `for` loop.",
+    "starter_code": "def sum_numbers(nums):\n    # Use a for loop to calculate and return the sum\n    pass",
+    "solution_code": "def sum_numbers(nums):\n    total = 0\n    for n in nums:\n        total += n\n    return total",
+    "test_suite": "def test_sum_positive():\n    result = exercise.sum_numbers([12, 7, 9, 22, 15])\n    assert result == 65, f\"Expected 65, got {result}\"\n\ndef test_sum_empty():\n    result = exercise.sum_numbers([])\n    assert result == 0, f\"Expected 0 for empty list, got {result}\"\n\ndef test_sum_single():\n    result = exercise.sum_numbers([42])\n    assert result == 42, f\"Expected 42, got {result}\"\n\ndef test_sum_negatives():\n    result = exercise.sum_numbers([-5, 10, -3])\n    assert result == 2, f\"Expected 2, got {result}\"",
+    "test_cases": [],
     "order": 2
   },
   {
     "slug": "list-even-filter",
     "title": "Filter even numbers",
-    "instruction": "Given `numbers`, create a new list `evens` containing only the even numbers. Print `evens`.",
-    "starter_code": "numbers = [3, 8, 12, 7, 10, 5, 18]\n# Create a list of only the even numbers\n",
-    "solution_code": "numbers = [3, 8, 12, 7, 10, 5, 18]\nevens = []\nfor n in numbers:\n    if n % 2 == 0:\n        evens.append(n)\nprint(evens)",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "[8, 12, 10, 18]\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `filter_evens(numbers)` that takes a list of numbers and returns a **new list** containing only the even numbers, preserving order.",
+    "starter_code": "def filter_evens(numbers):\n    # Return a new list with only the even numbers from numbers\n    pass",
+    "solution_code": "def filter_evens(numbers):\n    evens = []\n    for n in numbers:\n        if n % 2 == 0:\n            evens.append(n)\n    return evens",
+    "test_suite": "def test_mixed_numbers():\n    result = exercise.filter_evens([3, 8, 12, 7, 10, 5, 18])\n    assert result == [8, 12, 10, 18], f\"Expected [8, 12, 10, 18], got {result}\"\n\ndef test_all_odd():\n    result = exercise.filter_evens([1, 3, 5])\n    assert result == [], f\"Expected empty list, got {result}\"\n\ndef test_all_even():\n    result = exercise.filter_evens([2, 4, 6, 8])\n    assert result == [2, 4, 6, 8], f\"Expected [2, 4, 6, 8], got {result}\"\n\ndef test_empty():\n    result = exercise.filter_evens([])\n    assert result == [], f\"Expected empty list, got {result}\"",
+    "test_cases": [],
     "order": 3
   },
   {
     "slug": "list-grocery",
-    "title": "Build a grocery list",
-    "instruction": "Start with an empty list called `grocery_list`. Use `.append()` to add \"milk\", \"bread\", \"eggs\", and \"apples\". Then use a `for` loop with `enumerate()` to print each item with its index number (starting from 1, not 0).",
-    "starter_code": "# Build a grocery list and print with numbered items\n",
-    "solution_code": "grocery_list = []\ngrocery_list.append(\"milk\")\ngrocery_list.append(\"bread\")\ngrocery_list.append(\"eggs\")\ngrocery_list.append(\"apples\")\nfor i, item in enumerate(grocery_list):\n    print(f\"{i+1}. {item}\")",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "1. milk\n2. bread\n3. eggs\n4. apples\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "title": "Build a numbered grocery list",
+    "instruction": "Define a function `build_grocery_list()` that returns a list of strings. Start with an empty list, use `.append()` to add `\"milk\"`, `\"bread\"`, `\"eggs\"`, and `\"apples\"` in that order, then return the list `[\"milk\", \"bread\", \"eggs\", \"apples\"]`.",
+    "starter_code": "def build_grocery_list():\n    # Start empty, append items, return the list\n    pass",
+    "solution_code": "def build_grocery_list():\n    grocery_list = []\n    grocery_list.append(\"milk\")\n    grocery_list.append(\"bread\")\n    grocery_list.append(\"eggs\")\n    grocery_list.append(\"apples\")\n    return grocery_list",
+    "test_suite": "def test_correct_items():\n    result = exercise.build_grocery_list()\n    assert isinstance(result, list), f\"Expected a list, got {type(result)}\"\n    assert result == [\"milk\", \"bread\", \"eggs\", \"apples\"], f\"Expected exact list, got {result}\"\n\ndef test_length():\n    result = exercise.build_grocery_list()\n    assert len(result) == 4, f\"Expected 4 items, got {len(result)}\"",
+    "test_cases": [],
     "order": 4
   }
 ]

@@ -2,31 +2,21 @@
   {
     "slug": "mod-import-math",
     "title": "Use the math module",
-    "instruction": "Import the `math` module and use `math.sqrt()` to calculate the square root of 144. Print the result.",
-    "starter_code": "# Import math and calculate square root\n",
-    "solution_code": "import math\nprint(math.sqrt(144))\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "12.0\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `calculate_sqrt(n)` that imports the `math` module and uses `math.sqrt()` to **return** the square root of `n`.",
+    "starter_code": "def calculate_sqrt(n):\n    # Import math and return the square root of n\n    pass",
+    "solution_code": "import math\n\ndef calculate_sqrt(n):\n    return math.sqrt(n)",
+    "test_suite": "def test_sqrt_of_perfect_square():\n    result = exercise.calculate_sqrt(144)\n    assert result == 12.0, f\"Expected 12.0, got {result}\"\n\ndef test_sqrt_of_zero():\n    result = exercise.calculate_sqrt(0)\n    assert result == 0.0, f\"Expected 0.0, got {result}\"\n\ndef test_sqrt_of_one():\n    result = exercise.calculate_sqrt(1)\n    assert result == 1.0, f\"Expected 1.0, got {result}\"\n\ndef test_sqrt_of_two():\n    result = exercise.calculate_sqrt(2)\n    assert abs(result - 1.41421356) < 0.0001, f\"Expected ~1.4142, got {result}\"\n\ndef test_sqrt_of_large_number():\n    result = exercise.calculate_sqrt(1000000)\n    assert result == 1000.0, f\"Expected 1000.0, got {result}\"",
+    "test_cases": [],
     "order": 1
   },
   {
     "slug": "mod-custom-module",
     "title": "Create a helper module",
-    "instruction": "Write code that defines a function `greet(name)` in a separate module-like structure and calls it. Since we're in a single file, just define the function at the top and call it at the bottom.",
-    "starter_code": "def greet(name):\n    # Your code here\n    pass\n\nprint(greet(\"Python\"))\n",
-    "solution_code": "def greet(name):\n    return f\"Hello, {name}!\"\n\nprint(greet(\"Python\"))\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Hello, Python!\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `greet(name)` that **returns** the string `\"Hello, [name]!\"`. This simulates a reusable function you might put in a module.",
+    "starter_code": "def greet(name):\n    # Return the greeting string\n    pass",
+    "solution_code": "def greet(name):\n    return f\"Hello, {name}!\"",
+    "test_suite": "def test_greet_python():\n    result = exercise.greet(\"Python\")\n    assert result == \"Hello, Python!\", f\"Expected 'Hello, Python!', got {result!r}\"\n\ndef test_greet_world():\n    result = exercise.greet(\"World\")\n    assert result == \"Hello, World!\", f\"Expected 'Hello, World!', got {result!r}\"\n\ndef test_greet_empty():\n    result = exercise.greet(\"\")\n    assert result == \"Hello, !\", f\"Expected 'Hello, !', got {result!r}\"",
+    "test_cases": [],
     "order": 2
   },
   {

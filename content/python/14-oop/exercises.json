@@ -2,46 +2,31 @@
   {
     "slug": "oop-student-class",
     "title": "Create a Student class",
-    "instruction": "Create a `Student` class with `__init__` that takes `name` and `grade`. Add an `introduce()` method that returns `\"Hi, I'm [name] and I'm in grade [grade].\"`",
-    "starter_code": "class Student:\n    # Your code here\n    pass\n\n# Test it\ns = Student(\"Alice\", 10)\nprint(s.introduce())\n",
-    "solution_code": "class Student:\n    def __init__(self, name, grade):\n        self.name = name\n        self.grade = grade\n\n    def introduce(self):\n        return f\"Hi, I'm {self.name} and I'm in grade {self.grade}.\"\n\ns = Student(\"Alice\", 10)\nprint(s.introduce())\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Hi, I'm Alice and I'm in grade 10.\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Create a `Student` class with an `__init__` method that takes `name` and `grade`. Add an `introduce()` method that **returns** the string `\"Hi, I'm [name] and I'm in grade [grade].\"`.",
+    "starter_code": "class Student:\n    def __init__(self, name, grade):\n        # Set name and grade attributes\n        pass\n    \n    def introduce(self):\n        # Return the introduction string\n        pass",
+    "solution_code": "class Student:\n    def __init__(self, name, grade):\n        self.name = name\n        self.grade = grade\n\n    def introduce(self):\n        return f\"Hi, I'm {self.name} and I'm in grade {self.grade}.\"",
+    "test_suite": "def test_introduce_returns_correct_string():\n    s = exercise.Student(\"Alice\", 10)\n    result = s.introduce()\n    assert result == \"Hi, I'm Alice and I'm in grade 10.\", f\"Expected 'Hi, I'm Alice and I'm in grade 10.', got {result!r}\"\n\ndef test_introduce_different_student():\n    s = exercise.Student(\"Bob\", 7)\n    result = s.introduce()\n    assert result == \"Hi, I'm Bob and I'm in grade 7.\", f\"Expected 'Hi, I'm Bob and I'm in grade 7.', got {result!r}\"\n\ndef test_stores_name_and_grade():\n    s = exercise.Student(\"Charlie\", 12)\n    assert s.name == \"Charlie\", f\"Expected name 'Charlie', got {s.name!r}\"\n    assert s.grade == 12, f\"Expected grade 12, got {s.grade}\"\n\ndef test_grade_can_be_zero():\n    s = exercise.Student(\"Test\", 0)\n    assert s.grade == 0, f\"Expected grade 0, got {s.grade}\"",
+    "test_cases": [],
     "order": 1
   },
   {
     "slug": "oop-repr-str",
     "title": "Add __str__ to Student",
-    "instruction": "Add a `__str__` method to your `Student` class so that `print(student)` displays `\"Student: [name], Grade: [grade]\"`.",
-    "starter_code": "class Student:\n    def __init__(self, name, grade):\n        self.name = name\n        self.grade = grade\n\n    # Add __str__ method here\n\n# Test it\ns = Student(\"Bob\", 11)\nprint(s)\n",
-    "solution_code": "class Student:\n    def __init__(self, name, grade):\n        self.name = name\n        self.grade = grade\n\n    def __str__(self):\n        return f\"Student: {self.name}, Grade: {self.grade}\"\n\ns = Student(\"Bob\", 11)\nprint(s)\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Student: Bob, Grade: 11\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Add a `__str__` method to the `Student` class so that `str(student)` returns `\"Student: [name], Grade: [grade]\"`.",
+    "starter_code": "class Student:\n    def __init__(self, name, grade):\n        self.name = name\n        self.grade = grade\n\n    def introduce(self):\n        return f\"Hi, I'm {self.name} and I'm in grade {self.grade}.\"\n\n    # Add __str__ method here\n    pass",
+    "solution_code": "class Student:\n    def __init__(self, name, grade):\n        self.name = name\n        self.grade = grade\n\n    def introduce(self):\n        return f\"Hi, I'm {self.name} and I'm in grade {self.grade}.\"\n\n    def __str__(self):\n        return f\"Student: {self.name}, Grade: {self.grade}\"",
+    "test_suite": "def test_str_returns_formatted_string():\n    s = exercise.Student(\"Bob\", 11)\n    result = str(s)\n    assert result == \"Student: Bob, Grade: 11\", f\"Expected 'Student: Bob, Grade: 11', got {result!r}\"\n\ndef test_str_different_student():\n    s = exercise.Student(\"Alice\", 9)\n    result = str(s)\n    assert result == \"Student: Alice, Grade: 9\", f\"Expected 'Student: Alice, Grade: 9', got {result!r}\"\n\ndef test_introduce_still_works():\n    s = exercise.Student(\"Charlie\", 10)\n    assert s.introduce() == \"Hi, I'm Charlie and I'm in grade 10.\", f\"introduce() should still work after adding __str__\"\n\ndef test_str_single_digit_grade():\n    s = exercise.Student(\"Diana\", 5)\n    result = str(s)\n    assert result == \"Student: Diana, Grade: 5\", f\"Expected 'Student: Diana, Grade: 5', got {result!r}\"",
+    "test_cases": [],
     "order": 2
   },
   {
     "slug": "oop-inheritance",
     "title": "Inherit from Student",
-    "instruction": "Create a `GraduateStudent` class that inherits from `Student`. Add a `thesis_topic` attribute to `__init__` and override `introduce()` to include the thesis topic.",
-    "starter_code": "class Student:\n    def __init__(self, name, grade):\n        self.name = name\n        self.grade = grade\n\n    def introduce(self):\n        return f\"Hi, I'm {self.name}, grade {self.grade}.\"\n\n# Create GraduateStudent here\n\n# Test it\ngs = GraduateStudent(\"Diana\", 12, \"AI in Healthcare\")\nprint(gs.introduce())\n",
-    "solution_code": "class Student:\n    def __init__(self, name, grade):\n        self.name = name\n        self.grade = grade\n\n    def introduce(self):\n        return f\"Hi, I'm {self.name}, grade {self.grade}.\"\n\nclass GraduateStudent(Student):\n    def __init__(self, name, grade, thesis_topic):\n        super().__init__(name, grade)\n        self.thesis_topic = thesis_topic\n\n    def introduce(self):\n        return f\"Hi, I'm {self.name}, grade {self.grade}. My thesis is on {self.thesis_topic}.\"\n\ngs = GraduateStudent(\"Diana\", 12, \"AI in Healthcare\")\nprint(gs.introduce())\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Hi, I'm Diana, grade 12. My thesis is on AI in Healthcare.\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Create a `GraduateStudent` class that inherits from `Student`. It should accept an additional `thesis_topic` parameter in `__init__` and override `introduce()` to **return** `\"Hi, I'm [name], grade [grade]. My thesis is on [thesis_topic].\"`.",
+    "starter_code": "class Student:\n    def __init__(self, name, grade):\n        self.name = name\n        self.grade = grade\n\n    def introduce(self):\n        return f\"Hi, I'm {self.name}, grade {self.grade}.\"\n\n# Create GraduateStudent class here\n# It should inherit from Student\n",
+    "solution_code": "class Student:\n    def __init__(self, name, grade):\n        self.name = name\n        self.grade = grade\n\n    def introduce(self):\n        return f\"Hi, I'm {self.name}, grade {self.grade}.\"\n\nclass GraduateStudent(Student):\n    def __init__(self, name, grade, thesis_topic):\n        super().__init__(name, grade)\n        self.thesis_topic = thesis_topic\n\n    def introduce(self):\n        return f\"Hi, I'm {self.name}, grade {self.grade}. My thesis is on {self.thesis_topic}.\"",
+    "test_suite": "def test_graduate_student_introduce():\n    gs = exercise.GraduateStudent(\"Diana\", 12, \"AI in Healthcare\")\n    result = gs.introduce()\n    assert result == \"Hi, I'm Diana, grade 12. My thesis is on AI in Healthcare.\", f\"Expected 'Hi, I'm Diana, grade 12. My thesis is on AI in Healthcare.', got {result!r}\"\n\ndef test_graduate_student_different_topic():\n    gs = exercise.GraduateStudent(\"Eve\", 11, \"Quantum Computing\")\n    result = gs.introduce()\n    assert \"Quantum Computing\" in result, f\"Expected thesis topic 'Quantum Computing' in {result!r}\"\n\ndef test_student_still_works():\n    s = exercise.Student(\"Frank\", 9)\n    result = s.introduce()\n    assert result == \"Hi, I'm Frank, grade 9.\", f\"Expected 'Hi, I'm Frank, grade 9.', got {result!r}\"\n\ndef test_graduate_student_inherits_attributes():\n    gs = exercise.GraduateStudent(\"Grace\", 10, \"Robotics\")\n    assert gs.name == \"Grace\", f\"Expected name 'Grace', got {gs.name!r}\"\n    assert gs.grade == 10, f\"Expected grade 10, got {gs.grade}\"\n    assert gs.thesis_topic == \"Robotics\", f\"Expected thesis_topic 'Robotics', got {gs.thesis_topic!r}\"\n\ndef test_graduate_student_is_instance_of_student():\n    gs = exercise.GraduateStudent(\"Henry\", 12, \"Bioinformatics\")\n    assert isinstance(gs, exercise.Student), \"GraduateStudent should inherit from Student\"",
+    "test_cases": [],
     "order": 3
   }
 ]
