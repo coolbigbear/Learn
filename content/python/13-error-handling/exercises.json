@@ -2,26 +2,11 @@
   {
     "slug": "error-safe-division",
     "title": "Safe division with error handling",
-    "instruction": "Write a program that asks the user for two numbers (numerator and denominator) and prints the result of dividing them. Handle `ValueError` (non-number input) and `ZeroDivisionError` (divide by zero) separately.",
-    "starter_code": "# Ask for two numbers and divide them safely\nnum1 = input(\"Enter numerator: \")\nnum2 = input(\"Enter denominator: \")\n# Your code here\n",
-    "solution_code": "num1 = input(\"Enter numerator: \")\nnum2 = input(\"Enter denominator: \")\ntry:\n    result = int(num1) / int(num2)\n    print(f\"Result: {result}\")\nexcept ValueError:\n    print(\"Please enter valid numbers!\")\nexcept ZeroDivisionError:\n    print(\"Cannot divide by zero!\")\n",
-    "test_cases": [
-      {
-        "input": "10\n2\n",
-        "expected_output": "Result: 5.0\n",
-        "comparison_type": "exact"
-      },
-      {
-        "input": "10\n0\n",
-        "expected_output": "Cannot divide by zero!\n",
-        "comparison_type": "exact"
-      },
-      {
-        "input": "hello\n5\n",
-        "expected_output": "Please enter valid numbers!\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `safe_divide(a, b)` that takes two numbers and returns the result of dividing `a` by `b`. Raise a `ValueError` with the message `\"Both inputs must be numbers\"` if either input is not an `int` or `float`. Let Python's natural `ZeroDivisionError` propagate when `b` is zero.",
+    "starter_code": "def safe_divide(a, b):\n    # Check for non-numeric inputs, then return a / b\n    pass",
+    "solution_code": "def safe_divide(a, b):\n    if not isinstance(a, (int, float)) or not isinstance(b, (int, float)):\n        raise ValueError(\"Both inputs must be numbers\")\n    return a / b",
+    "test_suite": "def test_normal_division():\n    result = exercise.safe_divide(10, 2)\n    assert result == 5.0, f\"Expected 5.0, got {result}\"\n\ndef test_division_float():\n    result = exercise.safe_divide(7, 2)\n    assert result == 3.5, f\"Expected 3.5, got {result}\"\n\ndef test_division_by_negative():\n    result = exercise.safe_divide(10, -2)\n    assert result == -5.0, f\"Expected -5.0, got {result}\"\n\ndef test_division_by_zero():\n    try:\n        exercise.safe_divide(10, 0)\n        assert False, \"Expected ZeroDivisionError for denominator=0, but no exception was raised\"\n    except ZeroDivisionError:\n        pass\n\ndef test_non_numeric_numerator():\n    try:\n        exercise.safe_divide(\"hello\", 5)\n        assert False, \"Expected ValueError for non-numeric input, but no exception was raised\"\n    except ValueError as e:\n        assert \"Both inputs must be numbers\" in str(e), f\"Expected message about numbers, got {str(e)!r}\"\n\ndef test_non_numeric_denominator():\n    try:\n        exercise.safe_divide(10, \"x\")\n        assert False, \"Expected ValueError for non-numeric input, but no exception was raised\"\n    except ValueError as e:\n        assert \"Both inputs must be numbers\" in str(e), f\"Expected message about numbers, got {str(e)!r}\"",
+    "test_cases": [],
     "order": 1
   },
   {
@@ -37,16 +22,11 @@
   {
     "slug": "error-file-handling",
     "title": "Graceful file reading",
-    "instruction": "Write a program that tries to read a file called `data.txt`. If the file doesn't exist, print `\"File not found, creating it...\"` and create the file with the content `\"New file!\"`.",
-    "starter_code": "filename = \"data.txt\"\n# Your code here\n",
-    "solution_code": "filename = \"data.txt\"\ntry:\n    with open(filename, \"r\") as f:\n        print(f.read())\nexcept FileNotFoundError:\n    print(\"File not found, creating it...\")\n    with open(filename, \"w\") as f:\n        f.write(\"New file!\")\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "File not found, creating it...\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `read_or_create(filename)` that tries to open the file and **return** its content as a string. If the file does not exist (raises a `FileNotFoundError`), create the file with the content `\"New file!\"` and return `\"New file!\"`.",
+    "starter_code": "def read_or_create(filename):\n    # Try to open and read the file; if not found, create it with \"New file!\"\n    pass",
+    "solution_code": "def read_or_create(filename):\n    try:\n        with open(filename, \"r\") as f:\n            return f.read()\n    except FileNotFoundError:\n        with open(filename, \"w\") as f:\n            f.write(\"New file!\")\n        return \"New file!\"",
+    "test_suite": "import os\n\ndef test_creates_file_when_not_exists():\n    filename = \"_test_read_or_create_temp.txt\"\n    if os.path.exists(filename):\n        os.remove(filename)\n    result = exercise.read_or_create(filename)\n    assert result == \"New file!\", f\"Expected 'New file!', got {result!r}\"\n    assert os.path.exists(filename), \"File was not created\"\n    os.remove(filename)\n\ndef test_reads_existing_file():\n    filename = \"_test_existing_file.txt\"\n    with open(filename, \"w\") as f:\n        f.write(\"Hello World\")\n    result = exercise.read_or_create(filename)\n    assert result == \"Hello World\", f\"Expected 'Hello World', got {result!r}\"\n    os.remove(filename)\n\ndef test_multiple_calls():\n    filename = \"_test_multiple_calls.txt\"\n    if os.path.exists(filename):\n        os.remove(filename)\n    result = exercise.read_or_create(filename)\n    assert result == \"New file!\", f\"First call: Expected 'New file!', got {result!r}\"\n    result = exercise.read_or_create(filename)\n    assert result == \"New file!\", f\"Second call: Expected 'New file!', got {result!r}\"\n    os.remove(filename)\n\ndef test_reads_file_with_new_content():\n    filename = \"_test_new_content.txt\"\n    with open(filename, \"w\") as f:\n        f.write(\"Custom content\")\n    result = exercise.read_or_create(filename)\n    assert result == \"Custom content\", f\"Expected 'Custom content', got {result!r}\"\n    os.remove(filename)",
+    "test_cases": [],
     "order": 3
   }
 ]
