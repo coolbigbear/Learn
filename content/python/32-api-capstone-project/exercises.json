@@ -2,106 +2,41 @@
   {
     "slug": "capstone-project-structure",
     "title": "Plan the project file structure",
-    "instruction": "Write a function `project_files()` that returns a Python list of all the files needed for the capstone API project. The files are: database.py, models.py, schemas.py, auth.py, and main.py. Print the sorted list using print().\n\nHint: Return `[\"auth.py\", \"database.py\", \"main.py\", \"models.py\", \"schemas.py\"]`.",
-    "starter_code": "def project_files():\n    # Return the sorted list of file names\n    pass\n\nfiles = project_files()\nprint(files)",
-    "solution_code": "def project_files():\n    return [\"auth.py\", \"database.py\", \"main.py\", \"models.py\", \"schemas.py\"]\n\nfiles = project_files()\nprint(files)",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "['auth.py', 'database.py', 'main.py', 'models.py', 'schemas.py']\n",
-        "comparison_type": "exact"
-      },
-      {
-        "input": "",
-        "expected_output": "project_files",
-        "comparison_type": "code_contains"
-      }
-    ],
+    "instruction": "Write a function `project_files()` that returns a Python list of all the files needed for the capstone API project, in **sorted** order. The files are: database.py, models.py, schemas.py, auth.py, and main.py.\n\nHint: Return `[\"auth.py\", \"database.py\", \"main.py\", \"models.py\", \"schemas.py\"]`.",
+    "starter_code": "def project_files():\n    # Return the sorted list of file names\n    pass",
+    "solution_code": "def project_files():\n    return [\"auth.py\", \"database.py\", \"main.py\", \"models.py\", \"schemas.py\"]",
+    "test_suite": "def test_returns_correct_files():\n    result = exercise.project_files()\n    expected = [\"auth.py\", \"database.py\", \"main.py\", \"models.py\", \"schemas.py\"]\n    assert result == expected, f\"Expected {expected}, got {result}\"\n\ndef test_is_sorted():\n    result = exercise.project_files()\n    assert result == sorted(result), f\"List is not sorted: {result}\"\n\ndef test_returns_list():\n    result = exercise.project_files()\n    assert isinstance(result, list), f\"Expected list, got {type(result)}\"\n    assert len(result) == 5, f\"Expected 5 files, got {len(result)}\"",
+    "test_cases": [],
     "order": 1
   },
   {
     "slug": "database-url-construction",
     "title": "Build an async database URL",
-    "instruction": "Write a function `make_db_url(db_name)` that returns a SQLAlchemy async database URL string for SQLite. The URL format is:\n\n```\nsqlite+aiosqlite:///./{db_name}\n```\n\nFor example:\n- `make_db_url(\"tasks.db\")` → `\"sqlite+aiosqlite:///./tasks.db\"`\n- `make_db_url(\"test.db\")` → `\"sqlite+aiosqlite:///./test.db\"`\n\nPrint the result for `db_name=\"tasks.db\"`.",
-    "starter_code": "def make_db_url(db_name):\n    # Return the async SQLite URL string\n    pass\n\nprint(make_db_url(\"tasks.db\"))",
-    "solution_code": "def make_db_url(db_name):\n    return f\"sqlite+aiosqlite:///./{db_name}\"\n\nprint(make_db_url(\"tasks.db\"))",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "sqlite+aiosqlite:///./tasks.db\n",
-        "comparison_type": "exact"
-      },
-      {
-        "input": "",
-        "expected_output": "aiosqlite",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "f\"",
-        "comparison_type": "code_contains"
-      }
-    ],
+    "instruction": "Write a function `make_db_url(db_name)` that returns a SQLAlchemy async database URL string for SQLite. The URL format is:\n\n```\nsqlite+aiosqlite:///./{db_name}\n```\n\nFor example:\n- `make_db_url(\"tasks.db\")` → `\"sqlite+aiosqlite:///./tasks.db\"`\n- `make_db_url(\"test.db\")` → `\"sqlite+aiosqlite:///./test.db\"`",
+    "starter_code": "def make_db_url(db_name):\n    # Return the async SQLite URL string\n    pass",
+    "solution_code": "def make_db_url(db_name):\n    return f\"sqlite+aiosqlite:///./{db_name}\"",
+    "test_suite": "def test_tasks_db_url():\n    result = exercise.make_db_url(\"tasks.db\")\n    assert result == \"sqlite+aiosqlite:///./tasks.db\", f\"Expected 'sqlite+aiosqlite:///./tasks.db', got {result!r}\"\n\ndef test_test_db_url():\n    result = exercise.make_db_url(\"test.db\")\n    assert result == \"sqlite+aiosqlite:///./test.db\", f\"Expected 'sqlite+aiosqlite:///./test.db', got {result!r}\"\n\ndef test_custom_db_name():\n    result = exercise.make_db_url(\"mydata.db\")\n    assert result == \"sqlite+aiosqlite:///./mydata.db\", f\"Expected 'sqlite+aiosqlite:///./mydata.db', got {result!r}\"\n\ndef test_db_url_format():\n    result = exercise.make_db_url(\"x.db\")\n    assert \"sqlite+aiosqlite\" in result, f\"Expected 'sqlite+aiosqlite' in URL, got {result!r}\"",
+    "test_cases": [],
     "order": 2
   },
   {
     "slug": "password-hashing-concept",
     "title": "Hash a password with SHA-256",
-    "instruction": "Write a function `hash_password(password)` that uses hashlib.sha256 to hash a password and returns the hex digest.\n\nThen write a function `verify_password(password, hashed)` that returns True if `hashlib.sha256(password.encode()).hexdigest() == hashed`, else False.\n\nPrint the result of:\n1. `hash_password(\"secret123\")`\n2. `verify_password(\"secret123\", hash_password(\"secret123\"))`\n3. `verify_password(\"wrong\", hash_password(\"secret123\"))`\n\nEach on its own line.",
-    "starter_code": "import hashlib\n\ndef hash_password(password):\n    # Return SHA-256 hex digest\n    pass\n\ndef verify_password(password, hashed):\n    # Return True if password matches the hash\n    pass\n\n# Print the three test results\nprint(hash_password(\"secret123\"))\nprint(verify_password(\"secret123\", hash_password(\"secret123\")))\nprint(verify_password(\"wrong\", hash_password(\"secret123\")))",
-    "solution_code": "import hashlib\n\ndef hash_password(password):\n    return hashlib.sha256(password.encode()).hexdigest()\n\ndef verify_password(password, hashed):\n    return hashlib.sha256(password.encode()).hexdigest() == hashed\n\nh = hash_password(\"secret123\")\nprint(h)\nprint(verify_password(\"secret123\", h))\nprint(verify_password(\"wrong\", h))",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": ".*\\nTrue\\nFalse\\n",
-        "comparison_type": "regex"
-      },
-      {
-        "input": "",
-        "expected_output": "hashlib.sha256",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "def hash_password",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "def verify_password",
-        "comparison_type": "code_contains"
-      }
-    ],
+    "instruction": "Write two functions:\n\n1. `hash_password(password)` — uses `hashlib.sha256()` to hash the password and returns the hex digest.\n2. `verify_password(password, hashed)` — returns `True` if `hashlib.sha256(password.encode()).hexdigest() == hashed`, else `False`.",
+    "starter_code": "import hashlib\n\ndef hash_password(password):\n    # Return SHA-256 hex digest\n    pass\n\ndef verify_password(password, hashed):\n    # Return True if password matches the hash\n    pass",
+    "solution_code": "import hashlib\n\ndef hash_password(password):\n    return hashlib.sha256(password.encode()).hexdigest()\n\ndef verify_password(password, hashed):\n    return hashlib.sha256(password.encode()).hexdigest() == hashed",
+    "test_suite": "def test_hash_returns_hex_string():\n    result = exercise.hash_password(\"secret123\")\n    assert isinstance(result, str), f\"Expected string, got {type(result)}\"\n    assert len(result) == 64, f\"Expected SHA-256 hex digest of length 64, got length {len(result)}\"\n    assert all(c in \"0123456789abcdef\" for c in result), f\"Expected hex string, got {result!r}\"\n\ndef test_hash_is_deterministic():\n    h1 = exercise.hash_password(\"mypassword\")\n    h2 = exercise.hash_password(\"mypassword\")\n    assert h1 == h2, f\"Hashes should be identical for same input, got {h1} vs {h2}\"\n\ndef test_different_passwords_different_hashes():\n    h1 = exercise.hash_password(\"password1\")\n    h2 = exercise.hash_password(\"password2\")\n    assert h1 != h2, \"Different passwords should produce different hashes\"\n\ndef test_verify_correct_password():\n    h = exercise.hash_password(\"secret123\")\n    assert exercise.verify_password(\"secret123\", h) == True, \"verify_password should return True for correct password\"\n\ndef test_verify_wrong_password():\n    h = exercise.hash_password(\"secret123\")\n    assert exercise.verify_password(\"wrong\", h) == False, \"verify_password should return False for wrong password\"",
+    "test_cases": [],
     "order": 3
   },
   {
     "slug": "jwt-structure-simulation",
     "title": "Simulate JWT token structure",
-    "instruction": "Write a function `make_jwt(user_id, username)` that simulates a JWT token by creating:\n1. A header: `{\"alg\": \"HS256\", \"typ\": \"JWT\"}` (base64 encoded)\n2. A payload: `{\"sub\": username, \"user_id\": user_id, \"exp\": 9999999999}` (base64 encoded)\n3. A signature: `\"fake_signature\"` (no real signing)\n\nConcatenate them with dots: `header.payload.signature`\n\nUse `json.dumps()` to convert dicts to strings and `base64.urlsafe_b64encode()` to encode them (encode the string to bytes first, then decode the result).\n\nPrint the result of `make_jwt(1, \"alice\")`.\n\nHint: base64.urlsafe_b64encode() needs bytes → `.encode()` the JSON string first. Then `.decode()` the result to get a string.",
-    "starter_code": "import json\nimport base64\n\ndef make_jwt(user_id, username):\n    # Build header dict\n    header = {\"alg\": \"HS256\", \"typ\": \"JWT\"}\n    # Build payload dict\n    payload = {\"sub\": username, \"user_id\": user_id, \"exp\": 9999999999}\n    \n    # Base64-encode the JSON strings\n    header_b64 = base64.urlsafe_b64encode(json.dumps(header).encode()).decode()\n    # Your code for payload here\n    \n    # Fake signature\n    sig = \"fake_signature\"\n    \n    # Return header.payload.signature\n    pass\n\nprint(make_jwt(1, \"alice\"))",
-    "solution_code": "import json\nimport base64\n\ndef make_jwt(user_id, username):\n    header = {\"alg\": \"HS256\", \"typ\": \"JWT\"}\n    payload = {\"sub\": username, \"user_id\": user_id, \"exp\": 9999999999}\n    \n    header_b64 = base64.urlsafe_b64encode(json.dumps(header).encode()).decode()\n    payload_b64 = base64.urlsafe_b64encode(json.dumps(payload).encode()).decode()\n    sig = \"fake_signature\"\n    \n    return f\"{header_b64}.{payload_b64}.{sig}\"\n\nprint(make_jwt(1, \"alice\"))",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": ".+\\.+.+\\.fake_signature\n",
-        "comparison_type": "regex"
-      },
-      {
-        "input": "",
-        "expected_output": "base64.urlsafe_b64encode",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "json.dumps",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "\"sub\"",
-        "comparison_type": "code_contains"
-      }
-    ],
+    "instruction": "Write a function `make_jwt(user_id, username)` that simulates a JWT token by creating:\n1. A header: `{\"alg\": \"HS256\", \"typ\": \"JWT\"}` (base64 encoded)\n2. A payload: `{\"sub\": username, \"user_id\": user_id, \"exp\": 9999999999}` (base64 encoded)\n3. A signature: `\"fake_signature\"` (no real signing)\n\nConcatenate them with dots: `header.payload.signature`\n\nUse `json.dumps()` to convert dicts to strings and `base64.urlsafe_b64encode()` to encode them.\n\nHint: base64.urlsafe_b64encode() needs bytes → `.encode()` the JSON string first. Then `.decode()` the result to get a string.",
+    "starter_code": "import json\nimport base64\n\ndef make_jwt(user_id, username):\n    # Build header dict: {\"alg\": \"HS256\", \"typ\": \"JWT\"}\n    header = {\"alg\": \"HS256\", \"typ\": \"JWT\"}\n    # Build payload: {\"sub\": username, \"user_id\": user_id, \"exp\": 9999999999}\n    payload = {\"sub\": username, \"user_id\": user_id, \"exp\": 9999999999}\n    \n    # Encode header, encode payload, fake signature\n    # Return header.payload.signature\n    pass",
+    "solution_code": "import json\nimport base64\n\ndef make_jwt(user_id, username):\n    header = {\"alg\": \"HS256\", \"typ\": \"JWT\"}\n    payload = {\"sub\": username, \"user_id\": user_id, \"exp\": 9999999999}\n    \n    header_b64 = base64.urlsafe_b64encode(json.dumps(header).encode()).decode()\n    payload_b64 = base64.urlsafe_b64encode(json.dumps(payload).encode()).decode()\n    sig = \"fake_signature\"\n    \n    return f\"{header_b64}.{payload_b64}.{sig}\"",
+    "test_suite": "import json\nimport base64\n\ndef test_returns_string_with_two_dots():\n    result = exercise.make_jwt(1, \"alice\")\n    assert isinstance(result, str), f\"Expected string, got {type(result)}\"\n    parts = result.split(\".\")\n    assert len(parts) == 3, f\"Expected 3 dot-separated parts, got {len(parts)} parts from {result!r}\"\n\ndef test_ends_with_fake_signature():\n    result = exercise.make_jwt(42, \"bob\")\n    assert result.endswith(\".fake_signature\"), f\"Expected token ending with '.fake_signature', got {result!r}\"\n\ndef test_payload_contains_username_and_user_id():\n    result = exercise.make_jwt(7, \"charlie\")\n    payload_b64 = result.split(\".\")[1]\n    padding = 4 - len(payload_b64) % 4\n    if padding != 4:\n        payload_b64 += \"=\" * padding\n    decoded = json.loads(base64.urlsafe_b64decode(payload_b64))\n    assert decoded[\"sub\"] == \"charlie\", f\"Expected payload sub 'charlie', got {decoded.get('sub')}\"\n    assert decoded[\"user_id\"] == 7, f\"Expected payload user_id 7, got {decoded.get('user_id')}\"\n    assert decoded[\"exp\"] == 9999999999, f\"Expected payload exp 9999999999, got {decoded.get('exp')}\"\n\ndef test_different_users_produce_different_tokens():\n    t1 = exercise.make_jwt(1, \"alice\")\n    t2 = exercise.make_jwt(2, \"bob\")\n    assert t1 != t2, \"Different users should produce different tokens\"",
+    "test_cases": [],
     "order": 4
   },
   {
@@ -110,118 +45,38 @@
     "instruction": "Write a FastAPI application with:\n1. A function `get_current_user(token: str)` that returns the token (just returns the token as-is for this exercise — no real auth).\n2. A protected GET endpoint at `/me` that uses `Depends(get_current_user)` and returns `{\"user\": current_user}`.\n\nThe `get_current_user` function should accept a query parameter `token: str` and return it directly.\n\nHint: Use `from fastapi import FastAPI, Depends`.",
     "starter_code": "from fastapi import FastAPI, Depends\n\napp = FastAPI()\n\ndef get_current_user(token: str):\n    return token\n\n# Add the /me endpoint using Depends(get_current_user)\n",
     "solution_code": "from fastapi import FastAPI, Depends\n\napp = FastAPI()\n\ndef get_current_user(token: str):\n    return token\n\n@app.get(\"/me\")\nasync def read_users_me(current_user: str = Depends(get_current_user)):\n    return {\"user\": current_user}",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "",
-        "comparison_type": "exact"
-      },
-      {
-        "input": "",
-        "expected_output": "Depends(get_current_user)",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "@app.get(\"/me\")",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "async def",
-        "comparison_type": "code_contains"
-      }
-    ],
+    "test_suite": "from fastapi.testclient import TestClient\n\ndef test_me_endpoint_exists():\n    client = TestClient(exercise.app)\n    response = client.get(\"/me?token=alice_token\")\n    assert response.status_code == 200, f\"Expected 200 OK, got {response.status_code}\"\n\ndef test_me_returns_user_from_token():\n    client = TestClient(exercise.app)\n    response = client.get(\"/me?token=my_test_token\")\n    data = response.json()\n    assert data == {\"user\": \"my_test_token\"}, f\"Expected {{\\\"user\\\": \\\"my_test_token\\\"}}, got {data}\"\n\ndef test_me_with_different_token():\n    client = TestClient(exercise.app)\n    response = client.get(\"/me?token=bob_token\")\n    assert response.json() == {\"user\": \"bob_token\"}, f\"Expected {{\\\"user\\\": \\\"bob_token\\\"}}, got {response.json()}\"",
+    "test_cases": [],
     "order": 5
   },
   {
     "slug": "error-handling-status-codes",
     "title": "Handle errors with proper HTTP status codes",
-    "instruction": "Write a function `handle_task_not_found(task_id)` that:\n1. Takes a task_id (int)\n2. Raises an `HTTPException` with status_code=404 and detail=f\"Task {task_id} not found\"\n3. But first, print a message: `f\"Searching for task {task_id}...\"`\n\nAlso write a function `handle_unauthorized()` that raises an `HTTPException` with status_code=401 and detail=\"Invalid or expired token\".\n\nFinally, call `handle_task_not_found(42)` inside a try/except block that catches HTTPException and prints the exception's status_code and detail.\n\nHint: `from fastapi import HTTPException`. An HTTPException has `.status_code` and `.detail` attributes.",
-    "starter_code": "from fastapi import HTTPException\n\ndef handle_task_not_found(task_id):\n    print(f\"Searching for task {task_id}...\")\n    raise HTTPException(status_code=404, detail=f\"Task {task_id} not found\")\n\ndef handle_unauthorized():\n    # Raise HTTPException with 401 status\n    pass\n\n# Call handle_task_not_found(42) with try/except\n",
-    "solution_code": "from fastapi import HTTPException\n\ndef handle_task_not_found(task_id):\n    print(f\"Searching for task {task_id}...\")\n    raise HTTPException(status_code=404, detail=f\"Task {task_id} not found\")\n\ndef handle_unauthorized():\n    raise HTTPException(status_code=401, detail=\"Invalid or expired token\")\n\ntry:\n    handle_task_not_found(42)\nexcept HTTPException as e:\n    print(f\"Status: {e.status_code}, Detail: {e.detail}\")",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Searching for task 42...\\nStatus: 404, Detail: Task 42 not found\\n",
-        "comparison_type": "exact"
-      },
-      {
-        "input": "",
-        "expected_output": "status_code=401",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "HTTPException",
-        "comparison_type": "code_contains"
-      }
-    ],
+    "instruction": "Write two functions:\n\n1. `handle_task_not_found(task_id)` — prints `f\"Searching for task {task_id}...\"` and then raises an `HTTPException` with `status_code=404` and `detail=f\"Task {task_id} not found\"`.\n2. `handle_unauthorized()` — raises an `HTTPException` with `status_code=401` and `detail=\"Invalid or expired token\"`.\n\nHint: `from fastapi import HTTPException`. An `HTTPException` has `.status_code` and `.detail` attributes.",
+    "starter_code": "from fastapi import HTTPException\n\ndef handle_task_not_found(task_id):\n    print(f\"Searching for task {task_id}...\")\n    raise HTTPException(status_code=404, detail=f\"Task {task_id} not found\")\n\ndef handle_unauthorized():\n    # Raise HTTPException with 401 status\n    pass",
+    "solution_code": "from fastapi import HTTPException\n\ndef handle_task_not_found(task_id):\n    print(f\"Searching for task {task_id}...\")\n    raise HTTPException(status_code=404, detail=f\"Task {task_id} not found\")\n\ndef handle_unauthorized():\n    raise HTTPException(status_code=401, detail=\"Invalid or expired token\")",
+    "test_suite": "from fastapi import HTTPException\n\ndef test_handle_task_not_found_raises_404():\n    try:\n        exercise.handle_task_not_found(42)\n        assert False, \"Expected HTTPException to be raised\"\n    except HTTPException as e:\n        assert e.status_code == 404, f\"Expected status_code 404, got {e.status_code}\"\n        assert \"42\" in e.detail, f\"Expected detail to mention task id 42, got {e.detail!r}\"\n\ndef test_handle_unauthorized_raises_401():\n    try:\n        exercise.handle_unauthorized()\n        assert False, \"Expected HTTPException to be raised\"\n    except HTTPException as e:\n        assert e.status_code == 401, f\"Expected status_code 401, got {e.status_code}\"\n        assert e.detail == \"Invalid or expired token\", f\"Expected detail 'Invalid or expired token', got {e.detail!r}\"\n\ndef test_handle_task_not_found_different_id():\n    try:\n        exercise.handle_task_not_found(99)\n        assert False, \"Expected HTTPException to be raised\"\n    except HTTPException as e:\n        assert \"99\" in e.detail, f\"Expected detail to mention task id 99, got {e.detail!r}\"",
+    "test_cases": [],
     "order": 6
   },
   {
     "slug": "api-client-test-workflow",
     "title": "Write an API test workflow script",
-    "instruction": "Write a script that simulates testing a Task Manager API. Define these functions (they don't make real HTTP requests — they just return strings showing what would happen):\n\n1. `signup(username, password)` → returns the string `f\"Signed up as {username}\"`\n2. `login(username, password)` → returns the string `f\"Bearer {username}_token\"`\n3. `create_task(title, token)` → returns the string `f\"Created task: {title}\"`\n4. `list_tasks(token)` → returns the string `\"Tasks: [Learn FastAPI, Build capstone]\"`\n\nThen simulate the full workflow:\n- Signup as \"alice\" with password \"secret123\"\n- Login with \"alice\" / \"secret123\" to get a token\n- Create a task \"Learn FastAPI\"\n- Create a task \"Build capstone\"\n- List all tasks\n\nPrint each step's result on its own line.",
-    "starter_code": "def signup(username, password):\n    return f\"Signed up as {username}\"\n\ndef login(username, password):\n    # Return the simulated token\n    pass\n\ndef create_task(title, token):\n    # Return the simulated creation message\n    pass\n\ndef list_tasks(token):\n    # Return the simulated task list\n    pass\n\n# Simulate the full workflow\n",
-    "solution_code": "def signup(username, password):\n    return f\"Signed up as {username}\"\n\ndef login(username, password):\n    return f\"Bearer {username}_token\"\n\ndef create_task(title, token):\n    return f\"Created task: {title}\"\n\ndef list_tasks(token):\n    return \"Tasks: [Learn FastAPI, Build capstone]\"\n\ntoken = login(\"alice\", \"secret123\")\nprint(signup(\"alice\", \"secret123\"))\nprint(token)\nprint(create_task(\"Learn FastAPI\", token))\nprint(create_task(\"Build capstone\", token))\nprint(list_tasks(token))",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Signed up as alice\nBearer alice_token\nCreated task: Learn FastAPI\nCreated task: Build capstone\nTasks: [Learn FastAPI, Build capstone]\n",
-        "comparison_type": "exact"
-      },
-      {
-        "input": "",
-        "expected_output": "def signup",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "def login",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "def create_task",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "def list_tasks",
-        "comparison_type": "code_contains"
-      }
-    ],
+    "instruction": "Write the following functions (they don't make real HTTP requests — they just return strings showing what would happen):\n\n1. `signup(username, password)` → returns the string `f\"Signed up as {username}\"`\n2. `login(username, password)` → returns the string `f\"Bearer {username}_token\"`\n3. `create_task(title, token)` → returns the string `f\"Created task: {title}\"`\n4. `list_tasks(token)` → returns the string `\"Tasks: [Learn FastAPI, Build capstone]\"`",
+    "starter_code": "def signup(username, password):\n    return f\"Signed up as {username}\"\n\ndef login(username, password):\n    # Return the simulated token\n    pass\n\ndef create_task(title, token):\n    # Return the simulated creation message\n    pass\n\ndef list_tasks(token):\n    # Return the simulated task list\n    pass",
+    "solution_code": "def signup(username, password):\n    return f\"Signed up as {username}\"\n\ndef login(username, password):\n    return f\"Bearer {username}_token\"\n\ndef create_task(title, token):\n    return f\"Created task: {title}\"\n\ndef list_tasks(token):\n    return \"Tasks: [Learn FastAPI, Build capstone]\"",
+    "test_suite": "def test_signup_returns_message():\n    result = exercise.signup(\"alice\", \"secret123\")\n    assert result == \"Signed up as alice\", f\"Expected 'Signed up as alice', got {result!r}\"\n\ndef test_login_returns_bearer_token():\n    result = exercise.login(\"alice\", \"secret123\")\n    assert result == \"Bearer alice_token\", f\"Expected 'Bearer alice_token', got {result!r}\"\n\ndef test_login_different_user():\n    result = exercise.login(\"bob\", \"pass456\")\n    assert result == \"Bearer bob_token\", f\"Expected 'Bearer bob_token', got {result!r}\"\n\ndef test_create_task_returns_message():\n    result = exercise.create_task(\"Learn FastAPI\", \"Bearer tok\")\n    assert result == \"Created task: Learn FastAPI\", f\"Expected 'Created task: Learn FastAPI', got {result!r}\"\n\ndef test_list_tasks_returns_fixed_list():\n    result = exercise.list_tasks(\"any_token\")\n    assert result == \"Tasks: [Learn FastAPI, Build capstone]\", f\"Expected 'Tasks: [Learn FastAPI, Build capstone]', got {result!r}\"",
+    "test_cases": [],
     "order": 7
   },
   {
     "slug": "xml-export-tasks",
     "title": "Stretch: Export tasks as XML",
-    "instruction": "Write a function `tasks_to_xml(tasks)` that converts a list of task dictionaries into an XML string using `xml.etree.ElementTree`.\n\nEach task dict has keys: `id`, `title`, `completed`, `owner_id`.\n\nThe output should be a valid XML document with:\n- Root element `<tasks>`\n- Each task as a `<task>` child element\n- Inside each `<task>`: `<id>`, `<title>`, `<completed>`, `<owner_id>` child elements\n\nSerialize with `ET.tostring(root, encoding=\"unicode\", xml_declaration=True)`.\n\nExample input:\n```python\ntasks = [\n    {\"id\": 1, \"title\": \"Learn FastAPI\", \"completed\": False, \"owner_id\": 1},\n    {\"id\": 2, \"title\": \"Build capstone\", \"completed\": True, \"owner_id\": 1},\n]\n```\n\nExpected output (exact format — compact, no indentation):\n```xml\n<?xml version='1.0' encoding='utf-8'?>\n<tasks><task><id>1</id><title>Learn FastAPI</title><completed>false</completed><owner_id>1</owner_id></task><task><id>2</id><title>Build capstone</title><completed>true</completed><owner_id>1</owner_id></task></tasks>\n```\n\nPrint the result for the example input above.\n\nHint: convert `completed` to lowercase string with `str(value).lower()`.",
-    "starter_code": "import xml.etree.ElementTree as ET\n\ndef tasks_to_xml(tasks):\n    # Build XML from task list\n    pass\n\ntasks = [\n    {\"id\": 1, \"title\": \"Learn FastAPI\", \"completed\": False, \"owner_id\": 1},\n    {\"id\": 2, \"title\": \"Build capstone\", \"completed\": True, \"owner_id\": 1},\n]\n\nprint(tasks_to_xml(tasks))",
-    "solution_code": "import xml.etree.ElementTree as ET\n\ndef tasks_to_xml(tasks):\n    root = ET.Element(\"tasks\")\n    for task in tasks:\n        task_elem = ET.SubElement(root, \"task\")\n        ET.SubElement(task_elem, \"id\").text = str(task[\"id\"])\n        ET.SubElement(task_elem, \"title\").text = task[\"title\"]\n        ET.SubElement(task_elem, \"completed\").text = str(task[\"completed\"]).lower()\n        ET.SubElement(task_elem, \"owner_id\").text = str(task[\"owner_id\"])\n    return ET.tostring(root, encoding=\"unicode\", xml_declaration=True)\n\ntasks = [\n    {\"id\": 1, \"title\": \"Learn FastAPI\", \"completed\": False, \"owner_id\": 1},\n    {\"id\": 2, \"title\": \"Build capstone\", \"completed\": True, \"owner_id\": 1},\n]\n\nprint(tasks_to_xml(tasks))",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "<?xml version='1.0' encoding='utf-8'?>\n<tasks><task><id>1</id><title>Learn FastAPI</title><completed>false</completed><owner_id>1</owner_id></task><task><id>2</id><title>Build capstone</title><completed>true</completed><owner_id>1</owner_id></task></tasks>\n",
-        "comparison_type": "exact"
-      },
-      {
-        "input": "",
-        "expected_output": "xml.etree.ElementTree",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "ET.SubElement",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "ET.tostring",
-        "comparison_type": "code_contains"
-      }
-    ],
+    "instruction": "Write a function `tasks_to_xml(tasks)` that converts a list of task dictionaries into an XML string using `xml.etree.ElementTree`.\n\nEach task dict has keys: `id`, `title`, `completed`, `owner_id`.\nThe output should be a valid XML document with:\n- Root element `<tasks>`\n- Each task as a `<task>` child element\n- Inside each `<task>`: `<id>`, `<title>`, `<completed>`, `<owner_id>` child elements\n\nSerialize with `ET.tostring(root, encoding=\"unicode\", xml_declaration=True)`.\n\nHint: convert `completed` to lowercase string with `str(value).lower()`.",
+    "starter_code": "import xml.etree.ElementTree as ET\n\ndef tasks_to_xml(tasks):\n    # Build XML from task list and return it\n    pass",
+    "solution_code": "import xml.etree.ElementTree as ET\n\ndef tasks_to_xml(tasks):\n    root = ET.Element(\"tasks\")\n    for task in tasks:\n        task_elem = ET.SubElement(root, \"task\")\n        ET.SubElement(task_elem, \"id\").text = str(task[\"id\"])\n        ET.SubElement(task_elem, \"title\").text = task[\"title\"]\n        ET.SubElement(task_elem, \"completed\").text = str(task[\"completed\"]).lower()\n        ET.SubElement(task_elem, \"owner_id\").text = str(task[\"owner_id\"])\n    return ET.tostring(root, encoding=\"unicode\", xml_declaration=True)",
+    "test_suite": "import xml.etree.ElementTree as ET\n\ndef test_converts_two_tasks():\n    tasks = [\n        {\"id\": 1, \"title\": \"Learn FastAPI\", \"completed\": False, \"owner_id\": 1},\n        {\"id\": 2, \"title\": \"Build capstone\", \"completed\": True, \"owner_id\": 1},\n    ]\n    result = exercise.tasks_to_xml(tasks)\n    root = ET.fromstring(result)\n    assert root.tag == \"tasks\", f\"Expected root tag 'tasks', got '{root.tag}'\"\n    task_elems = root.findall(\"task\")\n    assert len(task_elems) == 2, f\"Expected 2 task elements, got {len(task_elems)}\"\n    assert task_elems[0].find(\"id\").text == \"1\", f\"Expected id '1', got {task_elems[0].find('id').text!r}\"\n    assert task_elems[0].find(\"title\").text == \"Learn FastAPI\", f\"Expected title 'Learn FastAPI', got {task_elems[0].find('title').text!r}\"\n    assert task_elems[0].find(\"completed\").text == \"false\", f\"Expected completed 'false', got {task_elems[0].find('completed').text!r}\"\n\ndef test_handles_single_task():\n    tasks = [{\"id\": 5, \"title\": \"Test\", \"completed\": True, \"owner_id\": 2}]\n    result = exercise.tasks_to_xml(tasks)\n    root = ET.fromstring(result)\n    task_elems = root.findall(\"task\")\n    assert len(task_elems) == 1, f\"Expected 1 task, got {len(task_elems)}\"\n    assert task_elems[0].find(\"completed\").text == \"true\", f\"Expected completed 'true', got {task_elems[0].find('completed').text!r}\"\n    assert task_elems[0].find(\"owner_id\").text == \"2\", f\"Expected owner_id '2', got {task_elems[0].find('owner_id').text!r}\"\n\ndef test_handles_empty_list():\n    result = exercise.tasks_to_xml([])\n    root = ET.fromstring(result)\n    assert root.tag == \"tasks\", f\"Expected root tag 'tasks', got '{root.tag}'\"\n    assert len(root.findall(\"task\")) == 0, \"Expected no task elements for empty input\"\n\ndef test_includes_xml_declaration():\n    result = exercise.tasks_to_xml([{\"id\": 1, \"title\": \"A\", \"completed\": False, \"owner_id\": 1}])\n    assert result.startswith(\"<?xml\"), f\"Expected XML declaration at start, got {result[:50]!r}\"",
+    "test_cases": [],
     "order": 8
   }
 ]
