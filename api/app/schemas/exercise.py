@@ -36,3 +36,4 @@ class ExerciseDetail(BaseModel):
     language: str = "python"
     order: int
     lesson_id: int
+    test_suite: str | None = None  # Read-only; used by exercise runner
