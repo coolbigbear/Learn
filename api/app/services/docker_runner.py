@@ -11,6 +11,11 @@ volume mount path-resolution issues when the app itself runs in Docker / DinD
 environments). See https://docker-py.readthedocs.io/ for the SDK reference.
 
 On timeout, the container is force-killed to prevent dangling resources.
+
+A ``warm_up()`` method is provided to prime the Docker daemon (overlay
+filesystem, cgroups) on application startup, avoiding first-submission
+timeouts caused by cold-start overhead on resource-constrained hosts
+such as the Raspberry Pi.
 """
 
 import asyncio
@@ -41,7 +46,9 @@ class LanguageConfigError(Exception):
     """Raised when the language configuration is invalid or missing."""
 
 
-def _render_harness(user_code: str, test_cases: list[dict]) -> str:
+def _render_harness(
+    user_code: str, test_cases: list[dict], test_suite: str | None = None
+) -> str:
     """Render the harness template with user code and test cases.
 
     Reads the Jinja2-style template from the harness file and substitutes
@@ -190,6 +197,7 @@ class DockerRunner:
             languages_config_path = DOCKER_LANGUAGES_CONFIG
         self._client = None
         self.languages: dict = {}
+        self._warmed_up: bool = False
         self._load_config(languages_config_path)
 
     @property
@@ -293,6 +301,116 @@ class DockerRunner:
             )
         return cfg
 
+
+    async def warm_up(self):
+        """Prime the Docker daemon for faster first-submission response.
+
+        For each configured language, this method:
+        1. Ensures the Docker image is available locally (pulls if needed)
+        2. Creates and runs a throwaway container that exits immediately
+        3. Removes the container
+
+        This initializes overlay filesystem layers, cgroup controllers,
+        and process-scheduling infrastructure so real user submissions
+        don't hit cold-start latency on the first attempt.
+
+        The method is safe to call multiple times -- subsequent calls are
+        no-ops after the first successful warm-up.
+        """
+        if self._warmed_up or self._client is None:
+            return
+
+        logger.info("Warming up Docker sandbox runner ...")
+
+        for lang, cfg in self.languages.items():
+            image = cfg.get("image", "")
+            if not image:
+                continue
+
+            container = None
+            try:
+                # Step 1: Ensure the image is available locally.
+                # ``pull()`` is a fast no-op when the image is already cached,
+                # but forces Docker to resolve the image manifest and prime
+                # the layer cache. This avoids ImageNotFound errors on the
+                # very first container create() call.
+                logger.info("Warm-up: ensuring image '%s' is available ...", image)
+                self.client.images.pull(image)
+                logger.info("Warm-up: image '%s' ready", image)
+
+                # Step 2: Create a minimal throwaway container that exits
+                # immediately. This primes overlay filesystem initialization,
+                # cgroup creation, and process-startup overhead so that real
+                # submissions don't pay this latency tax.
+                logger.info("Warm-up: creating throwaway container for '%s' ...", image)
+                container = self.client.containers.create(
+                    image=image,
+                    command=cfg.get("run_command", ["python3", "-c", "print('warm-up')"]),
+                    network_disabled=True,
+                    read_only=False,
+                    mem_limit=cfg.get("memory_limit", "64m"),
+                    nano_cpus=cfg.get("cpu_limit", 250000000),
+                    pids_limit=cfg.get("pids_limit", 50),
+                    user="sandbox",
+                    cap_drop=["ALL"],
+                )
+
+                # Inject a minimal harness that just prints OK and exits,
+                # so we don't need the full harness template.
+                warmup_script = (
+                    '#!/usr/bin/env python3\n'
+                    'import json\n'
+                    "result = {'passed': True, 'actual_output': 'warm-up\\n', "
+                    "'expected_output': '', 'errors': '', 'test_results': []}\n"
+                    'print(json.dumps(result))\n'
+                )
+                self._inject_harness(container, warmup_script)
+
+                # Start and wait with a generous timeout (warm-up itself can
+                # be slow on cold Docker on ARM).
+                logger.info("Warm-up: starting throwaway container ...")
+                container.start()
+                container.wait(timeout=30)
+                logger.info(
+                    "Warm-up: container for '%s' completed successfully", image
+                )
+
+            except Exception as exc:
+                logger.warning(
+                    "Warm-up: failed for image '%s': %s (non-fatal)", image, exc
+                )
+            finally:
+                # Always clean up the warm-up container
+                try:
+                    if container is not None:
+                        _remove_container_with_retry(container)
+                except Exception:
+                    pass
+
+        self._warmed_up = True
+        logger.info("Docker sandbox runner warm-up complete")
+
+    def _inject_harness(self, container, harness_script: str):
+        """Inject a harness script into a container via put_archive.
+
+        Builds a tar archive containing the harness file and uses the Docker
+        API's put_archive() to copy it to /tmp/runner/ inside the container.
+        """
+        harness_filename = "runner.py"
+        tar_entry = f"runner/{harness_filename}"
+        tar_buffer = io.BytesIO()
+        with tarfile.open(fileobj=tar_buffer, mode="w") as tar:
+            file_info = tarfile.TarInfo(name=tar_entry)
+            script_bytes = harness_script.encode("utf-8")
+            file_info.size = len(script_bytes)
+            file_info.mode = 0o644
+            tar.addfile(file_info, io.BytesIO(script_bytes))
+        tar_buffer.seek(0)
+        tar_data = tar_buffer.getvalue()
+        container.put_archive(path="/tmp", data=tar_data)
+
+
+
     async def run_code(
         self,
         user_code: str,
@@ -329,7 +447,7 @@ class DockerRunner:
                 asyncio.get_event_loop().run_in_executor(
                     None, self._run_container, cfg, harness_script
                 ),
-                timeout=cfg["timeout_seconds"] + 5,
+                timeout=cfg["timeout_seconds"] + 10,
             )
             return _truncate_output(result)
         except asyncio.TimeoutError:
