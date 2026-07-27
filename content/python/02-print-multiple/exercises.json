@@ -5,7 +5,7 @@
     "instruction": "Use a single print() to output **Hello Python**.",
     "starter_code": "# Print Hello Python\n",
     "solution_code": "print(\"Hello\", \"Python\")",
-    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"Hello Python\\n\"",
+    "test_suite": "import io, sys\nimport re\n\ndef test_prints_hello_python():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"Hello Python\\n\"",
     "test_cases": [],
     "order": 1
   },
@@ -15,7 +15,7 @@
     "instruction": "Use print() to output **I love coding**.",
     "starter_code": "# Print three items with commas\n",
     "solution_code": "print(\"I\", \"love\", \"coding\")",
-    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"I love coding\\n\"",
+    "test_suite": "import io, sys\nimport re\n\ndef test_prints_i_love_coding():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"I love coding\\n\"",
     "test_cases": [],
     "order": 2
   },
@@ -25,7 +25,7 @@
     "instruction": "Print favorite food and favorite color in one print().",
     "starter_code": "# Print favorite food and color\n",
     "solution_code": "print(\"Pizza\", \"Blue\")",
-    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert re.match(r\".+ .+\\n\", output)",
+    "test_suite": "import io, sys\nimport re\n\ndef test_prints_two_words():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert re.match(r\".+ .+\\n\", output)",
     "test_cases": [],
     "order": 3
   },
@@ -35,7 +35,7 @@
     "instruction": "Print first and last name on same line.",
     "starter_code": "# Print first and last name\n",
     "solution_code": "print(\"Ada\", \"Lovelace\")",
-    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert re.match(r\".+ .+\\n\", output)",
+    "test_suite": "import io, sys\nimport re\n\ndef test_prints_two_words_regex():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert re.match(r\".+ .+\\n\", output)",
     "test_cases": [],
     "order": 4
   },
@@ -45,7 +45,7 @@
     "instruction": "Print: **I am <age> years old** with age as a number.",
     "starter_code": "# Print: I am [age] years old\n",
     "solution_code": "print(\"I am\", 30, \"years old\")",
-    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert re.match(r\"I am \\d+ years old\\n\", output)",
+    "test_suite": "import io, sys\nimport re\n\ndef test_prints_age_format():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert re.match(r\"I am \\d+ years old\\n\", output)",
     "test_cases": [],
     "order": 5
   }

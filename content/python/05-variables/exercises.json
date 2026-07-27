@@ -5,7 +5,7 @@
     "instruction": "Create `greeting = \"Hello, Python!\"` and print it.",
     "starter_code": "# Create a greeting variable and print it\n",
     "solution_code": "greeting = \"Hello, Python!\"\nprint(greeting)",
-    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"Hello, Python!\\n\"",
+    "test_suite": "import io, sys\nimport re\n\ndef test_prints_greeting_variable():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"Hello, Python!\\n\"",
     "test_cases": [],
     "order": 1
   },
@@ -15,7 +15,7 @@
     "instruction": "Swap `x=5` and `y=10`. Print both after swapping.",
     "starter_code": "x = 5\ny = 10\n# Swap the values here\n",
     "solution_code": "x = 5\ny = 10\nx, y = y, x\nprint(x)\nprint(y)",
-    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"10\\n5\\n\"",
+    "test_suite": "import io, sys\nimport re\n\ndef test_prints_swapped_values():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"10\\n5\\n\"",
     "test_cases": [],
     "order": 2
   },
@@ -25,7 +25,7 @@
     "instruction": "Create int, float, and str variables. Print their types.",
     "starter_code": "# Create three variables of different types and print their types\n",
     "solution_code": "my_int = 7\nmy_float = 3.14\nmy_str = \"hello\"\nprint(type(my_int))\nprint(type(my_float))\nprint(type(my_str))",
-    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"<class 'int'>\\n<class 'float'>\\n<class 'str'>\\n\"",
+    "test_suite": "import io, sys\nimport re\n\ndef test_prints_types():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"<class 'int'>\\n<class 'float'>\\n<class 'str'>\\n\"",
     "test_cases": [],
     "order": 3
   }
