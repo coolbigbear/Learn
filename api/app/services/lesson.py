@@ -45,6 +45,13 @@ async def get_lesson_by_slug(db: AsyncSession, slug: str) -> Lesson | None:
     return result.scalar_one_or_none()
 
 
+async def get_lesson_by_id(db: AsyncSession, lesson_id: int) -> Lesson | None:
+    result = await db.execute(
+        select(Lesson).options(selectinload(Lesson.exercises)).where(Lesson.id == lesson_id)
+    )
+    return result.scalar_one_or_none()
+
+
 async def get_exercise_by_id(db: AsyncSession, exercise_id: int) -> Exercise | None:
     result = await db.execute(select(Exercise).where(Exercise.id == exercise_id))
     return result.scalar_one_or_none()

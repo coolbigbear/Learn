@@ -13,6 +13,7 @@ from app.schemas.lesson import (
     PathGroup,
 )
 from app.services.lesson import (
+    get_lesson_by_id,
     get_lesson_by_slug,
     get_lessons_grouped_by_path,
     get_lessons_with_counts,
@@ -31,16 +32,15 @@ async def list_lessons(
     return LessonListResponse(lessons=lessons)
 
 
-# Path display metadata
 PATH_META = {
     "core": {
         "display_name": "Python Fundamentals",
-        "description": "Master the core building blocks of Python — variables, data types, functions, and object-oriented programming.",
+        "description": "Master the core building blocks of Python \u2014 variables, data types, functions, and object-oriented programming.",
         "color": "indigo",
     },
     "data-processing": {
         "display_name": "Data Processing",
-        "description": "Learn to work with real-world data — CSV files, JSON, and APIs using Python.",
+        "description": "Learn to work with real-world data \u2014 CSV files, JSON, and APIs using Python.",
         "color": "green",
     },
     "api": {
@@ -91,7 +91,13 @@ async def get_lesson(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
+    # First try slug lookup
     lesson = await get_lesson_by_slug(db, slug)
+
+    # If not found and slug looks numeric, try ID lookup
+    if lesson is None and slug.isdigit():
+        lesson = await get_lesson_by_id(db, int(slug))
+
     if lesson is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson not found")
 
