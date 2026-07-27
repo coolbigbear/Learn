@@ -139,11 +139,11 @@ async def _sync_existing_lesson_paths(
 async def _sync_exercise_test_cases(
     session: AsyncSession, base_dir: Path, manifest: list[dict]
 ) -> int:
-    """Sync exercise test_cases from content files to DB.
+    """Sync exercise test_cases and test_suite from content files to DB.
 
     Reads base_dir/<lesson>/exercises.json for each lesson in the manifest and
-    updates the database if any exercise's test_cases differ. Returns count of
-    updates made.
+    updates the database if any exercise's test_cases or test_suite differ.
+    Returns count of updates made.
 
     Uses lesson slug + exercise slug to uniquely identify exercises (the
     Exercise.slug is unique per lesson, not globally).
@@ -174,6 +174,7 @@ async def _sync_exercise_test_cases(
         for content_ex in exercises_data:
             ex_slug = content_ex["slug"]
             content_test_cases = content_ex.get("test_cases", [])
+            content_test_suite = content_ex.get("test_suite", None)
 
             result = await session.execute(
                 select(Exercise).where(
@@ -186,8 +187,18 @@ async def _sync_exercise_test_cases(
                 continue
 
             db_test_cases = db_exercise.test_cases or []
+            db_test_suite = db_exercise.test_suite
+            needs_update = False
+
             if db_test_cases != content_test_cases:
                 db_exercise.test_cases = content_test_cases
+                needs_update = True
+
+            if db_test_suite != content_test_suite:
+                db_exercise.test_suite = content_test_suite
+                needs_update = True
+
+            if needs_update:
                 update_count += 1
 
     return update_count
@@ -242,6 +253,7 @@ async def _seed_lesson(
             starter_code=ex.get("starter_code", "# Write your code here\n"),
             solution_code=ex.get("solution_code", ""),
             test_cases=ex.get("test_cases", []),
+            test_suite=ex.get("test_suite", None),
             language="python",
             order=ex["order"],
         )
