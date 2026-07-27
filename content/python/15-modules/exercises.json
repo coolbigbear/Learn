@@ -22,16 +22,11 @@
   {
     "slug": "mod-main-guard",
     "title": "Use __name__ == '__main__'",
-    "instruction": "Write a program that defines a function `run()` which prints 'Program started'. Call `run()` only when the script is executed directly (not when imported).",
-    "starter_code": "def run():\n    print(\"Program started\")\n\n# Your code here\n",
-    "solution_code": "def run():\n    print(\"Program started\")\n\nif __name__ == \"__main__\":\n    run()\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Program started\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `run()` that **returns** the string `\"Program started\"`. Below the function, add an `if __name__ == \"__main__\":` guard that calls `run()` and prints its result. When the module is imported, `run()` should not be called automatically.",
+    "starter_code": "def run():\n    # Return \"Program started\"\n    pass\n\n# Add the __name__ guard below\n",
+    "solution_code": "def run():\n    return \"Program started\"\n\nif __name__ == \"__main__\":\n    print(run())",
+    "test_suite": "def test_run_returns_correct_string():\n    result = exercise.run()\n    assert result == \"Program started\", f\"Expected 'Program started', got {result!r}\"\n\ndef test_main_guard_present():\n    with open(exercise.__file__, \"r\") as f:\n        source = f.read()\n    has_guard = \"if __name__ == \\\"__main__\\\":\" in source or \"if __name__ == '__main__':\" in source\n    assert has_guard, \"The __name__ guard pattern 'if __name__ == \\\"__main__\\\":' was not found in the source code\"\n\ndef test_run_not_executed_on_import():\n    result = exercise.run()\n    assert result is not None, \"run() should return a value, not None\"",
+    "test_cases": [],
     "order": 3
   }
 ]
