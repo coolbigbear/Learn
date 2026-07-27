@@ -1,5 +1,6 @@
 """FastAPI app factory with CORS, static file serving, and all routers."""
 
+import asyncio
 import os
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -91,6 +92,25 @@ async def lifespan(app: FastAPI):
                 print(f"[content_seed] Warning: could not seed content: {error}")
         except Exception as e:
             print(f"[content_seed] Error seeding content: {e}")
+
+
+
+    # --- Docker sandbox warm-up (non-blocking) -------------------------
+    # Fire off a background task to prime the Docker daemon. This ensures
+    # that the first real exercise submission doesn't time out due to
+    # cold-start overhead (overlay fs, cgroups, process startup) on the
+    # Raspberry Pi / ARM platform.  The warm-up runs asynchronously so it
+    # never blocks server startup or health checks.
+    try:
+        from app.services.docker_runner import get_runner
+
+        runner = get_runner()
+        if runner is not None:
+            asyncio.create_task(runner.warm_up())
+            print("[docker] Warm-up task scheduled")
+    except Exception:
+        pass
+
 
     yield  # Always yield — every code path must reach this
 
