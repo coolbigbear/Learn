@@ -2,156 +2,41 @@
   {
     "slug": "form-login",
     "title": "Login form endpoint",
-    "instruction": "Create a FastAPI POST endpoint at `/login` that accepts two URL-encoded form fields: `username` (str) and `password` (str). Return `{\"message\": \"Welcome, {username}!\"}`.",
-    "starter_code": "from fastapi import FastAPI, Form\n\napp = FastAPI()\n\n# Your code here\n",
-    "solution_code": "from fastapi import FastAPI, Form\n\napp = FastAPI()\n\n@app.post(\"/login\")\nasync def login(username: str = Form(), password: str = Form()):\n    return {\"message\": f\"Welcome, {username}!\"}\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "",
-        "comparison_type": "exact"
-      },
-      {
-        "input": "",
-        "expected_output": "@app.post(\"/login\")",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "def login(username: str = Form()",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "password: str = Form()",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "return {\"message\":",
-        "comparison_type": "code_contains"
-      }
-    ],
+    "instruction": "Create a FastAPI POST endpoint at `/login` that accepts two URL-encoded form fields: `username` (str) and `password` (str). Return `{\"message\": \"Welcome, {username}!\"}`.\n\nUse `Form()` from FastAPI to declare the form parameters.",
+    "starter_code": "from fastapi import FastAPI, Form\n\napp = FastAPI()\n\n# Your code here",
+    "test_suite": "def test_login_endpoint_exists():\n    routes = [(r.path, r.methods) for r in exercise.app.routes]\n    assert (\"/login\", {\"POST\"}) in routes or (\"/login\", {\"POST\", \"OPTIONS\"}) in routes, f\"/login POST not found: {routes}\"\n\ndef test_login_returns_welcome_message():\n    from starlette.testclient import TestClient\n    client = TestClient(exercise.app)\n    response = client.post(\"/login\", data={\"username\": \"Alice\", \"password\": \"secret\"})\n    assert response.status_code == 200, f\"Expected 200, got {response.status_code}\"\n    assert response.json() == {\"message\": \"Welcome, Alice!\"}, f\"Got {response.json()}\"\n\ndef test_login_with_different_username():\n    from starlette.testclient import TestClient\n    client = TestClient(exercise.app)\n    response = client.post(\"/login\", data={\"username\": \"Bob\", \"password\": \"pass123\"})\n    assert response.status_code == 200\n    assert response.json() == {\"message\": \"Welcome, Bob!\"}, f\"Got {response.json()}\"",
+    "solution_code": "from fastapi import FastAPI, Form\n\napp = FastAPI()\n\n@app.post(\"/login\")\nasync def login(username: str = Form(), password: str = Form()):\n    return {\"message\": f\"Welcome, {username}!\"}",
+    "test_cases": [],
     "order": 1
   },
   {
     "slug": "file-upload-size",
     "title": "File upload with size check",
-    "instruction": "Create a POST endpoint at `/upload` that accepts a file via `UploadFile`. Read the file, and return its filename and size in bytes as `{\"filename\": \"...\", \"size_bytes\": 123}`.",
-    "starter_code": "from fastapi import FastAPI, File, UploadFile\n\napp = FastAPI()\n\n# Your code here\n",
-    "solution_code": "from fastapi import FastAPI, File, UploadFile\n\napp = FastAPI()\n\n@app.post(\"/upload\")\nasync def upload(file: UploadFile = File()):\n    contents = await file.read()\n    return {\"filename\": file.filename, \"size_bytes\": len(contents)}\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "",
-        "comparison_type": "exact"
-      },
-      {
-        "input": "",
-        "expected_output": "@app.post(\"/upload\")",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "UploadFile = File()",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "await file.read()",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "return {\"filename\": file.filename, \"size_bytes\": len(contents)}",
-        "comparison_type": "code_contains"
-      }
-    ],
+    "instruction": "Create a POST endpoint at `/upload` that accepts a file via `UploadFile`. Read the file contents, and return its filename and size in bytes as `{\"filename\": \"...\", \"size_bytes\": 123}`.\n\nUse `File()` and `UploadFile` from FastAPI.",
+    "starter_code": "from fastapi import FastAPI, File, UploadFile\n\napp = FastAPI()\n\n# Your code here",
+    "test_suite": "def test_upload_endpoint_exists():\n    routes = [(r.path, r.methods) for r in exercise.app.routes]\n    assert (\"/upload\", {\"POST\"}) in routes or (\"/upload\", {\"POST\", \"OPTIONS\"}) in routes, f\"/upload POST not found: {routes}\"\n\ndef test_upload_text_file():\n    from starlette.testclient import TestClient\n    client = TestClient(exercise.app)\n    response = client.post(\"/upload\", files={\"file\": (\"hello.txt\", b\"Hello World\")})\n    assert response.status_code == 200, f\"Expected 200, got {response.status_code}\"\n    data = response.json()\n    assert data[\"filename\"] == \"hello.txt\", f\"Expected 'hello.txt', got {data['filename']!r}\"\n    assert data[\"size_bytes\"] == 11, f\"Expected 11, got {data['size_bytes']}\"\n\ndef test_upload_empty_file():\n    from starlette.testclient import TestClient\n    client = TestClient(exercise.app)\n    response = client.post(\"/upload\", files={\"file\": (\"empty.txt\", b\"\")})\n    assert response.status_code == 200\n    data = response.json()\n    assert data[\"filename\"] == \"empty.txt\"\n    assert data[\"size_bytes\"] == 0, f\"Expected 0, got {data['size_bytes']}\"",
+    "solution_code": "from fastapi import FastAPI, File, UploadFile\n\napp = FastAPI()\n\n@app.post(\"/upload\")\nasync def upload(file: UploadFile = File()):\n    contents = await file.read()\n    return {\"filename\": file.filename, \"size_bytes\": len(contents)}",
+    "test_cases": [],
     "order": 2
   },
   {
     "slug": "validated-registration",
     "title": "Validated registration form",
-    "instruction": "Create a POST endpoint at `/signup` with the following form fields and validation:\n- `username`: str, Form, min_length=3, max_length=20\n- `email`: str, Form\n- `age`: int, Form, ge=13, le=120\n\nReturn the submitted data as a dictionary.",
-    "starter_code": "from fastapi import FastAPI, Form\n\napp = FastAPI()\n\n# Your code here\n",
-    "solution_code": "from fastapi import FastAPI, Form\n\napp = FastAPI()\n\n@app.post(\"/signup\")\nasync def signup(\n    username: str = Form(min_length=3, max_length=20),\n    email: str = Form(),\n    age: int = Form(ge=13, le=120)\n):\n    return {\"username\": username, \"email\": email, \"age\": age}\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "",
-        "comparison_type": "exact"
-      },
-      {
-        "input": "",
-        "expected_output": "@app.post(\"/signup\")",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "def signup(",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "Form(min_length=3, max_length=20)",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "Form(ge=13, le=120)",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "return {\"username\": username, \"email\": email, \"age\": age}",
-        "comparison_type": "code_contains"
-      }
-    ],
+    "instruction": "Create a POST endpoint at `/signup` with the following form fields and validation:\n- `username`: str, Form, min_length=3, max_length=20\n- `email`: str, Form\n- `age`: int, Form, ge=13, le=120\n\nReturn the submitted data as a dictionary with keys `username`, `email`, and `age`.",
+    "starter_code": "from fastapi import FastAPI, Form\n\napp = FastAPI()\n\n# Your code here",
+    "test_suite": "def test_signup_endpoint_exists():\n    routes = [(r.path, r.methods) for r in exercise.app.routes]\n    assert (\"/signup\", {\"POST\"}) in routes or (\"/signup\", {\"POST\", \"OPTIONS\"}) in routes, f\"/signup POST not found: {routes}\"\n\ndef test_signup_valid_data():\n    from starlette.testclient import TestClient\n    client = TestClient(exercise.app)\n    response = client.post(\"/signup\", data={\"username\": \"alice123\", \"email\": \"alice@test.com\", \"age\": 25})\n    assert response.status_code == 200, f\"Expected 200, got {response.status_code}\"\n    data = response.json()\n    assert data[\"username\"] == \"alice123\"\n    assert data[\"email\"] == \"alice@test.com\"\n    assert data[\"age\"] == 25\n\ndef test_signup_rejects_short_username():\n    from starlette.testclient import TestClient\n    client = TestClient(exercise.app)\n    response = client.post(\"/signup\", data={\"username\": \"ab\", \"email\": \"a@b.com\", \"age\": 20})\n    assert response.status_code == 422, f\"Expected 422 for short username, got {response.status_code}\"\n\ndef test_signup_rejects_underage():\n    from starlette.testclient import TestClient\n    client = TestClient(exercise.app)\n    response = client.post(\"/signup\", data={\"username\": \"validuser\", \"email\": \"a@b.com\", \"age\": 10})\n    assert response.status_code == 422, f\"Expected 422 for underage, got {response.status_code}\"",
+    "solution_code": "from fastapi import FastAPI, Form\n\napp = FastAPI()\n\n@app.post(\"/signup\")\nasync def signup(\n    username: str = Form(min_length=3, max_length=20),\n    email: str = Form(),\n    age: int = Form(ge=13, le=120)\n):\n    return {\"username\": username, \"email\": email, \"age\": age}",
+    "test_cases": [],
     "order": 3
   },
   {
     "slug": "profile-with-avatar",
     "title": "Profile with avatar upload",
-    "instruction": "Create a POST endpoint at `/profile` that accepts:\n- `name`: str, Form\n- `bio`: str, Form, max_length=200\n- `avatar`: UploadFile\n\nRead the avatar file and return `{\"name\": name, \"bio\": bio, \"avatar_filename\": avatar.filename, \"avatar_size\": len(contents)}`.",
-    "starter_code": "from fastapi import FastAPI, Form, File, UploadFile\n\napp = FastAPI()\n\n# Your code here\n",
-    "solution_code": "from fastapi import FastAPI, Form, File, UploadFile\n\napp = FastAPI()\n\n@app.post(\"/profile\")\nasync def create_profile(\n    name: str = Form(),\n    bio: str = Form(max_length=200),\n    avatar: UploadFile = File()\n):\n    contents = await avatar.read()\n    return {\n        \"name\": name,\n        \"bio\": bio,\n        \"avatar_filename\": avatar.filename,\n        \"avatar_size\": len(contents)\n    }\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "",
-        "comparison_type": "exact"
-      },
-      {
-        "input": "",
-        "expected_output": "@app.post(\"/profile\")",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "def create_profile(",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "name: str = Form()",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "bio: str = Form(max_length=200)",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "avatar: UploadFile = File()",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "await avatar.read()",
-        "comparison_type": "code_contains"
-      }
-    ],
+    "instruction": "Create a POST endpoint at `/profile` that accepts:\n- `name`: str, Form\n- `bio`: str, Form, max_length=200\n- `avatar`: UploadFile, File\n\nRead the avatar file contents and return `{\"name\": name, \"bio\": bio, \"avatar_filename\": avatar.filename, \"avatar_size\": len(contents)}`.",
+    "starter_code": "from fastapi import FastAPI, Form, File, UploadFile\n\napp = FastAPI()\n\n# Your code here",
+    "test_suite": "def test_profile_endpoint_exists():\n    routes = [(r.path, r.methods) for r in exercise.app.routes]\n    assert (\"/profile\", {\"POST\"}) in routes or (\"/profile\", {\"POST\", \"OPTIONS\"}) in routes, f\"/profile POST not found: {routes}\"\n\ndef test_profile_with_avatar():\n    from starlette.testclient import TestClient\n    client = TestClient(exercise.app)\n    response = client.post(\n        \"/profile\",\n        data={\"name\": \"Alice\", \"bio\": \"Python developer\"},\n        files={\"avatar\": (\"avatar.png\", b\"fake-image-bytes\")}\n    )\n    assert response.status_code == 200, f\"Expected 200, got {response.status_code}\"\n    data = response.json()\n    assert data[\"name\"] == \"Alice\"\n    assert data[\"bio\"] == \"Python developer\"\n    assert data[\"avatar_filename\"] == \"avatar.png\", f\"Got {data['avatar_filename']!r}\"\n    assert data[\"avatar_size\"] == 16, f\"Expected 16, got {data['avatar_size']}\"\n\ndef test_profile_rejects_long_bio():\n    from starlette.testclient import TestClient\n    client = TestClient(exercise.app)\n    long_bio = \"x\" * 201\n    response = client.post(\n        \"/profile\",\n        data={\"name\": \"Bob\", \"bio\": long_bio},\n        files={\"avatar\": (\"pic.png\", b\"data\")}\n    )\n    assert response.status_code == 422, f\"Expected 422 for long bio, got {response.status_code}\"",
+    "solution_code": "from fastapi import FastAPI, Form, File, UploadFile\n\napp = FastAPI()\n\n@app.post(\"/profile\")\nasync def create_profile(\n    name: str = Form(),\n    bio: str = Form(max_length=200),\n    avatar: UploadFile = File()\n):\n    contents = await avatar.read()\n    return {\n        \"name\": name,\n        \"bio\": bio,\n        \"avatar_filename\": avatar.filename,\n        \"avatar_size\": len(contents)\n    }",
+    "test_cases": [],
     "order": 4
   }
 ]

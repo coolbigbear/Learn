@@ -2,121 +2,81 @@
   {
     "slug": "build-json-payload",
     "title": "Build a JSON payload for an API request",
-    "instruction": "Build a Python dictionary that represents a JSON payload for creating a new product in an API. The payload should have:\n- 'name': 'Wireless Mouse'\n- 'price': 29.99\n- 'in_stock': True\n- 'tags': ['electronics', 'accessories']\n\nThen serialize it to a JSON string using `json.dumps(indent=2)` and print it.",
-    "starter_code": "import json\n\n# Build the payload dictionary\npayload = {\n    # Your code here\n}\n\n# Serialize and print\n",
-    "solution_code": "import json\n\npayload = {\n    \"name\": \"Wireless Mouse\",\n    \"price\": 29.99,\n    \"in_stock\": True,\n    \"tags\": [\"electronics\", \"accessories\"]\n}\n\nprint(json.dumps(payload, indent=2))\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "{\n  \"name\": \"Wireless Mouse\",\n  \"price\": 29.99,\n  \"in_stock\": true,\n  \"tags\": [\n    \"electronics\",\n    \"accessories\"\n  ]\n}\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `create_product_payload()` that **returns** a dictionary representing a product for an API request. The payload should have:\n- `'name'`: `'Wireless Mouse'`\n- `'price'`: `29.99`\n- `'in_stock'`: `True`\n- `'tags'`: `['electronics', 'accessories']`",
+    "starter_code": "def create_product_payload():\n    # Return the product payload dictionary\n    pass",
+    "test_suite": "def test_has_name():\n    result = exercise.create_product_payload()\n    assert result[\"name\"] == \"Wireless Mouse\", f\"Expected 'Wireless Mouse', got {result['name']!r}\"\n\ndef test_has_price():\n    result = exercise.create_product_payload()\n    assert result[\"price\"] == 29.99, f\"Expected 29.99, got {result['price']}\"\n\ndef test_has_in_stock():\n    result = exercise.create_product_payload()\n    assert result[\"in_stock\"] == True, f\"Expected True, got {result['in_stock']}\"\n\ndef test_has_tags():\n    result = exercise.create_product_payload()\n    assert result[\"tags\"] == [\"electronics\", \"accessories\"], f\"Expected ['electronics', 'accessories'], got {result['tags']}\"\n\ndef test_returns_dict():\n    result = exercise.create_product_payload()\n    assert isinstance(result, dict), f\"Expected a dict, got {type(result).__name__}\"",
+    "solution_code": "def create_product_payload():\n    return {\n        \"name\": \"Wireless Mouse\",\n        \"price\": 29.99,\n        \"in_stock\": True,\n        \"tags\": [\"electronics\", \"accessories\"]\n    }",
+    "test_cases": [],
     "order": 1
   },
   {
     "slug": "parse-api-response",
     "title": "Parse a simulated API response",
-    "instruction": "The variable `api_response` contains a JSON string that simulates what an API returns after creating a user. Parse it with `json.loads()`, then print the user's name and email, each on its own line.\n\nJSON string:\n```\n{\"id\": 101, \"name\": \"Alice\", \"email\": \"alice@example.com\", \"role\": \"admin\"}\n```",
-    "starter_code": "import json\n\napi_response = '{\"id\": 101, \"name\": \"Alice\", \"email\": \"alice@example.com\", \"role\": \"admin\"}'\n\n# Parse and print name and email\n",
-    "solution_code": "import json\n\napi_response = '{\"id\": 101, \"name\": \"Alice\", \"email\": \"alice@example.com\", \"role\": \"admin\"}'\n\ndata = json.loads(api_response)\nprint(data[\"name\"])\nprint(data[\"email\"])\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Alice\nalice@example.com\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `parse_user_data(json_string)` that takes a JSON string representing an API response and **returns** a dictionary with the user's `name` and `email`.\n\nFor example, given the JSON `{\"id\": 101, \"name\": \"Alice\", \"email\": \"alice@example.com\", \"role\": \"admin\"}`, the function should return `{\"name\": \"Alice\", \"email\": \"alice@example.com\"}`.\n\nUse `json.loads()` to parse the string.",
+    "starter_code": "import json\n\ndef parse_user_data(json_string):\n    # Parse the JSON and return a dict with 'name' and 'email'\n    pass",
+    "test_suite": "def test_parse_alice():\n    result = exercise.parse_user_data('{\"id\": 101, \"name\": \"Alice\", \"email\": \"alice@example.com\", \"role\": \"admin\"}')\n    assert result == {\"name\": \"Alice\", \"email\": \"alice@example.com\"}, f\"Got {result}\"\n\ndef test_parse_bob():\n    result = exercise.parse_user_data('{\"id\": 102, \"name\": \"Bob\", \"email\": \"bob@test.com\"}')\n    assert result == {\"name\": \"Bob\", \"email\": \"bob@test.com\"}, f\"Got {result}\"\n\ndef test_returns_dict():\n    result = exercise.parse_user_data('{\"name\": \"Test\", \"email\": \"t@t.com\"}')\n    assert isinstance(result, dict), f\"Expected dict, got {type(result).__name__}\"",
+    "solution_code": "import json\n\ndef parse_user_data(json_string):\n    data = json.loads(json_string)\n    return {\"name\": data[\"name\"], \"email\": data[\"email\"]}",
+    "test_cases": [],
     "order": 2
   },
   {
     "slug": "validate-required-keys",
     "title": "Validate required keys before sending",
-    "instruction": "Write a function called `validate_payload()` that takes a dictionary and checks it has all the required keys: 'name', 'email', and 'age'. If any key is missing, print 'Missing key: X' (where X is the missing key name) and return False. If all keys are present, print 'Payload valid' and return True.\n\nTest it with the payload: `{\"name\": \"Bob\", \"age\": 30}` (missing 'email').",
-    "starter_code": "import json\n\ndef validate_payload(payload):\n    required = [\"name\", \"email\", \"age\"]\n    # Your validation code here\n\n# Test with missing email\npayload = {\"name\": \"Bob\", \"age\": 30}\nvalidate_payload(payload)\n",
-    "solution_code": "import json\n\ndef validate_payload(payload):\n    required = [\"name\", \"email\", \"age\"]\n    for key in required:\n        if key not in payload:\n            print(f\"Missing key: {key}\")\n            return False\n    print(\"Payload valid\")\n    return True\n\npayload = {\"name\": \"Bob\", \"age\": 30}\nvalidate_payload(payload)\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Missing key: email\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `validate_payload(payload)` that takes a dictionary and checks it has all the required keys: `'name'`, `'email'`, and `'age'`. The function should **return**:\n- A string `\"Missing key: X\"` (where X is the first missing key) if any key is missing\n- The string `\"Payload valid\"` if all keys are present\n- Check keys in order: name, email, age",
+    "starter_code": "def validate_payload(payload):\n    # Check required keys (name, email, age) and return appropriate message\n    pass",
+    "test_suite": "def test_missing_email():\n    result = exercise.validate_payload({\"name\": \"Bob\", \"age\": 30})\n    assert result == \"Missing key: email\", f\"Expected 'Missing key: email', got {result!r}\"\n\ndef test_missing_name():\n    result = exercise.validate_payload({\"email\": \"bob@test.com\", \"age\": 30})\n    assert result == \"Missing key: name\", f\"Expected 'Missing key: name', got {result!r}\"\n\ndef test_missing_age():\n    result = exercise.validate_payload({\"name\": \"Alice\", \"email\": \"alice@test.com\"})\n    assert result == \"Missing key: age\", f\"Expected 'Missing key: age', got {result!r}\"\n\ndef test_valid_payload():\n    result = exercise.validate_payload({\"name\": \"Alice\", \"email\": \"alice@test.com\", \"age\": 25})\n    assert result == \"Payload valid\", f\"Expected 'Payload valid', got {result!r}\"\n\ndef test_empty_payload():\n    result = exercise.validate_payload({})\n    assert result == \"Missing key: name\", f\"Expected 'Missing key: name', got {result!r}\"\n\ndef test_missing_multiple_checks_first():\n    result = exercise.validate_payload({\"email\": \"a@b.com\"})\n    assert result == \"Missing key: name\", f\"Expected 'Missing key: name', got {result!r}\"",
+    "solution_code": "def validate_payload(payload):\n    required = [\"name\", \"email\", \"age\"]\n    for key in required:\n        if key not in payload:\n            return f\"Missing key: {key}\"\n    return \"Payload valid\"",
+    "test_cases": [],
     "order": 3
   },
   {
     "slug": "safe-nested-access",
     "title": "Safely access nested fields from an API response",
-    "instruction": "Parse the JSON string below (simulating an API response) and safely print:\n1. The 'city' from the 'address' object (or 'Unknown city' if missing)\n2. The 'name' of the first tag (or 'No tags' if the list is empty)\n3. The 'theme' from 'preferences' (or 'default' if missing)\n\nUse `.get()` for safe access.\n\nJSON:\n```json\n{\n  \"name\": \"Alice\",\n  \"address\": {\"city\": \"Paris\", \"zip\": \"75001\"},\n  \"tags\": [\"premium\", \"active\"],\n  \"preferences\": {\"notifications\": true}\n}\n```\n\nNote: 'preferences' exists but has no 'theme' key.",
-    "starter_code": "import json\n\ndata = json.loads('''{\n  \"name\": \"Alice\",\n  \"address\": {\"city\": \"Paris\", \"zip\": \"75001\"},\n  \"tags\": [\"premium\", \"active\"],\n  \"preferences\": {\"notifications\": true}\n}''')\n\n# Safely print city, first tag, and theme\n",
-    "solution_code": "import json\n\ndata = json.loads('''{\n  \"name\": \"Alice\",\n  \"address\": {\"city\": \"Paris\", \"zip\": \"75001\"},\n  \"tags\": [\"premium\", \"active\"],\n  \"preferences\": {\"notifications\": true}\n}''')\n\naddress = data.get(\"address\", {})\ncity = address.get(\"city\", \"Unknown city\")\nprint(f\"City: {city}\")\n\ntags = data.get(\"tags\", [])\nfirst_tag = tags[0] if tags else \"No tags\"\nprint(f\"First tag: {first_tag}\")\n\nprefs = data.get(\"preferences\", {})\ntheme = prefs.get(\"theme\", \"default\")\nprint(f\"Theme: {theme}\")\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "City: Paris\nFirst tag: premium\nTheme: default\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `extract_api_info(data)` that takes a parsed JSON dictionary (representing an API response) and **returns** a dictionary with these keys and default fallbacks:\n- `\"city\"`: the value from `data[\"address\"][\"city\"]`, or `\"Unknown city\"` if missing\n- `\"first_tag\"`: the first element of `data[\"tags\"]`, or `\"No tags\"` if the list is empty or missing\n- `\"theme\"`: the value from `data[\"preferences\"][\"theme\"]`, or `\"default\"` if missing\n\nUse `.get()` for safe access.",
+    "starter_code": "def extract_api_info(data):\n    # Safely extract city, first_tag, and theme with defaults\n    pass",
+    "test_suite": "def test_full_data():\n    data = {\n        \"name\": \"Alice\",\n        \"address\": {\"city\": \"Paris\", \"zip\": \"75001\"},\n        \"tags\": [\"premium\", \"active\"],\n        \"preferences\": {\"notifications\": True}\n    }\n    result = exercise.extract_api_info(data)\n    assert result[\"city\"] == \"Paris\", f\"Expected 'Paris', got {result['city']!r}\"\n    assert result[\"first_tag\"] == \"premium\", f\"Expected 'premium', got {result['first_tag']!r}\"\n    assert result[\"theme\"] == \"default\", f\"Expected 'default', got {result['theme']!r}\"\n\ndef test_missing_address():\n    result = exercise.extract_api_info({\"name\": \"Bob\"})\n    assert result[\"city\"] == \"Unknown city\", f\"Expected 'Unknown city', got {result['city']!r}\"\n\ndef test_empty_tags():\n    result = exercise.extract_api_info({\"name\": \"Charlie\", \"tags\": []})\n    assert result[\"first_tag\"] == \"No tags\", f\"Expected 'No tags', got {result['first_tag']!r}\"\n\ndef test_missing_preferences():\n    result = exercise.extract_api_info({\"name\": \"Diana\"})\n    assert result[\"theme\"] == \"default\", f\"Expected 'default', got {result['theme']!r}\"\n\ndef test_returns_dict():\n    result = exercise.extract_api_info({\"name\": \"Test\"})\n    assert isinstance(result, dict), f\"Expected dict, got {type(result).__name__}\"\n    assert \"city\" in result, \"Missing 'city' key\"\n    assert \"first_tag\" in result, \"Missing 'first_tag' key\"\n    assert \"theme\" in result, \"Missing 'theme' key\"",
+    "solution_code": "def extract_api_info(data):\n    address = data.get(\"address\", {})\n    city = address.get(\"city\", \"Unknown city\")\n    tags = data.get(\"tags\", [])\n    first_tag = tags[0] if tags else \"No tags\"\n    prefs = data.get(\"preferences\", {})\n    theme = prefs.get(\"theme\", \"default\")\n    return {\"city\": city, \"first_tag\": first_tag, \"theme\": theme}",
+    "test_cases": [],
     "order": 4
   },
   {
     "slug": "build-nested-payload",
     "title": "Build a nested payload programmatically",
-    "instruction": "Build a nested dictionary for an order in an e-commerce API. Start with an empty dict and add keys step by step:\n\n1. Set 'order_id' to 1001\n2. Set 'customer' to a dict with 'name' ('Alice') and 'email' ('alice@example.com')\n3. Set 'items' to a list of two items, each with 'product' (str) and 'quantity' (int)\n   - Item 1: product='Widget', quantity=2\n   - Item 2: product='Gadget', quantity=1\n4. Set 'shipping' to a dict with 'method' ('express') and 'cost' (9.99)\n\nSerialize with `json.dumps(indent=2)` and print.",
-    "starter_code": "import json\n\norder = {}\n\n# Build the nested structure step by step\n\nprint(json.dumps(order, indent=2))\n",
-    "solution_code": "import json\n\norder = {}\norder[\"order_id\"] = 1001\norder[\"customer\"] = {\"name\": \"Alice\", \"email\": \"alice@example.com\"}\norder[\"items\"] = [\n    {\"product\": \"Widget\", \"quantity\": 2},\n    {\"product\": \"Gadget\", \"quantity\": 1}\n]\norder[\"shipping\"] = {\"method\": \"express\", \"cost\": 9.99}\n\nprint(json.dumps(order, indent=2))\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "{\n  \"order_id\": 1001,\n  \"customer\": {\n    \"name\": \"Alice\",\n    \"email\": \"alice@example.com\"\n  },\n  \"items\": [\n    {\n      \"product\": \"Widget\",\n      \"quantity\": 2\n    },\n    {\n      \"product\": \"Gadget\",\n      \"quantity\": 1\n    }\n  ],\n  \"shipping\": {\n    \"method\": \"express\",\n    \"cost\": 9.99\n  }\n}\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `create_order()` that **returns** a nested dictionary for an order in an e-commerce API. Build it step by step with these keys:\n1. `\"order_id\"`: `1001`\n2. `\"customer\"`: a dict with `\"name\"` (\"Alice\") and `\"email\"` (\"alice@example.com\")\n3. `\"items\"`: a list of two items, each a dict with `\"product\"` (str) and `\"quantity\"` (int):\n   - Item 1: product=\"Widget\", quantity=2\n   - Item 2: product=\"Gadget\", quantity=1\n4. `\"shipping\"`: a dict with `\"method\"` (\"express\") and `\"cost\"` (9.99)",
+    "starter_code": "def create_order():\n    # Build and return the nested order dictionary\n    pass",
+    "test_suite": "def test_has_order_id():\n    result = exercise.create_order()\n    assert result[\"order_id\"] == 1001, f\"Expected 1001, got {result['order_id']}\"\n\ndef test_has_customer():\n    result = exercise.create_order()\n    assert result[\"customer\"] == {\"name\": \"Alice\", \"email\": \"alice@example.com\"}, f\"Got {result['customer']}\"\n\ndef test_has_two_items():\n    result = exercise.create_order()\n    assert len(result[\"items\"]) == 2, f\"Expected 2 items, got {len(result['items'])}\"\n    assert result[\"items\"][0] == {\"product\": \"Widget\", \"quantity\": 2}, f\"Item 1 mismatch: {result['items'][0]}\"\n    assert result[\"items\"][1] == {\"product\": \"Gadget\", \"quantity\": 1}, f\"Item 2 mismatch: {result['items'][1]}\"\n\ndef test_has_shipping():\n    result = exercise.create_order()\n    assert result[\"shipping\"] == {\"method\": \"express\", \"cost\": 9.99}, f\"Got {result['shipping']}\"\n\ndef test_returns_dict():\n    result = exercise.create_order()\n    assert isinstance(result, dict), f\"Expected dict, got {type(result).__name__}\"",
+    "solution_code": "def create_order():\n    order = {}\n    order[\"order_id\"] = 1001\n    order[\"customer\"] = {\"name\": \"Alice\", \"email\": \"alice@example.com\"}\n    order[\"items\"] = [\n        {\"product\": \"Widget\", \"quantity\": 2},\n        {\"product\": \"Gadget\", \"quantity\": 1}\n    ]\n    order[\"shipping\"] = {\"method\": \"express\", \"cost\": 9.99}\n    return order",
+    "test_cases": [],
     "order": 5
   },
   {
     "slug": "validate-data-types",
     "title": "Validate data types in a payload",
-    "instruction": "Write a function `validate_types(payload)` that checks:\n- 'age' must be an int or float (if present)\n- 'tags' must be a list (if present)\n- 'email' must be a string (if present)\n- 'active' must be a bool (if present)\n\nIf a type check fails, print 'X must be Y' (e.g., 'age must be a number'). If all checks pass, print 'All types valid'.\n\nTest with: `{\"name\": \"Bob\", \"age\": \"thirty\", \"tags\": [\"user\"], \"active\": True}`",
-    "starter_code": "import json\n\ndef validate_types(payload):\n    # Your type validation code here\n\npayload = {\"name\": \"Bob\", \"age\": \"thirty\", \"tags\": [\"user\"], \"active\": True}\nvalidate_types(payload)\n",
-    "solution_code": "import json\n\ndef validate_types(payload):\n    if \"age\" in payload and not isinstance(payload[\"age\"], (int, float)):\n        print(\"age must be a number\")\n        return\n    if \"tags\" in payload and not isinstance(payload[\"tags\"], list):\n        print(\"tags must be a list\")\n        return\n    if \"email\" in payload and not isinstance(payload[\"email\"], str):\n        print(\"email must be a string\")\n        return\n    if \"active\" in payload and not isinstance(payload[\"active\"], bool):\n        print(\"active must be a bool\")\n        return\n    print(\"All types valid\")\n\npayload = {\"name\": \"Bob\", \"age\": \"thirty\", \"tags\": [\"user\"], \"active\": True}\nvalidate_types(payload)\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "age must be a number\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `validate_types(payload)` that takes a dictionary and checks the types of specific keys (if present). **Return** `True` if all checks pass, or a string describing the first type error:\n- `\"age must be a number\"` if 'age' is present and not an int or float\n- `\"tags must be a list\"` if 'tags' is present and not a list\n- `\"email must be a string\"` if 'email' is present and not a string\n- `\"active must be a bool\"` if 'active' is present and not a bool\n- `True` if all present keys pass type checks\n\nCheck keys in this order: age, tags, email, active.",
+    "starter_code": "def validate_types(payload):\n    # Check types of keys and return True or an error message\n    pass",
+    "test_suite": "def test_age_must_be_number():\n    result = exercise.validate_types({\"name\": \"Bob\", \"age\": \"thirty\"})\n    assert result == \"age must be a number\", f\"Got {result!r}\"\n\ndef test_tags_must_be_list():\n    result = exercise.validate_types({\"name\": \"Bob\", \"age\": 30, \"tags\": \"admin\"})\n    assert result == \"tags must be a list\", f\"Got {result!r}\"\n\ndef test_email_must_be_string():\n    result = exercise.validate_types({\"email\": [\"nested\"]})\n    assert result == \"email must be a string\", f\"Got {result!r}\"\n\ndef test_active_must_be_bool():\n    result = exercise.validate_types({\"active\": \"yes\"})\n    assert result == \"active must be a bool\", f\"Got {result!r}\"\n\ndef test_all_valid():\n    result = exercise.validate_types({\"name\": \"Bob\", \"age\": 30, \"tags\": [\"user\"], \"active\": True})\n    assert result == True, f\"Expected True, got {result!r}\"\n\ndef test_empty_payload_valid():\n    result = exercise.validate_types({})\n    assert result == True, f\"Expected True, got {result!r}\"",
+    "solution_code": "def validate_types(payload):\n    if \"age\" in payload and not isinstance(payload[\"age\"], (int, float)):\n        return \"age must be a number\"\n    if \"tags\" in payload and not isinstance(payload[\"tags\"], list):\n        return \"tags must be a list\"\n    if \"email\" in payload and not isinstance(payload[\"email\"], str):\n        return \"email must be a string\"\n    if \"active\" in payload and not isinstance(payload[\"active\"], bool):\n        return \"active must be a bool\"\n    return True",
+    "test_cases": [],
     "order": 6
   },
   {
     "slug": "handle-json-parse-error",
     "title": "Handle a malformed JSON response",
-    "instruction": "The variable `bad_response` contains invalid JSON (simulating a broken API response). Use a try/except block with `json.JSONDecodeError` to catch the error and print 'Invalid JSON response'. If parsing succeeds, print the parsed data.\n\nBad JSON: `{\"name\": \"Alice\", \"age\": 25,}` (trailing comma)",
-    "starter_code": "import json\n\nbad_response = '{\"name\": \"Alice\", \"age\": 25,}'\n\n# Parse safely with try/except\n",
-    "solution_code": "import json\n\nbad_response = '{\"name\": \"Alice\", \"age\": 25,}'\n\ntry:\n    data = json.loads(bad_response)\n    print(data)\nexcept json.JSONDecodeError:\n    print(\"Invalid JSON response\")\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Invalid JSON response\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `safe_parse_json(json_string)` that safely attempts to parse a JSON string. **Return**:\n- The parsed Python object (e.g., dict) if parsing succeeds\n- `None` if a `json.JSONDecodeError` occurs\n\nUse a try/except block to catch the error.",
+    "starter_code": "import json\n\ndef safe_parse_json(json_string):\n    # Safely parse JSON, returning None on error\n    pass",
+    "test_suite": "def test_valid_json():\n    result = exercise.safe_parse_json('{\"name\": \"Alice\", \"age\": 25}')\n    assert result == {\"name\": \"Alice\", \"age\": 25}, f\"Got {result}\"\n\ndef test_invalid_json_with_trailing_comma():\n    result = exercise.safe_parse_json('{\"name\": \"Alice\", \"age\": 25,}')\n    assert result is None, f\"Expected None, got {result}\"\n\ndef test_invalid_json_garbage():\n    result = exercise.safe_parse_json('not json at all')\n    assert result is None, f\"Expected None, got {result}\"\n\ndef test_empty_string():\n    result = exercise.safe_parse_json('')\n    assert result is None, f\"Expected None, got {result}\"\n\ndef test_valid_list():\n    result = exercise.safe_parse_json('[1, 2, 3]')\n    assert result == [1, 2, 3], f\"Got {result}\"",
+    "solution_code": "import json\n\ndef safe_parse_json(json_string):\n    try:\n        return json.loads(json_string)\n    except json.JSONDecodeError:\n        return None",
+    "test_cases": [],
     "order": 7
   },
   {
     "slug": "api-client-function",
     "title": "Write a reusable API client function",
-    "instruction": "Write a function `create_item(name, price)` that builds a payload dict with 'name' and 'price' keys, then simulates sending it by serializing with `json.dumps(indent=2)`. Call it twice:\n- First with name='Laptop', price=999.99\n- Second with name='Mouse', price=25.50\n\nPrint the JSON output of each call separated by a line of 5 dashes ('-----').",
-    "starter_code": "import json\n\ndef create_item(name, price):\n    # Build payload and serialize\n\n# Create Laptop\n\nprint('-----')\n\n# Create Mouse\n",
-    "solution_code": "import json\n\ndef create_item(name, price):\n    payload = {\"name\": name, \"price\": price}\n    print(json.dumps(payload, indent=2))\n\ncreate_item(\"Laptop\", 999.99)\nprint('-----')\ncreate_item(\"Mouse\", 25.50)\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "{\n  \"name\": \"Laptop\",\n  \"price\": 999.99\n}\n-----\n{\n  \"name\": \"Mouse\",\n  \"price\": 25.5\n}\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `create_item(name, price)` that takes a name (string) and price (number) and **returns** a payload dictionary with those values:\n- `\"name\"`: the `name` parameter\n- `\"price\"`: the `price` parameter\n\nThis is a reusable helper you'd use in an API client to build JSON payloads for creating items.",
+    "starter_code": "def create_item(name, price):\n    # Return a payload dict with name and price\n    pass",
+    "test_suite": "def test_laptop():\n    result = exercise.create_item(\"Laptop\", 999.99)\n    assert result == {\"name\": \"Laptop\", \"price\": 999.99}, f\"Got {result}\"\n\ndef test_mouse():\n    result = exercise.create_item(\"Mouse\", 25.50)\n    assert result == {\"name\": \"Mouse\", \"price\": 25.5}, f\"Got {result}\"\n\ndef test_cheap_item():\n    result = exercise.create_item(\"Pen\", 0.99)\n    assert result == {\"name\": \"Pen\", \"price\": 0.99}, f\"Got {result}\"\n\ndef test_zero_price():\n    result = exercise.create_item(\"Free Item\", 0)\n    assert result == {\"name\": \"Free Item\", \"price\": 0}, f\"Got {result}\"\n\ndef test_returns_dict():\n    result = exercise.create_item(\"Test\", 1.0)\n    assert isinstance(result, dict), f\"Expected dict, got {type(result).__name__}\"",
+    "solution_code": "def create_item(name, price):\n    return {\"name\": name, \"price\": price}",
+    "test_cases": [],
     "order": 8
   }
 ]
