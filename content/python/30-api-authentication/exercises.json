@@ -3,145 +3,60 @@
     "slug": "basic-auth-header",
     "title": "Build a Basic Auth Header",
     "instruction": "Write a function `basic_auth_header(username, password)` that returns the `Authorization` header string for Basic Authentication. It should base64-encode the string `username:password` and return it in the format `Basic <encoded>`.\n\nExample: `basic_auth_header(\"admin\", \"secret\")` → `\"Basic YWRtaW46c2VjcmV0\"`\n\nHint: Use `base64.b64encode()` from Python's `base64` module. Remember to encode the string to bytes first, then decode the result back to a string.",
-    "starter_code": "import base64\n\ndef basic_auth_header(username, password):\n    # Combine username and password with a colon\n    # Base64-encode the combined string\n    # Return \"Basic <encoded>\"\n    pass\n\n# Test it\nprint(basic_auth_header(\"admin\", \"secret\"))",
-    "solution_code": "import base64\n\ndef basic_auth_header(username, password):\n    credentials = f\"{username}:{password}\"\n    encoded = base64.b64encode(credentials.encode()).decode()\n    return f\"Basic {encoded}\"\n\n# Test it\nprint(basic_auth_header(\"admin\", \"secret\"))",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Basic YWRtaW46c2VjcmV0\n",
-        "comparison_type": "exact"
-      },
-      {
-        "input": "",
-        "expected_output": "base64.b64encode",
-        "comparison_type": "code_contains"
-      }
-    ],
+    "starter_code": "import base64\n\ndef basic_auth_header(username, password):\n    # Combine username and password with a colon\n    # Base64-encode the combined string\n    # Return \"Basic <encoded>\"\n    pass",
+    "solution_code": "import base64\n\ndef basic_auth_header(username, password):\n    credentials = f\"{username}:{password}\"\n    encoded = base64.b64encode(credentials.encode()).decode()\n    return f\"Basic {encoded}\"",
+    "test_suite": "def test_basic_auth_admin_secret():\n    result = exercise.basic_auth_header(\"admin\", \"secret\")\n    assert result == \"Basic YWRtaW46c2VjcmV0\", f\"Expected 'Basic YWRtaW46c2VjcmV0', got {result!r}\"\n\ndef test_basic_auth_user_pass():\n    result = exercise.basic_auth_header(\"user\", \"pass\")\n    assert result == \"Basic dXNlcjpwYXNz\", f\"Expected 'Basic dXNlcjpwYXNz', got {result!r}\"\n\ndef test_basic_auth_empty_username():\n    result = exercise.basic_auth_header(\"\", \"secret\")\n    assert result == \"Basic OnNlY3JldA==\", f\"Expected 'Basic OnNlY3JldA==', got {result!r}\"\n\ndef test_basic_auth_with_special_chars():\n    result = exercise.basic_auth_header(\"alice@test\", \"p@ss:w0rd\")\n    assert result == \"Basic YWxpY2VAdGVzdDpwQHNzOncwcmQ=\", f\"Expected 'Basic YWxpY2VAdGVzdDpwQHNzOncwcmQ=', got {result!r}\"",
+    "test_cases": [],
     "order": 1
   },
   {
     "slug": "api-key-auth",
     "title": "Send a Request with an API Key",
     "instruction": "Write a function `get_api_data(api_key)` that builds a headers dictionary and sends a GET request to `\"https://api.example.com/data\"` with the API key as a Bearer token in the Authorization header. Return the response JSON (call `.json()` on the response object).\n\nHint: Use `requests.get(url, headers=headers)`. The headers dict should have `\"Authorization\"` set to `\"Bearer <api_key>\"`.",
-    "starter_code": "import requests\n\ndef get_api_data(api_key):\n    # Build the headers dict\n    # Send a GET request to \"https://api.example.com/data\"\n    # Return response.json()\n    pass\n\n# Test with a dummy key (won't actually work, but the code is what matters)\nprint(get_api_data(\"sk-test-abc123\") if False else \"Code complete - see submitted code\")",
-    "solution_code": "import requests\n\ndef get_api_data(api_key):\n    headers = {\"Authorization\": f\"Bearer {api_key}\"}\n    response = requests.get(\"https://api.example.com/data\", headers=headers)\n    return response.json()\n\nprint(\"get_api_data function defined correctly\")",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "get_api_data function defined correctly\n",
-        "comparison_type": "exact"
-      },
-      {
-        "input": "",
-        "expected_output": "Bearer",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "Authorization",
-        "comparison_type": "code_contains"
-      }
-    ],
+    "starter_code": "import requests\n\ndef get_api_data(api_key):\n    # Build the headers dict\n    # Send a GET request to \"https://api.example.com/data\"\n    # Return response.json()\n    pass",
+    "solution_code": "import requests\n\ndef get_api_data(api_key):\n    headers = {\"Authorization\": f\"Bearer {api_key}\"}\n    response = requests.get(\"https://api.example.com/data\", headers=headers)\n    return response.json()",
+    "test_suite": "import unittest.mock\n\ndef test_sends_bearer_token_header():\n    with unittest.mock.patch('requests.get') as mock_get:\n        mock_get.return_value.json.return_value = {\"data\": \"test\"}\n        result = exercise.get_api_data(\"sk-test-key-123\")\n        mock_get.assert_called_once()\n        args, kwargs = mock_get.call_args\n        auth = kwargs.get(\"headers\", {}).get(\"Authorization\", \"\")\n        assert auth == \"Bearer sk-test-key-123\", f\"Expected Authorization header 'Bearer sk-test-key-123', got {kwargs.get('headers', {})}\"\n\ndef test_correct_url():\n    with unittest.mock.patch('requests.get') as mock_get:\n        mock_get.return_value.json.return_value = {\"ok\": True}\n        exercise.get_api_data(\"test-key\")\n        mock_get.assert_called_once()\n        args, kwargs = mock_get.call_args\n        assert args[0] == \"https://api.example.com/data\", f\"Expected URL 'https://api.example.com/data', got {args[0]}\"\n\ndef test_returns_json():\n    with unittest.mock.patch('requests.get') as mock_get:\n        expected = {\"user\": \"alice\", \"role\": \"admin\"}\n        mock_get.return_value.json.return_value = expected\n        result = exercise.get_api_data(\"key\")\n        assert result == expected, f\"Expected {expected}, got {result}\"",
+    "test_cases": [],
     "order": 2
   },
   {
     "slug": "jwt-decode-payload",
     "title": "Decode a JWT Payload",
-    "instruction": "Write a function `decode_jwt_payload(token)` that decodes the **payload** (the second part) of a JWT token and returns it as a Python dictionary. The three parts of a JWT are separated by dots: `header.payload.signature`. Each part is base64-encoded.\n\nExample:\n`decode_jwt_payload(\"eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoiYWxpY2UiLCJyb2xlIjoiYWRtaW4ifQ.signature\")`\n→ `{\"user\": \"alice\", \"role\": \"admin\"}`\n\nHint: Split the token on `\".\"`, take the second element (index 1), decode it with `base64.urlsafe_b64decode()`, then parse with `json.loads()`. Use `.decode()` on the decoded bytes.",
-    "starter_code": "import base64\nimport json\n\ndef decode_jwt_payload(token):\n    # Split the token by \".\"\n    # Take the second part (payload, index 1)\n    # Add padding if needed (base64.b64decode handles this)\n    # Decode with base64.urlsafe_b64decode\n    # Parse with json.loads and return\n    pass\n\n# Test\ntoken = \"eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoiYWxpY2UiLCJyb2xlIjoiYWRtaW4ifQ.signature\"\nprint(decode_jwt_payload(token))",
-    "solution_code": "import base64\nimport json\n\ndef decode_jwt_payload(token):\n    parts = token.split(\".\")\n    payload_b64 = parts[1]\n    # Add padding for base64 decoding\n    padding = 4 - len(payload_b64) % 4\n    if padding != 4:\n        payload_b64 += \"=\" * padding\n    decoded_bytes = base64.urlsafe_b64decode(payload_b64)\n    return json.loads(decoded_bytes)\n\ntoken = \"eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoiYWxpY2UiLCJyb2xlIjoiYWRtaW4ifQ.signature\"\nprint(decode_jwt_payload(token))",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "{'user': 'alice', 'role': 'admin'}\n",
-        "comparison_type": "exact"
-      },
-      {
-        "input": "",
-        "expected_output": "base64.urlsafe_b64decode",
-        "comparison_type": "code_contains"
-      }
-    ],
+    "instruction": "Write a function `decode_jwt_payload(token)` that decodes the **payload** (the second part) of a JWT token and returns it as a Python dictionary. The three parts of a JWT are separated by dots: `header.payload.signature`. Each part is base64-encoded.\n\nExample:\n`decode_jwt_payload(\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiYWxpY2UiLCJyb2xlIjoiYWRtaW4ifQ.test_sig\")`\n→ `{\"user\": \"alice\", \"role\": \"admin\"}`\n\nHint: Split the token on `\".\"`, take the second element (index 1), decode it with `base64.urlsafe_b64decode()`, then parse with `json.loads()`. Use `.decode()` on the decoded bytes.",
+    "starter_code": "import base64\nimport json\n\ndef decode_jwt_payload(token):\n    # Split the token by \".\"\n    # Take the second part (payload, index 1)\n    # Add padding if needed\n    # Decode with base64.urlsafe_b64decode\n    # Parse with json.loads and return\n    pass",
+    "solution_code": "import base64\nimport json\n\ndef decode_jwt_payload(token):\n    parts = token.split(\".\")\n    payload_b64 = parts[1]\n    padding = 4 - len(payload_b64) % 4\n    if padding != 4:\n        payload_b64 += \"=\" * padding\n    decoded_bytes = base64.urlsafe_b64decode(payload_b64)\n    return json.loads(decoded_bytes)",
+    "test_suite": "def test_decode_admin_payload():\n    token = \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiYWxpY2UiLCJyb2xlIjoiYWRtaW4ifQ.test_sig\"\n    result = exercise.decode_jwt_payload(token)\n    assert result == {\"user\": \"alice\", \"role\": \"admin\"}, f\"Expected {{'user': 'alice', 'role': 'admin'}}, got {result}\"\n\ndef test_decode_user_payload():\n    token = \"eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxMjMsInVzZXJuYW1lIjoiYm9iIn0.sig\"\n    result = exercise.decode_jwt_payload(token)\n    assert result == {\"user_id\": 123, \"username\": \"bob\"}, f\"Expected {{'user_id': 123, 'username': 'bob'}}, got {result}\"\n\ndef test_decode_return_type():\n    result = exercise.decode_jwt_payload(\"eyJ0ZXN0IjoieCJ9.eyJpZCI6MX0.c2ln\")\n    assert isinstance(result, dict), f\"Expected dict return type, got {type(result)}\"",
+    "test_cases": [],
     "order": 3
   },
   {
     "slug": "oauth-client-creds",
     "title": "Build an OAuth 2.0 Token Request",
     "instruction": "Write a function `get_oauth_token(client_id, client_secret)` that sends a POST request to `\"https://auth.example.com/oauth/token\"` with the body as a form-encoded dictionary containing `grant_type`, `client_id`, and `client_secret`.\n\nReturn the access token from the response: `response.json()[\"access_token\"]`.\n\nHint: Use `requests.post(url, data=body)` where body is a dict. `requests` automatically encodes the dict as form data.",
-    "starter_code": "import requests\n\ndef get_oauth_token(client_id, client_secret):\n    # Build the form body (dict)\n    # POST to \"https://auth.example.com/oauth/token\"\n    # Return response.json()[\"access_token\"]\n    pass\n\nprint(\"get_oauth_token function defined correctly\")",
-    "solution_code": "import requests\n\ndef get_oauth_token(client_id, client_secret):\n    body = {\n        \"grant_type\": \"client_credentials\",\n        \"client_id\": client_id,\n        \"client_secret\": client_secret\n    }\n    response = requests.post(\"https://auth.example.com/oauth/token\", data=body)\n    return response.json()[\"access_token\"]\n\nprint(\"get_oauth_token function defined correctly\")",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "get_oauth_token function defined correctly\n",
-        "comparison_type": "exact"
-      },
-      {
-        "input": "",
-        "expected_output": "grant_type",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "client_credentials",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "client_id",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "client_secret",
-        "comparison_type": "code_contains"
-      }
-    ],
+    "starter_code": "import requests\n\ndef get_oauth_token(client_id, client_secret):\n    # Build the form body (dict)\n    # POST to \"https://auth.example.com/oauth/token\"\n    # Return response.json()[\"access_token\"]\n    pass",
+    "solution_code": "import requests\n\ndef get_oauth_token(client_id, client_secret):\n    body = {\n        \"grant_type\": \"client_credentials\",\n        \"client_id\": client_id,\n        \"client_secret\": client_secret\n    }\n    response = requests.post(\"https://auth.example.com/oauth/token\", data=body)\n    return response.json()[\"access_token\"]",
+    "test_suite": "import unittest.mock\n\ndef test_posts_to_correct_url():\n    with unittest.mock.patch('requests.post') as mock_post:\n        mock_post.return_value.json.return_value = {\"access_token\": \"tok_abc\"}\n        exercise.get_oauth_token(\"my_client\", \"my_secret\")\n        mock_post.assert_called_once()\n        args, kwargs = mock_post.call_args\n        assert args[0] == \"https://auth.example.com/oauth/token\", f\"Expected URL 'https://auth.example.com/oauth/token', got {args[0]}\"\n\ndef test_sends_credentials_in_body():\n    with unittest.mock.patch('requests.post') as mock_post:\n        mock_post.return_value.json.return_value = {\"access_token\": \"tok_xyz\"}\n        exercise.get_oauth_token(\"client_1\", \"secret_1\")\n        mock_post.assert_called_once()\n        args, kwargs = mock_post.call_args\n        body = kwargs.get(\"data\", {})\n        assert body.get(\"grant_type\") == \"client_credentials\", f\"Expected grant_type 'client_credentials', got {body.get('grant_type')}\"\n        assert body.get(\"client_id\") == \"client_1\", f\"Expected client_id 'client_1', got {body.get('client_id')}\"\n        assert body.get(\"client_secret\") == \"secret_1\", f\"Expected client_secret 'secret_1', got {body.get('client_secret')}\"\n\ndef test_returns_access_token():\n    with unittest.mock.patch('requests.post') as mock_post:\n        mock_post.return_value.json.return_value = {\"access_token\": \"tok_abc123\"}\n        result = exercise.get_oauth_token(\"a\", \"b\")\n        assert result == \"tok_abc123\", f\"Expected 'tok_abc123', got {result}\"",
+    "test_cases": [],
     "order": 4
   },
   {
     "slug": "send-jwt-bearer",
     "title": "Send a Request with JWT Bearer Token",
     "instruction": "Write a function `get_protected_data(jwt_token)` that sends a GET request to `\"https://api.example.com/protected\"` with the JWT token as a Bearer token in the Authorization header. Return the response JSON.\n\nHint: Same pattern as the API key exercise, but the token value is a JWT string.",
-    "starter_code": "import requests\n\ndef get_protected_data(jwt_token):\n    # Build the Authorization header with Bearer + token\n    # Send GET request to \"https://api.example.com/protected\"\n    # Return response.json()\n    pass\n\nprint(\"get_protected_data function defined correctly\")",
-    "solution_code": "import requests\n\ndef get_protected_data(jwt_token):\n    headers = {\"Authorization\": f\"Bearer {jwt_token}\"}\n    response = requests.get(\"https://api.example.com/protected\", headers=headers)\n    return response.json()\n\nprint(\"get_protected_data function defined correctly\")",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "get_protected_data function defined correctly\n",
-        "comparison_type": "exact"
-      },
-      {
-        "input": "",
-        "expected_output": "\"Authorization\"",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "Bearer",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "requests.get",
-        "comparison_type": "code_contains"
-      }
-    ],
+    "starter_code": "import requests\n\ndef get_protected_data(jwt_token):\n    # Build the Authorization header with Bearer + token\n    # Send GET request to \"https://api.example.com/protected\"\n    # Return response.json()\n    pass",
+    "solution_code": "import requests\n\ndef get_protected_data(jwt_token):\n    headers = {\"Authorization\": f\"Bearer {jwt_token}\"}\n    response = requests.get(\"https://api.example.com/protected\", headers=headers)\n    return response.json()",
+    "test_suite": "import unittest.mock\n\ndef test_sends_bearer_token():\n    with unittest.mock.patch('requests.get') as mock_get:\n        mock_get.return_value.json.return_value = {\"data\": \"ok\"}\n        exercise.get_protected_data(\"eyJ0eXAiOiJKV1QifQ.eyJ1c2VyIjoiYWxpY2UifQ.sig\")\n        mock_get.assert_called_once()\n        args, kwargs = mock_get.call_args\n        auth = kwargs.get(\"headers\", {}).get(\"Authorization\", \"\")\n        assert auth == \"Bearer eyJ0eXAiOiJKV1QifQ.eyJ1c2VyIjoiYWxpY2UifQ.sig\", f\"Expected 'Bearer ...' header, got {auth!r}\"\n\ndef test_correct_protected_url():\n    with unittest.mock.patch('requests.get') as mock_get:\n        mock_get.return_value.json.return_value = {}\n        exercise.get_protected_data(\"tok\")\n        mock_get.assert_called_once()\n        args, kwargs = mock_get.call_args\n        assert args[0] == \"https://api.example.com/protected\", f\"Expected URL 'https://api.example.com/protected', got {args[0]}\"\n\ndef test_returns_json():\n    with unittest.mock.patch('requests.get') as mock_get:\n        expected = {\"user\": \"alice\", \"role\": \"admin\"}\n        mock_get.return_value.json.return_value = expected\n        result = exercise.get_protected_data(\"tok\")\n        assert result == expected, f\"Expected {expected}, got {result}\"",
+    "test_cases": [],
     "order": 5
   },
   {
     "slug": "choose-auth-method",
     "title": "Identify the Right Auth Method",
     "instruction": "Write a function `recommend_auth(scenario)` that takes one of these strings and returns the recommended authentication method:\n\n- `\"quick-test\"` → `\"basic\"` (simplest for internal tools)\n- `\"public-api\"` → `\"api-key\"` (simple, widely used for public APIs)\n- `\"stateless-sso\"` → `\"jwt\"` (self-contained tokens for stateless auth)\n- `\"third-party-login\"` → `\"oauth2\"` (delegated authorisation for third-party access)\n- anything else → `\"unknown\"`\n\nThis exercise tests your understanding of when to use each auth method.",
-    "starter_code": "def recommend_auth(scenario):\n    # Return the appropriate auth method for each scenario\n    pass\n\n# Test cases\nprint(recommend_auth(\"quick-test\"))\nprint(recommend_auth(\"public-api\"))\nprint(recommend_auth(\"stateless-sso\"))\nprint(recommend_auth(\"third-party-login\"))\nprint(recommend_auth(\"something-else\"))",
-    "solution_code": "def recommend_auth(scenario):\n    if scenario == \"quick-test\":\n        return \"basic\"\n    elif scenario == \"public-api\":\n        return \"api-key\"\n    elif scenario == \"stateless-sso\":\n        return \"jwt\"\n    elif scenario == \"third-party-login\":\n        return \"oauth2\"\n    else:\n        return \"unknown\"\n\nprint(recommend_auth(\"quick-test\"))\nprint(recommend_auth(\"public-api\"))\nprint(recommend_auth(\"stateless-sso\"))\nprint(recommend_auth(\"third-party-login\"))\nprint(recommend_auth(\"something-else\"))",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "basic\napi-key\njwt\noauth2\nunknown\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "starter_code": "def recommend_auth(scenario):\n    # Return the appropriate auth method for each scenario\n    pass",
+    "solution_code": "def recommend_auth(scenario):\n    if scenario == \"quick-test\":\n        return \"basic\"\n    elif scenario == \"public-api\":\n        return \"api-key\"\n    elif scenario == \"stateless-sso\":\n        return \"jwt\"\n    elif scenario == \"third-party-login\":\n        return \"oauth2\"\n    else:\n        return \"unknown\"",
+    "test_suite": "def test_quick_test_returns_basic():\n    result = exercise.recommend_auth(\"quick-test\")\n    assert result == \"basic\", f\"Expected 'basic' for 'quick-test', got {result!r}\"\n\ndef test_public_api_returns_api_key():\n    result = exercise.recommend_auth(\"public-api\")\n    assert result == \"api-key\", f\"Expected 'api-key' for 'public-api', got {result!r}\"\n\ndef test_stateless_sso_returns_jwt():\n    result = exercise.recommend_auth(\"stateless-sso\")\n    assert result == \"jwt\", f\"Expected 'jwt' for 'stateless-sso', got {result!r}\"\n\ndef test_third_party_login_returns_oauth2():\n    result = exercise.recommend_auth(\"third-party-login\")\n    assert result == \"oauth2\", f\"Expected 'oauth2' for 'third-party-login', got {result!r}\"\n\ndef test_unknown_scenario():\n    result = exercise.recommend_auth(\"something-else\")\n    assert result == \"unknown\", f\"Expected 'unknown' for unknown scenario, got {result!r}\"\n\ndef test_empty_string():\n    result = exercise.recommend_auth(\"\")\n    assert result == \"unknown\", f\"Expected 'unknown' for empty string, got {result!r}\"",
+    "test_cases": [],
     "order": 6
   }
 ]
