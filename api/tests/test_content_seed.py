@@ -33,30 +33,49 @@ from app.services.content_seed import (
 # ---------------------------------------------------------------------------
 
 
-def _make_lesson_dir(base_dir: Path, slug: str, title: str, order: int, path_key: str = "core"):
-    """Create a lesson directory at base_dir/slug/ with lesson.md and exercises.json."""
+def _make_lesson_dir(base_dir: Path, slug: str, title: str, order: int, path_key: str = "core", include_test_suite: bool = False):
+    """Create a lesson directory at base_dir/slug/ with lesson.md and exercises.json.
+
+    When include_test_suite is True, the exercise includes a test_suite field
+    (for function-based/suite-style exercises) and an empty test_cases list.
+    Otherwise it uses the legacy test_cases format (print-based exercises).
+    """
     lesson_dir = base_dir / slug
     lesson_dir.mkdir(parents=True, exist_ok=True)
     (lesson_dir / "lesson.md").write_text(
         f"# {title}\n\nLesson content.\n", encoding="utf-8"
     )
-    exercises = [
-        {
-            "slug": f"{slug}-ex1",
-            "title": f"{title} Exercise",
-            "instruction": "Do something.",
-            "starter_code": "# Write\n",
-            "solution_code": "print('done')\n",
-            "test_cases": [
-                {
-                    "input": "",
-                    "expected_output": "done\n",
-                    "comparison_type": "exact",
-                }
-            ],
-            "order": 1,
-        }
-    ]
+    if include_test_suite:
+        exercises = [
+            {
+                "slug": f"{slug}-ex1",
+                "title": f"{title} Exercise",
+                "instruction": "Do something.",
+                "starter_code": "# Write\n",
+                "solution_code": "print('done')\n",
+                "test_cases": [],
+                "test_suite": "def test_example():\n    assert True\n",
+                "order": 1,
+            }
+        ]
+    else:
+        exercises = [
+            {
+                "slug": f"{slug}-ex1",
+                "title": f"{title} Exercise",
+                "instruction": "Do something.",
+                "starter_code": "# Write\n",
+                "solution_code": "print('done')\n",
+                "test_cases": [
+                    {
+                        "input": "",
+                        "expected_output": "done\n",
+                        "comparison_type": "exact",
+                    }
+                ],
+                "order": 1,
+            }
+        ]
     (lesson_dir / "exercises.json").write_text(
         json.dumps(exercises), encoding="utf-8"
     )
@@ -68,8 +87,12 @@ def _lesson_dir(base: Path, path_key: str, slug: str) -> Path:
     return base / path_key / slug
 
 
-def _write_lesson(base: Path, lesson: dict) -> None:
-    """Create lesson files (lesson.md + exercises.json) under the path-based dir."""
+def _write_lesson(base: Path, lesson: dict, include_test_suite: bool = False) -> None:
+    """Create lesson files (lesson.md + exercises.json) under the path-based dir.
+
+    When include_test_suite is True, the exercise includes a test_suite field
+    (function-based style) with empty test_cases.
+    """
     pth = lesson.get("path", "python")
     slug = lesson["slug"]
     lesson_dir = _lesson_dir(base, pth, slug)
@@ -77,23 +100,37 @@ def _write_lesson(base: Path, lesson: dict) -> None:
     (lesson_dir / "lesson.md").write_text(
         f"# {lesson['title']}\n\nLesson content.\n", encoding="utf-8"
     )
-    exercises = [
-        {
-            "slug": f"{slug}-ex1",
-            "title": f"{lesson['title']} Exercise",
-            "instruction": "Do something.",
-            "starter_code": "# Write\n",
-            "solution_code": "print('done')\n",
-            "test_cases": [
-                {
-                    "input": "",
-                    "expected_output": "done\n",
-                    "comparison_type": "exact",
-                }
-            ],
-            "order": 1,
-        }
-    ]
+    if include_test_suite:
+        exercises = [
+            {
+                "slug": f"{slug}-ex1",
+                "title": f"{lesson['title']} Exercise",
+                "instruction": "Do something.",
+                "starter_code": "# Write\n",
+                "solution_code": "print('done')\n",
+                "test_cases": [],
+                "test_suite": "def test_example():\n    assert True\n",
+                "order": 1,
+            }
+        ]
+    else:
+        exercises = [
+            {
+                "slug": f"{slug}-ex1",
+                "title": f"{lesson['title']} Exercise",
+                "instruction": "Do something.",
+                "starter_code": "# Write\n",
+                "solution_code": "print('done')\n",
+                "test_cases": [
+                    {
+                        "input": "",
+                        "expected_output": "done\n",
+                        "comparison_type": "exact",
+                    }
+                ],
+                "order": 1,
+            }
+        ]
     (lesson_dir / "exercises.json").write_text(
         json.dumps(exercises), encoding="utf-8"
     )
@@ -742,6 +779,123 @@ class TestSyncExerciseTestCases:
         )
         db_ex = result_ex.scalar_one()
         assert db_ex.test_cases[0]["expected_output"] == "nested_changed\n"
+
+
+# ---------------------------------------------------------------------------
+# Tests for test_suite seeding and syncing
+# ---------------------------------------------------------------------------
+
+
+class TestTestSuiteSeeding:
+    @pytest.mark.asyncio
+    async def test_seed_populates_test_suite(self, tmp_path: Path, db_session: AsyncSession):
+        """Exercises with test_suite in content should have it stored in DB."""
+        content_dir = _build_flat_content(tmp_path, count=1)
+        # Override with test_suite-format exercise
+        import shutil
+        shutil.rmtree(content_dir / "lesson-1")
+        _make_lesson_dir(content_dir, "lesson-1", "Lesson 1", 1, include_test_suite=True)
+
+        result = await seed_content(session=db_session, content_dir=content_dir)
+        assert result["status"] == "seeded"
+        assert result["exercises_added"] == 1
+
+        db_ex = (
+            await db_session.execute(
+                select(Exercise).where(Exercise.slug == "lesson-1-ex1")
+            )
+        ).scalar_one()
+        assert db_ex.test_suite == "def test_example():\n    assert True\n"
+        assert db_ex.test_cases == []  # test_suite exercises have empty test_cases
+
+    @pytest.mark.asyncio
+    async def test_seed_legacy_exercise_has_null_test_suite(
+        self, tmp_path: Path, db_session: AsyncSession
+    ):
+        """Exercises without test_suite in content should have None in DB."""
+        content_dir = _build_flat_content(tmp_path, count=1)
+        # Uses default (no test_suite)
+        result = await seed_content(session=db_session, content_dir=content_dir)
+        assert result["status"] == "seeded"
+        assert result["exercises_added"] == 1
+
+        db_ex = (
+            await db_session.execute(
+                select(Exercise).where(Exercise.slug == "lesson-1-ex1")
+            )
+        ).scalar_one()
+        assert db_ex.test_suite is None
+        assert len(db_ex.test_cases) == 1  # legacy format populates test_cases
+
+    @pytest.mark.asyncio
+    async def test_sync_updates_test_suite(
+        self, tmp_path: Path, db_session: AsyncSession
+    ):
+        """When test_suite changes in content, DB should be updated on re-seed."""
+        content_dir = _build_flat_content(tmp_path, count=1)
+        await seed_content(session=db_session, content_dir=content_dir)
+
+        # Verify initial state
+        db_ex = (
+            await db_session.execute(
+                select(Exercise).where(Exercise.slug == "lesson-1-ex1")
+            )
+        ).scalar_one()
+        assert db_ex.test_suite is None  # Legacy format
+
+        # Now add test_suite to the content file
+        ex_path = content_dir / "lesson-1" / "exercises.json"
+        exercises = json.loads(ex_path.read_text(encoding="utf-8"))
+        exercises[0]["test_suite"] = "def test_new():\n    assert 1 + 1 == 2\n"
+        exercises[0]["test_cases"] = []  # test_suite exercises typically have empty test_cases
+        ex_path.write_text(json.dumps(exercises), encoding="utf-8")
+
+        # Re-seed (incremental)
+        result = await seed_content(session=db_session, content_dir=content_dir)
+        assert result["status"] == "synced"
+        assert result["exercises_synced"] == 1
+
+        db_ex = (
+            await db_session.execute(
+                select(Exercise).where(Exercise.slug == "lesson-1-ex1")
+            )
+        ).scalar_one()
+        assert db_ex.test_suite == "def test_new():\n    assert 1 + 1 == 2\n"
+        assert db_ex.test_cases == []
+
+    @pytest.mark.asyncio
+    async def test_sync_updates_test_suite_nested(
+        self, tmp_path: Path, db_session: AsyncSession
+    ):
+        """test_suite sync should work with nested content layout."""
+        content_dir = _build_nested_content(tmp_path, lang="python", count=1)
+        await seed_content(session=db_session, content_dir=content_dir)
+
+        # Verify initial state
+        db_ex = (
+            await db_session.execute(
+                select(Exercise).where(Exercise.slug == "lesson-1-ex1")
+            )
+        ).scalar_one()
+        assert db_ex.test_suite is None
+
+        # Add test_suite to nested content
+        ex_path = content_dir / "python" / "lesson-1" / "exercises.json"
+        exercises = json.loads(ex_path.read_text(encoding="utf-8"))
+        exercises[0]["test_suite"] = "def test_nested():\n    assert True\n"
+        exercises[0]["test_cases"] = []
+        ex_path.write_text(json.dumps(exercises), encoding="utf-8")
+
+        result = await seed_content(session=db_session, content_dir=content_dir)
+        assert result["status"] == "synced"
+        assert result["exercises_synced"] == 1
+
+        db_ex = (
+            await db_session.execute(
+                select(Exercise).where(Exercise.slug == "lesson-1-ex1")
+            )
+        ).scalar_one()
+        assert db_ex.test_suite == "def test_nested():\n    assert True\n"
 
 
 # ---------------------------------------------------------------------------
