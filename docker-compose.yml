@@ -64,16 +64,17 @@ services:
     restart: unless-stopped
 
   # ── Self-hosted GitHub Actions Runner ─────────────────────────────────────────
-  # Uses ubuntu-noble (24.04 LTS) which ships Python 3.12 out of the box,
-  # avoiding the Python 3.8 issue on the focal-based `latest` tag.
+  # Uses `latest` tag (Ubuntu 20.04) — the CI workflow bootstraps Python 3.12
+  # via python-build-standalone. Would prefer `ubuntu-noble` (which ships
+  # Python 3.12 natively) but the image pull stalls indefinitely on ARM64.  
   runner:
-    image: myoung34/github-runner:ubuntu-noble
+    image: myoung34/github-runner:latest
     container_name: github-runner-learn
     restart: unless-stopped
     environment:
       - REPO_URL=https://github.com/coolbigbear/Learn
       - RUNNER_NAME=pi2-qa-runner
-      - RUNNER_TOKEN=AFSPESPQ4CEX6YURBO2RNGTKMHLZW
+      - RUNNER_TOKEN=AFSPESMEDMEC2AENAOXUDWLKM5JHK
       - RUNNER_WORKDIR=/tmp/runner-work
       - RUNNER_GROUP=default
       - LABELS=self-hosted,linux,arm64,pi
