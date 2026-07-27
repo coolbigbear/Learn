@@ -115,7 +115,7 @@ def _run_single(input_data, expected, comparison, test_name=None, message=None):
             # and inline comments while ignoring # inside string literals
             import re as _re
             comment_lines = []
-            for _l in _USER_CODE.split('\\n'):
+            for _l in _USER_CODE.split('\\\\n'):
                 _s = _l.strip()
                 if not _s:
                     continue
@@ -215,6 +215,92 @@ else:
         sys.stdout = old_stdout
 """
 
+TEST_SUITE_HARNESS_TEMPLATE = """\
+# Harness: wraps user code + test_suite, discovers and runs test_* functions,
+# outputs JSON results.
+# This script runs inside the sandbox subprocess.  The sandbox runner
+# grants it full builtins (import, exec, open, etc.) so that the harness
+# itself can function.
+
+import importlib.util
+import json
+import sys
+import traceback
+
+
+# 1. Write user code to exercise.py
+_USER_CODE = {user_code!r}
+with open('exercise.py', 'w') as _f:
+    _f.write(_USER_CODE)
+
+# 2. Write test suite to test_suite.py
+_TEST_SUITE = {test_suite!r}
+with open('test_suite.py', 'w') as _f:
+    _f.write(_TEST_SUITE)
+
+# 3. Import user code as the 'exercise' module via importlib
+_spec = importlib.util.spec_from_file_location('exercise', 'exercise.py')
+_exercise = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_exercise)
+
+# 4. Execute test suite in a namespace that has 'exercise'
+_test_ns = {{'exercise': _exercise}}
+exec(open('test_suite.py').read(), _test_ns)
+
+# 5. Discover test_* functions
+_test_funcs = [(name, fn) for name, fn in _test_ns.items() if name.startswith('test_')]
+_test_funcs.sort(key=lambda x: x[0])
+
+# 6. Run each test, collect results
+_results = []
+_all_passed = True
+for _i, (_name, _fn) in enumerate(_test_funcs):
+    try:
+        _fn()
+        _results.append({{
+            'test_index': _i,
+            'name': _name,
+            'passed': True,
+            'message': None,
+            'actual_output': '',
+            'expected_output': '',
+            'errors': None,
+            'comparison_type': 'exact'
+        }})
+    except AssertionError as _e:
+        _all_passed = False
+        _results.append({{
+            'test_index': _i,
+            'name': _name,
+            'passed': False,
+            'message': str(_e) if str(_e) else 'Assertion failed',
+            'actual_output': '',
+            'expected_output': '',
+            'errors': None,
+            'comparison_type': 'exact'
+        }})
+    except Exception as _e:
+        _all_passed = False
+        _results.append({{
+            'test_index': _i,
+            'name': _name,
+            'passed': False,
+            'message': f'{{type(_e).__name__}}: {{_e}}',
+            'actual_output': '',
+            'expected_output': '',
+            'errors': f'{{type(_e).__name__}}: {{_e}}',
+            'comparison_type': 'exact'
+        }})
+
+print(json.dumps({{
+    'passed': _all_passed,
+    'actual_output': '',
+    'expected_output': '',
+    'errors': None,
+    'test_results': _results
+}}))
+"""
+
 
 def _build_runner_script(user_code: str, test_cases: list[dict]) -> str:
     """Build a self-contained Python script that wraps user code + test cases."""
@@ -225,12 +311,45 @@ def _build_runner_script(user_code: str, test_cases: list[dict]) -> str:
     return textwrap.dedent(script)
 
 
-async def run_code(user_code: str, test_cases: list[dict]) -> dict:
-    """Execute user code against test cases in a sandboxed subprocess.
+def _build_test_suite_runner(user_code: str, test_suite: str) -> str:
+    """Build a harness script that writes user code + test_suite to disk and runs tests.
+
+    The generated script:
+    1. Writes user code to exercise.py
+    2. Writes test suite code to test_suite.py
+    3. Imports user code via importlib (proper module semantics)
+    4. Executes test suite to define test_* functions
+    5. Runs each test function, catching AssertionError and other exceptions
+    6. Outputs JSON in the standard RunResult format
+    """
+    script = TEST_SUITE_HARNESS_TEMPLATE.format(
+        user_code=user_code,
+        test_suite=test_suite,
+    )
+    return textwrap.dedent(script)
+
+
+async def run_code(
+    user_code: str,
+    test_cases: list[dict],
+    test_suite: str | None = None,
+) -> dict:
+    """Execute user code against test cases or test_suite in a sandboxed subprocess.
+
+    When *test_suite* is provided, the harness writes user code to ``exercise.py``
+    and the test suite to ``test_suite.py``, then discovers and runs ``test_*``
+    functions via importlib.  Test functions access user code through the
+    ``exercise`` module (e.g. ``exercise.add(1, 2)``).
+
+    When *test_suite* is *None* (default), falls back to the existing
+    test_cases-based execution.
 
     Returns a dict with keys: passed, actual_output, expected_output, errors, test_results.
     """
-    script = _build_runner_script(user_code, test_cases)
+    if test_suite is not None:
+        script = _build_test_suite_runner(user_code, test_suite)
+    else:
+        script = _build_runner_script(user_code, test_cases)
 
     with tempfile.TemporaryDirectory(prefix="py_sandbox_") as tmpdir:
         script_path = Path(tmpdir) / "runner.py"
@@ -318,14 +437,21 @@ async def run_code_with_docker_fallback(
     user_code: str,
     test_cases: list[dict],
     language: str = "python",
+    test_suite: str | None = None,
 ) -> dict:
     """Run user code using Docker with fallback to subprocess.
 
     Tries the Docker sandbox first (when DOCKER_ENABLED is True). If Docker
     is unavailable, falls back gracefully to the subprocess runner.
+    When *test_suite* is provided, the Docker runner is skipped and the
+    subprocess test_suite runner is used directly.
 
     Returns the same dict schema as run_code().
     """
+    # When test_suite is present, skip Docker and use subprocess test_suite runner
+    if test_suite is not None:
+        return await run_code(user_code, test_cases, test_suite=test_suite)
+
     if DOCKER_ENABLED:
         try:
             from app.services.docker_runner import run_code_in_docker
@@ -340,4 +466,4 @@ async def run_code_with_docker_fallback(
 
     # Fallback: use the subprocess runner (language parameter is not used
     # by the subprocess runner since it only supports Python)
-    return await run_code(user_code, test_cases)
+    return await run_code(user_code, test_cases, test_suite=test_suite)
