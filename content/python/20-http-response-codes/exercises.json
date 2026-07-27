@@ -2,131 +2,81 @@
   {
     "slug": "status-check-ok",
     "title": "Check if a response is successful using .ok",
-    "instruction": "You have a response object stored in the variable `resp`. Write code that checks `resp.ok` and prints \"Success!\" if it's True, or prints the status code if it's False.\n\nExpected output (example):\n- If resp.ok is True: `Success!`\n- If resp.ok is False: `Failed with status 404`",
-    "starter_code": "import requests\n\nresp = requests.get(\"https://jsonplaceholder.typicode.com/posts/1\")\n\n# Check resp.ok and print the result\n",
-    "solution_code": "import requests\n\nresp = requests.get(\"https://jsonplaceholder.typicode.com/posts/1\")\n\nif resp.ok:\n    print(\"Success!\")\nelse:\n    print(f\"Failed with status {resp.status_code}\")\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Success!\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `check_response_status(response)` that takes a dictionary with keys `ok` (bool) and `status_code` (int) and **returns** a string:\n- If `response[\"ok\"]` is `True`, return `\"Success!\"`\n- If `response[\"ok\"]` is `False`, return `f\"Failed with status {response['status_code']}\"`\n\nThis simulates checking `resp.ok` and `resp.status_code` from the requests library.",
+    "starter_code": "def check_response_status(response):\n    # Return \"Success!\" if ok is True, otherwise \"Failed with status N\"\n    pass",
+    "test_suite": "def test_successful_response():\n    result = exercise.check_response_status({\"ok\": True, \"status_code\": 200})\n    assert result == \"Success!\", f\"Expected 'Success!', got {result!r}\"\n\ndef test_failed_response_with_404():\n    result = exercise.check_response_status({\"ok\": False, \"status_code\": 404})\n    assert result == \"Failed with status 404\", f\"Expected 'Failed with status 404', got {result!r}\"\n\ndef test_failed_response_with_500():\n    result = exercise.check_response_status({\"ok\": False, \"status_code\": 500})\n    assert result == \"Failed with status 500\", f\"Expected 'Failed with status 500', got {result!r}\"\n\ndef test_failed_response_with_301():\n    result = exercise.check_response_status({\"ok\": False, \"status_code\": 301})\n    assert result == \"Failed with status 301\", f\"Expected 'Failed with status 301', got {result!r}\"",
+    "solution_code": "def check_response_status(response):\n    if response[\"ok\"]:\n        return \"Success!\"\n    else:\n        return f\"Failed with status {response['status_code']}\"",
+    "test_cases": [],
     "order": 1
   },
   {
     "slug": "status-201-created",
     "title": "Identify a 201 Created response",
-    "instruction": "A POST request to create a resource returned a response. The status code is stored in a variable `status_code`. Write code that prints \"Resource created!\" if the status code is 201, or \"Unexpected status\" otherwise.\n\nTest with `status_code = 201`.",
-    "starter_code": "status_code = 201  # This would come from response.status_code in real code\n\n# Check if status_code is 201 and print the right message\n",
-    "solution_code": "status_code = 201\n\nif status_code == 201:\n    print(\"Resource created!\")\nelse:\n    print(\"Unexpected status\")\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Resource created!\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `check_created_status(status_code)` that takes an integer status code and **returns** a string:\n- If the code is `201`, return `\"Resource created!\"`\n- Otherwise, return `\"Unexpected status\"`",
+    "starter_code": "def check_created_status(status_code):\n    # Return \"Resource created!\" if 201, otherwise \"Unexpected status\"\n    pass",
+    "test_suite": "def test_status_201():\n    result = exercise.check_created_status(201)\n    assert result == \"Resource created!\", f\"Expected 'Resource created!', got {result!r}\"\n\ndef test_status_200():\n    result = exercise.check_created_status(200)\n    assert result == \"Unexpected status\", f\"Expected 'Unexpected status', got {result!r}\"\n\ndef test_status_404():\n    result = exercise.check_created_status(404)\n    assert result == \"Unexpected status\", f\"Expected 'Unexpected status', got {result!r}\"\n\ndef test_status_0():\n    result = exercise.check_created_status(0)\n    assert result == \"Unexpected status\", f\"Expected 'Unexpected status', got {result!r}\"",
+    "solution_code": "def check_created_status(status_code):\n    if status_code == 201:\n        return \"Resource created!\"\n    else:\n        return \"Unexpected status\"",
+    "test_cases": [],
     "order": 2
   },
   {
     "slug": "status-404-handling",
     "title": "Handle a 404 Not Found response",
-    "instruction": "A GET request to `https://jsonplaceholder.typicode.com/posts/99999` will return 404. Write code that makes the request, checks the status code, and prints 'Post not found' if it's 404, or the JSON data if it's 200.",
-    "starter_code": "import requests\n\nresponse = requests.get(\"https://jsonplaceholder.typicode.com/posts/99999\")\n\n# Check the status code and handle it\n",
-    "solution_code": "import requests\n\nresponse = requests.get(\"https://jsonplaceholder.typicode.com/posts/99999\")\n\nif response.status_code == 404:\n    print(\"Post not found\")\nelse:\n    print(response.json())\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Post not found\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `handle_post_response(status_code, data=None)` that takes an integer status code and optional data (a dictionary). **Return** a string:\n- If `status_code` is `404`, return `\"Post not found\"`\n- If `status_code` is `200` and `data` is provided, return `str(data)`\n- For any other status code, return `f\"Unexpected status: {status_code}\"`",
+    "starter_code": "def handle_post_response(status_code, data=None):\n    # Return the appropriate message based on status_code\n    pass",
+    "test_suite": "def test_status_404():\n    result = exercise.handle_post_response(404)\n    assert result == \"Post not found\", f\"Expected 'Post not found', got {result!r}\"\n\ndef test_status_200_with_data():\n    result = exercise.handle_post_response(200, {\"title\": \"My Post\"})\n    assert result == \"{'title': 'My Post'}\", f\"Expected the dict as string, got {result!r}\"\n\ndef test_status_500():\n    result = exercise.handle_post_response(500)\n    assert result == \"Unexpected status: 500\", f\"Expected 'Unexpected status: 500', got {result!r}\"\n\ndef test_status_200_without_data():\n    result = exercise.handle_post_response(200)\n    assert result == \"Unexpected status: 200\", f\"Expected 'Unexpected status: 200', got {result!r}\"",
+    "solution_code": "def handle_post_response(status_code, data=None):\n    if status_code == 404:\n        return \"Post not found\"\n    elif status_code == 200 and data is not None:\n        return str(data)\n    else:\n        return f\"Unexpected status: {status_code}\"",
+    "test_cases": [],
     "order": 3
   },
   {
     "slug": "status-class-identifier",
     "title": "Classify a status code by its class",
-    "instruction": "Write a function called `classify_status(code)` that takes an integer status code and returns a string describing its class:\n- 1xx: \"Informational\"\n- 2xx: \"Success\"\n- 3xx: \"Redirection\"\n- 4xx: \"Client Error\"\n- 5xx: \"Server Error\"\n- Anything else: \"Unknown\"\n\nCall the function with `code = 403` and print the result.",
-    "starter_code": "def classify_status(code):\n    # Return the class name based on the first digit\n    pass\n\n# Test with 403\nprint(classify_status(403))\n",
-    "solution_code": "def classify_status(code):\n    if 100 <= code < 200:\n        return \"Informational\"\n    elif 200 <= code < 300:\n        return \"Success\"\n    elif 300 <= code < 400:\n        return \"Redirection\"\n    elif 400 <= code < 500:\n        return \"Client Error\"\n    elif 500 <= code < 600:\n        return \"Server Error\"\n    else:\n        return \"Unknown\"\n\nprint(classify_status(403))\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Client Error\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `classify_status(code)` that takes an integer status code and **returns** a string describing its class:\n- 1xx: `\"Informational\"`\n- 2xx: `\"Success\"`\n- 3xx: `\"Redirection\"`\n- 4xx: `\"Client Error\"`\n- 5xx: `\"Server Error\"`\n- Anything else: `\"Unknown\"`",
+    "starter_code": "def classify_status(code):\n    # Return the class name based on the first digit\n    pass",
+    "test_suite": "def test_status_200():\n    result = exercise.classify_status(200)\n    assert result == \"Success\", f\"Expected 'Success', got {result!r}\"\n\ndef test_status_403():\n    result = exercise.classify_status(403)\n    assert result == \"Client Error\", f\"Expected 'Client Error', got {result!r}\"\n\ndef test_status_500():\n    result = exercise.classify_status(500)\n    assert result == \"Server Error\", f\"Expected 'Server Error', got {result!r}\"\n\ndef test_status_301():\n    result = exercise.classify_status(301)\n    assert result == \"Redirection\", f\"Expected 'Redirection', got {result!r}\"\n\ndef test_status_100():\n    result = exercise.classify_status(100)\n    assert result == \"Informational\", f\"Expected 'Informational', got {result!r}\"\n\ndef test_status_99():\n    result = exercise.classify_status(99)\n    assert result == \"Unknown\", f\"Expected 'Unknown', got {result!r}\"\n\ndef test_status_600():\n    result = exercise.classify_status(600)\n    assert result == \"Unknown\", f\"Expected 'Unknown', got {result!r}\"",
+    "solution_code": "def classify_status(code):\n    if 100 <= code < 200:\n        return \"Informational\"\n    elif 200 <= code < 300:\n        return \"Success\"\n    elif 300 <= code < 400:\n        return \"Redirection\"\n    elif 400 <= code < 500:\n        return \"Client Error\"\n    elif 500 <= code < 600:\n        return \"Server Error\"\n    else:\n        return \"Unknown\"",
+    "test_cases": [],
     "order": 4
   },
   {
     "slug": "status-exponential-backoff",
     "title": "Implement retry with exponential backoff",
-    "instruction": "Write a loop that retries a request up to 3 times when the status code is 429 (rate limited). Use an exponential backoff delay: 1 second for the first retry, 2 for the second, 4 for the third. Print \"Waiting {n} seconds...\" before each retry.\n\nSimulate with a function `fake_request()` that returns a mock response with status code 429 for the first 2 calls, then 200 on the 3rd.",
-    "starter_code": "attempt = 0\nmax_retries = 3\n\n# Simulate a rate-limited API\nresponses = [429, 429, 200]\n\ndef fake_request():\n    global attempt\n    result = responses[attempt]\n    attempt += 1\n    # Return an object with .status_code\n    class MockResponse:\n        pass\n    r = MockResponse()\n    r.status_code = result\n    return r\n\n# Call fake_request(), check status, retry with backoff if 429\n",
-    "solution_code": "attempt = 0\nmax_retries = 3\nresponses = [429, 429, 200]\n\ndef fake_request():\n    global attempt\n    result = responses[attempt]\n    attempt += 1\n    class MockResponse:\n        pass\n    r = MockResponse()\n    r.status_code = result\n    return r\n\nfor i in range(max_retries):\n    response = fake_request()\n    if response.status_code == 200:\n        print(\"Success!\")\n        break\n    elif response.status_code == 429:\n        wait = 2 ** i\n        print(f\"Waiting {wait} seconds...\")\n    else:\n        print(f\"Error: {response.status_code}\")\n        break\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Waiting 1 seconds...\nWaiting 2 seconds...\nSuccess!\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define two functions:\n\n1. `should_retry(status_code)` \u2014 **returns** `True` if the status code is `429` (rate limited) or `503` (service unavailable), `False` otherwise.\n\n2. `get_backoff_wait(attempt)` \u2014 takes the attempt number (0-indexed) and **returns** the number of seconds to wait: `2 ** attempt` (1 for attempt 0, 2 for attempt 1, 4 for attempt 2).\n\nThese two functions together model retry logic with exponential backoff.",
+    "starter_code": "def should_retry(status_code):\n    # Return True if status_code indicates we should retry (429 or 503)\n    pass\n\ndef get_backoff_wait(attempt):\n    # Return the wait time in seconds: 2 ** attempt\n    pass",
+    "test_suite": "def test_should_retry_429():\n    assert exercise.should_retry(429) == True, \"Expected True for 429\"\n\ndef test_should_retry_503():\n    assert exercise.should_retry(503) == True, \"Expected True for 503\"\n\ndef test_should_not_retry_success():\n    assert exercise.should_retry(200) == False, \"Expected False for 200\"\n\ndef test_should_not_retry_client_error():\n    assert exercise.should_retry(404) == False, \"Expected False for 404\"\n\ndef test_should_not_retry_server_error():\n    assert exercise.should_retry(500) == False, \"Expected False for 500\"\n\ndef test_backoff_attempt_0():\n    assert exercise.get_backoff_wait(0) == 1, f\"Expected 1, got {exercise.get_backoff_wait(0)}\"\n\ndef test_backoff_attempt_1():\n    assert exercise.get_backoff_wait(1) == 2, f\"Expected 2, got {exercise.get_backoff_wait(1)}\"\n\ndef test_backoff_attempt_2():\n    assert exercise.get_backoff_wait(2) == 4, f\"Expected 4, got {exercise.get_backoff_wait(2)}\"\n\ndef test_backoff_attempt_3():\n    assert exercise.get_backoff_wait(3) == 8, f\"Expected 8, got {exercise.get_backoff_wait(3)}\"",
+    "solution_code": "def should_retry(status_code):\n    return status_code in (429, 503)\n\ndef get_backoff_wait(attempt):\n    return 2 ** attempt",
+    "test_cases": [],
     "order": 5
   },
   {
     "slug": "status-raise-for-status",
     "title": "Use raise_for_status() correctly",
-    "instruction": "Write code that makes a GET request to `https://jsonplaceholder.typicode.com/posts/1`, uses `raise_for_status()` to check for errors, and if successful, parses the JSON and prints the `title` field.\n\nWrap the call in a try/except that catches `requests.exceptions.HTTPError` and prints \"HTTP error occurred\".",
-    "starter_code": "import requests\n\ntry:\n    response = requests.get(\"https://jsonplaceholder.typicode.com/posts/1\")\n    # Use raise_for_status() here\n    # Parse and print the title\nexcept requests.exceptions.HTTPError:\n    print(\"HTTP error occurred\")\n",
-    "solution_code": "import requests\n\ntry:\n    response = requests.get(\"https://jsonplaceholder.typicode.com/posts/1\")\n    response.raise_for_status()\n    data = response.json()\n    print(data[\"title\"])\nexcept requests.exceptions.HTTPError:\n    print(\"HTTP error occurred\")\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "sunt aut facere repellat provident occaecati excepturi optio reprehenderit\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `safe_get_title(response)` that takes a dictionary representing an API response with possible keys:\n- `\"status_code\"`: int (e.g., 200, 404)\n- `\"ok\"`: bool\n- `\"data\"`: dict (the parsed JSON body, present only on success)\n\nThe function should:\n- If `response[\"ok\"]` is `True`, return `response[\"data\"][\"title\"]`\n- If `response[\"ok\"]` is `False`, return `None`\n\nThis mimics using `raise_for_status()` then parsing JSON.",
+    "starter_code": "def safe_get_title(response):\n    # Return the title from data if ok is True, otherwise None\n    pass",
+    "test_suite": "def test_returns_title():\n    result = exercise.safe_get_title({\"ok\": True, \"data\": {\"title\": \"My Post\", \"id\": 1}})\n    assert result == \"My Post\", f\"Expected 'My Post', got {result!r}\"\n\ndef test_returns_none_when_not_ok():\n    result = exercise.safe_get_title({\"ok\": False, \"status_code\": 404})\n    assert result is None, f\"Expected None, got {result!r}\"\n\ndef test_returns_title_with_different_value():\n    result = exercise.safe_get_title({\"ok\": True, \"data\": {\"title\": \"Hello World\"}})\n    assert result == \"Hello World\", f\"Expected 'Hello World', got {result!r}\"\n\ndef test_raises_key_error_on_missing_data():\n    try:\n        exercise.safe_get_title({\"ok\": True, \"data\": {}})\n        assert False, \"Expected a KeyError or similar for missing 'title'\"\n    except KeyError:\n        pass",
+    "solution_code": "def safe_get_title(response):\n    if response[\"ok\"]:\n        return response[\"data\"][\"title\"]\n    return None",
+    "test_cases": [],
     "order": 6
   },
   {
     "slug": "status-redirect-follow",
     "title": "Understand automatic redirect following",
-    "instruction": "Many APIs redirect HTTP to HTTPS (status 301). Python's `requests` library follows redirects automatically. Use `allow_redirects=False` to see the original 301 response.\n\nMake a GET request to `http://httpbin.org/redirect/1` (which returns a 302 redirect) with `allow_redirects=False`. Print the status code and the `Location` header.\n\nIf you can't access httpbin.org, simulate: set `response.status_code = 302` and `response.headers = {\"Location\": \"https://new-url.com\"}`.",
-    "starter_code": "import requests\n\nresponse = requests.get(\"http://httpbin.org/redirect/1\", allow_redirects=False)\n\n# Print the status code and Location header\n",
-    "solution_code": "import requests\n\ntry:\n    response = requests.get(\"http://httpbin.org/redirect/1\", allow_redirects=False, timeout=5)\n    print(f\"Status: {response.status_code}\")\n    print(f\"Location: {response.headers.get('Location')}\")\nexcept requests.exceptions.ConnectionError:\n    # Fallback for offline: simulate\n    class MockResponse:\n        status_code = 302\n        headers = {\"Location\": \"https://new-url.com\"}\n    response = MockResponse()\n    print(f\"Status: {response.status_code}\")\n    print(f\"Location: {response.headers.get('Location')}\")\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "302",
-        "comparison_type": "contains"
-      },
-      {
-        "input": "",
-        "expected_output": "response.status_code",
-        "comparison_type": "code_contains"
-      },
-      {
-        "input": "",
-        "expected_output": "Location",
-        "comparison_type": "code_contains"
-      }
-    ],
+    "instruction": "Define a function `format_redirect_info(status_code, location)` that takes an HTTP status code (int) and a redirect location (string) and **returns** a formatted string:\n- If the status code is `301` or `302`, return `f\"Redirected to: {location}\"`\n- For any other code, return `f\"Status: {status_code}\"`\n\nThis simulates what you'd see when you make a request with `allow_redirects=False` and inspect the `Location` header.",
+    "starter_code": "def format_redirect_info(status_code, location):\n    # Return formatted redirect info based on status_code\n    pass",
+    "test_suite": "def test_301_redirect():\n    result = exercise.format_redirect_info(301, \"https://example.com\")\n    assert result == \"Redirected to: https://example.com\", f\"Got {result!r}\"\n\ndef test_302_redirect():\n    result = exercise.format_redirect_info(302, \"https://new-url.com\")\n    assert result == \"Redirected to: https://new-url.com\", f\"Got {result!r}\"\n\ndef test_non_redirect_status():\n    result = exercise.format_redirect_info(200, \"https://example.com\")\n    assert result == \"Status: 200\", f\"Got {result!r}\"\n\ndef test_empty_location():\n    result = exercise.format_redirect_info(302, \"\")\n    assert result == \"Redirected to: \", f\"Got {result!r}\"",
+    "solution_code": "def format_redirect_info(status_code, location):\n    if status_code in (301, 302):\n        return f\"Redirected to: {location}\"\n    return f\"Status: {status_code}\"",
+    "test_cases": [],
     "order": 7
   },
   {
     "slug": "status-401-vs-403",
     "title": "Distinguish 401 Unauthorized from 403 Forbidden",
-    "instruction": "Write a function called `check_auth_status(status_code)` that prints:\n- \"Please log in\" for 401\n- \"Access denied\" for 403\n- \"Something else\" for any other code\n\nTest it with `status_code = 401` and `status_code = 403`.",
-    "starter_code": "def check_auth_status(status_code):\n    # Print the right message for 401 and 403\n    pass\n\n# Test both codes\ncheck_auth_status(401)\ncheck_auth_status(403)\n",
-    "solution_code": "def check_auth_status(status_code):\n    if status_code == 401:\n        print(\"Please log in\")\n    elif status_code == 403:\n        print(\"Access denied\")\n    else:\n        print(\"Something else\")\n\ncheck_auth_status(401)\ncheck_auth_status(403)\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Please log in\nAccess denied\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `check_auth_status(status_code)` that takes an integer status code and **returns** a string:\n- `401`: return `\"Please log in\"`\n- `403`: return `\"Access denied\"`\n- Any other code: return `\"Something else\"`",
+    "starter_code": "def check_auth_status(status_code):\n    # Return the appropriate message for 401, 403, or other codes\n    pass",
+    "test_suite": "def test_status_401():\n    result = exercise.check_auth_status(401)\n    assert result == \"Please log in\", f\"Expected 'Please log in', got {result!r}\"\n\ndef test_status_403():\n    result = exercise.check_auth_status(403)\n    assert result == \"Access denied\", f\"Expected 'Access denied', got {result!r}\"\n\ndef test_status_404():\n    result = exercise.check_auth_status(404)\n    assert result == \"Something else\", f\"Expected 'Something else', got {result!r}\"\n\ndef test_status_200():\n    result = exercise.check_auth_status(200)\n    assert result == \"Something else\", f\"Expected 'Something else', got {result!r}\"\n\ndef test_status_500():\n    result = exercise.check_auth_status(500)\n    assert result == \"Something else\", f\"Expected 'Something else', got {result!r}\"",
+    "solution_code": "def check_auth_status(status_code):\n    if status_code == 401:\n        return \"Please log in\"\n    elif status_code == 403:\n        return \"Access denied\"\n    else:\n        return \"Something else\"",
+    "test_cases": [],
     "order": 8
   }
 ]

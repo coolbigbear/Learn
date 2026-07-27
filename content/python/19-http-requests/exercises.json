@@ -2,121 +2,81 @@
   {
     "slug": "http-url-with-path",
     "title": "Construct a URL with a path variable",
-    "instruction": "Write code that builds a URL by inserting a user ID into the path. Given the base URL `https://api.example.com/users/` and a variable `user_id = 42`, construct the full URL using an f-string and print it.\n\nThe output should be: `https://api.example.com/users/42`",
-    "starter_code": "base_url = \"https://api.example.com/users/\"\nuser_id = 42\n\n# Construct the full URL with path variable using an f-string\n# Print the result\n",
-    "solution_code": "base_url = \"https://api.example.com/users/\"\nuser_id = 42\n\nurl = f\"{base_url}{user_id}\"\nprint(url)\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "https://api.example.com/users/42\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `build_user_url(user_id)` that takes a user ID (integer) and **returns** the full URL string in the format `https://api.example.com/users/{user_id}`.\n\nUse an f-string to insert the user_id into the path.",
+    "starter_code": "def build_user_url(user_id):\n    # Return the full URL with user_id inserted into the path\n    pass",
+    "test_suite": "def test_returns_url_with_id():\n    result = exercise.build_user_url(42)\n    assert result == \"https://api.example.com/users/42\", f\"Expected 'https://api.example.com/users/42', got {result!r}\"\n\ndef test_returns_url_with_zero():\n    result = exercise.build_user_url(0)\n    assert result == \"https://api.example.com/users/0\", f\"Expected 'https://api.example.com/users/0', got {result!r}\"\n\ndef test_returns_url_with_large_id():\n    result = exercise.build_user_url(9999)\n    assert result == \"https://api.example.com/users/9999\", f\"Expected 'https://api.example.com/users/9999', got {result!r}\"\n\ndef test_returns_string():\n    result = exercise.build_user_url(7)\n    assert isinstance(result, str), f\"Expected a string, got {type(result).__name__}\"",
+    "solution_code": "def build_user_url(user_id):\n    return f\"https://api.example.com/users/{user_id}\"",
+    "test_cases": [],
     "order": 1
   },
   {
     "slug": "http-headers-dict",
     "title": "Build a headers dictionary with Accept",
-    "instruction": "Create a dictionary called `headers` with the keys `Accept` (set to `application/json`) and `User-Agent` (set to `PythonRequests/1.0`). Then print the dictionary.",
-    "starter_code": "# Create the headers dictionary and print it\n",
-    "solution_code": "headers = {\n    \"Accept\": \"application/json\",\n    \"User-Agent\": \"PythonRequests/1.0\"\n}\nprint(headers)\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "{'Accept': 'application/json', 'User-Agent': 'PythonRequests/1.0'}\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `build_headers()` that **returns** a dictionary with the keys `Accept` (set to `application/json`) and `User-Agent` (set to `PythonRequests/1.0`).",
+    "starter_code": "def build_headers():\n    # Return the headers dictionary\n    pass",
+    "test_suite": "def test_has_accept_key():\n    result = exercise.build_headers()\n    assert \"Accept\" in result, f\"Key 'Accept' not found in headers: {result}\"\n    assert result[\"Accept\"] == \"application/json\", f\"Expected 'application/json', got {result['Accept']!r}\"\n\ndef test_has_user_agent():\n    result = exercise.build_headers()\n    assert \"User-Agent\" in result, f\"Key 'User-Agent' not found in headers: {result}\"\n    assert result[\"User-Agent\"] == \"PythonRequests/1.0\", f\"Expected 'PythonRequests/1.0', got {result['User-Agent']!r}\"\n\ndef test_returns_dict():\n    result = exercise.build_headers()\n    assert isinstance(result, dict), f\"Expected a dict, got {type(result).__name__}\"\n\ndef test_has_exactly_two_keys():\n    result = exercise.build_headers()\n    assert len(result) == 2, f\"Expected 2 keys, got {len(result)}: {result}\"",
+    "solution_code": "def build_headers():\n    return {\n        \"Accept\": \"application/json\",\n        \"User-Agent\": \"PythonRequests/1.0\"\n    }",
+    "test_cases": [],
     "order": 2
   },
   {
     "slug": "http-get-path-variable",
     "title": "GET request with a path variable",
-    "instruction": "Write a program that sets `user_id = 3`, then uses an f-string to build the URL `https://jsonplaceholder.typicode.com/users/{user_id}` and prints it.\n\nThe output should be: `https://jsonplaceholder.typicode.com/users/3`",
-    "starter_code": "user_id = 3\n\n# Build the URL with f-string\n# Print the URL\n",
-    "solution_code": "user_id = 3\nurl = f\"https://jsonplaceholder.typicode.com/users/{user_id}\"\nprint(url)\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "https://jsonplaceholder.typicode.com/users/3\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `build_jsonplaceholder_url(user_id)` that takes a user ID (integer) and **returns** the URL string `https://jsonplaceholder.typicode.com/users/{user_id}`.\n\nUse an f-string to insert the user_id into the path.",
+    "starter_code": "def build_jsonplaceholder_url(user_id):\n    # Return the full URL with user_id inserted\n    pass",
+    "test_suite": "def test_returns_url_with_id_3():\n    result = exercise.build_jsonplaceholder_url(3)\n    assert result == \"https://jsonplaceholder.typicode.com/users/3\", f\"Expected 'https://jsonplaceholder.typicode.com/users/3', got {result!r}\"\n\ndef test_returns_url_with_id_1():\n    result = exercise.build_jsonplaceholder_url(1)\n    assert result == \"https://jsonplaceholder.typicode.com/users/1\", f\"Expected 'https://jsonplaceholder.typicode.com/users/1', got {result!r}\"\n\ndef test_returns_url_with_large_id():\n    result = exercise.build_jsonplaceholder_url(99999)\n    assert result == \"https://jsonplaceholder.typicode.com/users/99999\", f\"Expected 'https://jsonplaceholder.typicode.com/users/99999', got {result!r}\"",
+    "solution_code": "def build_jsonplaceholder_url(user_id):\n    return f\"https://jsonplaceholder.typicode.com/users/{user_id}\"",
+    "test_cases": [],
     "order": 3
   },
   {
     "slug": "http-multiple-path-vars",
     "title": "URL with multiple path variables",
-    "instruction": "Write code that constructs a URL with two path variables: `user_id = 7` and `post_id = 15`. The URL pattern is `https://jsonplaceholder.typicode.com/users/{user_id}/posts/{post_id}`. Use an f-string and print the resulting URL.",
-    "starter_code": "user_id = 7\npost_id = 15\n\n# Construct the URL with both path variables\n# Print the URL\n",
-    "solution_code": "user_id = 7\npost_id = 15\n\nurl = f\"https://jsonplaceholder.typicode.com/users/{user_id}/posts/{post_id}\"\nprint(url)\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "https://jsonplaceholder.typicode.com/users/7/posts/15\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `build_post_url(user_id, post_id)` that takes two integers and **returns** the URL string `https://jsonplaceholder.typicode.com/users/{user_id}/posts/{post_id}`.\n\nUse an f-string to insert both variables into the path.",
+    "starter_code": "def build_post_url(user_id, post_id):\n    # Return the URL with both path variables\n    pass",
+    "test_suite": "def test_returns_url_with_7_and_15():\n    result = exercise.build_post_url(7, 15)\n    assert result == \"https://jsonplaceholder.typicode.com/users/7/posts/15\", f\"Expected 'https://jsonplaceholder.typicode.com/users/7/posts/15', got {result!r}\"\n\ndef test_returns_url_with_1_and_1():\n    result = exercise.build_post_url(1, 1)\n    assert result == \"https://jsonplaceholder.typicode.com/users/1/posts/1\", f\"Expected 'https://jsonplaceholder.typicode.com/users/1/posts/1', got {result!r}\"\n\ndef test_returns_url_with_large_ids():\n    result = exercise.build_post_url(100, 200)\n    assert result == \"https://jsonplaceholder.typicode.com/users/100/posts/200\", f\"Expected 'https://jsonplaceholder.typicode.com/users/100/posts/200', got {result!r}\"\n\ndef test_returns_string():\n    result = exercise.build_post_url(0, 0)\n    assert isinstance(result, str), f\"Expected a string, got {type(result).__name__}\"",
+    "solution_code": "def build_post_url(user_id, post_id):\n    return f\"https://jsonplaceholder.typicode.com/users/{user_id}/posts/{post_id}\"",
+    "test_cases": [],
     "order": 4
   },
   {
     "slug": "http-post-with-json",
     "title": "POST request with JSON body",
-    "instruction": "Write a program that creates the data dictionary and URL for a POST request. Use:\n- URL: `https://jsonplaceholder.typicode.com/posts`\n- JSON body: `{\"title\": \"My Post\", \"body\": \"Post content\", \"userId\": 1}`\n\nPrint the URL and the data dict (one per line). The output should be:\n```\nhttps://jsonplaceholder.typicode.com/posts\n{'title': 'My Post', 'body': 'Post content', 'userId': 1}\n```",
-    "starter_code": "# Create URL, data dict, and print them\n",
-    "solution_code": "url = \"https://jsonplaceholder.typicode.com/posts\"\ndata = {\"title\": \"My Post\", \"body\": \"Post content\", \"userId\": 1}\nprint(url)\nprint(data)\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "https://jsonplaceholder.typicode.com/posts\n{'title': 'My Post', 'body': 'Post content', 'userId': 1}\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `get_posts_url()` that returns the string `\"https://jsonplaceholder.typicode.com/posts\"`.\n\nDefine a function `create_post_payload()` that **returns** a dictionary with the keys `title` (\"My Post\"), `body` (\"Post content\"), and `userId` (1).",
+    "starter_code": "def get_posts_url():\n    # Return the posts endpoint URL\n    pass\n\ndef create_post_payload():\n    # Return the data dictionary for a new post\n    pass",
+    "test_suite": "def test_get_posts_url():\n    result = exercise.get_posts_url()\n    assert result == \"https://jsonplaceholder.typicode.com/posts\", f\"Expected posts URL, got {result!r}\"\n\ndef test_create_post_payload_has_title():\n    result = exercise.create_post_payload()\n    assert \"title\" in result, f\"Key 'title' not found: {result}\"\n    assert result[\"title\"] == \"My Post\", f\"Expected 'My Post', got {result['title']!r}\"\n\ndef test_create_post_payload_has_body():\n    result = exercise.create_post_payload()\n    assert \"body\" in result, f\"Key 'body' not found: {result}\"\n    assert result[\"body\"] == \"Post content\", f\"Expected 'Post content', got {result['body']!r}\"\n\ndef test_create_post_payload_has_userId():\n    result = exercise.create_post_payload()\n    assert \"userId\" in result, f\"Key 'userId' not found: {result}\"\n    assert result[\"userId\"] == 1, f\"Expected userId 1, got {result['userId']}\"\n\ndef test_create_post_payload_returns_dict():\n    result = exercise.create_post_payload()\n    assert isinstance(result, dict), f\"Expected a dict, got {type(result).__name__}\"",
+    "solution_code": "def get_posts_url():\n    return \"https://jsonplaceholder.typicode.com/posts\"\n\ndef create_post_payload():\n    return {\"title\": \"My Post\", \"body\": \"Post content\", \"userId\": 1}",
+    "test_cases": [],
     "order": 5
   },
   {
     "slug": "http-auth-header",
     "title": "GET request with Authorization header",
-    "instruction": "Write a program that creates a headers dictionary with an `Authorization` header set to `Bearer my-secret-token` and an `Accept` header set to `application/json`. Print the headers dictionary.",
-    "starter_code": "# Build headers with Authorization (Bearer) and Accept\n# Print the headers dict\n",
-    "solution_code": "headers = {\n    \"Authorization\": \"Bearer my-secret-token\",\n    \"Accept\": \"application/json\"\n}\nprint(headers)\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "{'Authorization': 'Bearer my-secret-token', 'Accept': 'application/json'}\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `build_auth_headers()` that **returns** a dictionary with:\n- `Authorization`: `\"Bearer my-secret-token\"`\n- `Accept`: `\"application/json\"`",
+    "starter_code": "def build_auth_headers():\n    # Return headers with Authorization and Accept\n    pass",
+    "test_suite": "def test_has_authorization():\n    result = exercise.build_auth_headers()\n    assert \"Authorization\" in result, f\"Key 'Authorization' not found: {result}\"\n    assert result[\"Authorization\"] == \"Bearer my-secret-token\", f\"Expected 'Bearer my-secret-token', got {result['Authorization']!r}\"\n\ndef test_has_accept():\n    result = exercise.build_auth_headers()\n    assert \"Accept\" in result, f\"Key 'Accept' not found: {result}\"\n    assert result[\"Accept\"] == \"application/json\", f\"Expected 'application/json', got {result['Accept']!r}\"\n\ndef test_returns_dict():\n    result = exercise.build_auth_headers()\n    assert isinstance(result, dict), f\"Expected a dict, got {type(result).__name__}\"\n\ndef test_has_exactly_two_keys():\n    result = exercise.build_auth_headers()\n    assert len(result) == 2, f\"Expected 2 keys, got {len(result)}: {result}\"",
+    "solution_code": "def build_auth_headers():\n    return {\n        \"Authorization\": \"Bearer my-secret-token\",\n        \"Accept\": \"application/json\"\n    }",
+    "test_cases": [],
     "order": 6
   },
   {
     "slug": "http-content-type-form",
     "title": "POST request with form data",
-    "instruction": "Write a program that shows how to send form-encoded data. Create:\n- A variable `form_data` with the dict `{\"username\": \"alice\", \"password\": \"secret\"}`\n- A variable `url` set to `https://httpbin.org/post`\n\nPrint the URL and the form data dict (one per line).\n\nThe output should be:\n```\nhttps://httpbin.org/post\n{'username': 'alice', 'password': 'secret'}\n```\n\nRemember: when using `data=` with `requests.post()`, the `Content-Type` header is automatically set to `application/x-www-form-urlencoded`.",
-    "starter_code": "# Create URL and form data dict, print both\n",
-    "solution_code": "url = \"https://httpbin.org/post\"\nform_data = {\"username\": \"alice\", \"password\": \"secret\"}\nprint(url)\nprint(form_data)\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "https://httpbin.org/post\n{'username': 'alice', 'password': 'secret'}\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `get_form_post_url()` that returns the string `\"https://httpbin.org/post\"`.\n\nDefine a function `create_form_data()` that **returns** a dictionary with keys `username` (\"alice\") and `password` (\"secret\").\n\nRemember: when using `data=` with `requests.post()`, the `Content-Type` header is automatically set to `application/x-www-form-urlencoded`.",
+    "starter_code": "def get_form_post_url():\n    # Return the form submission URL\n    pass\n\ndef create_form_data():\n    # Return the form data dictionary\n    pass",
+    "test_suite": "def test_get_form_post_url():\n    result = exercise.get_form_post_url()\n    assert result == \"https://httpbin.org/post\", f\"Expected 'https://httpbin.org/post', got {result!r}\"\n\ndef test_create_form_data_has_username():\n    result = exercise.create_form_data()\n    assert \"username\" in result, f\"Key 'username' not found: {result}\"\n    assert result[\"username\"] == \"alice\", f\"Expected 'alice', got {result['username']!r}\"\n\ndef test_create_form_data_has_password():\n    result = exercise.create_form_data()\n    assert \"password\" in result, f\"Key 'password' not found: {result}\"\n    assert result[\"password\"] == \"secret\", f\"Expected 'secret', got {result['password']!r}\"\n\ndef test_create_form_data_returns_dict():\n    result = exercise.create_form_data()\n    assert isinstance(result, dict), f\"Expected a dict, got {type(result).__name__}\"",
+    "solution_code": "def get_form_post_url():\n    return \"https://httpbin.org/post\"\n\ndef create_form_data():\n    return {\"username\": \"alice\", \"password\": \"secret\"}",
+    "test_cases": [],
     "order": 7
   },
   {
     "slug": "http-put-with-headers",
     "title": "PUT request with path variable and headers",
-    "instruction": "Write a program that prepares a PUT request to update a post. Create:\n- `post_id = 1`\n- A URL variable using f-string: `https://jsonplaceholder.typicode.com/posts/{post_id}`\n- A headers dict with `Content-Type` and `Accept` both set to `application/json`\n- A data dict with `{\"id\": 1, \"title\": \"Updated\", \"body\": \"Updated body\", \"userId\": 1}`\n\nPrint the URL, then the headers dict, then the data dict (one per line, in that order).",
-    "starter_code": "post_id = 1\n\n# Build URL, headers, and data dict\n# Print them one per line\n",
-    "solution_code": "post_id = 1\nurl = f\"https://jsonplaceholder.typicode.com/posts/{post_id}\"\nheaders = {\n    \"Content-Type\": \"application/json\",\n    \"Accept\": \"application/json\"\n}\ndata = {\"id\": 1, \"title\": \"Updated\", \"body\": \"Updated body\", \"userId\": 1}\nprint(url)\nprint(headers)\nprint(data)\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "https://jsonplaceholder.typicode.com/posts/1\n{'Content-Type': 'application/json', 'Accept': 'application/json'}\n{'id': 1, 'title': 'Updated', 'body': 'Updated body', 'userId': 1}\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `get_update_url(post_id)` that returns `https://jsonplaceholder.typicode.com/posts/{post_id}` using an f-string.\n\nDefine a function `get_update_headers()` that returns a dict with `Content-Type` and `Accept` both set to `\"application/json\"`.\n\nDefine a function `get_update_data()` that returns a dict with `id` (1), `title` (\"Updated\"), `body` (\"Updated body\"), and `userId` (1).",
+    "starter_code": "def get_update_url(post_id):\n    # Return the URL with post_id in the path\n    pass\n\ndef get_update_headers():\n    # Return headers with Content-Type and Accept\n    pass\n\ndef get_update_data():\n    # Return the update payload dictionary\n    pass",
+    "test_suite": "def test_get_update_url():\n    result = exercise.get_update_url(1)\n    assert result == \"https://jsonplaceholder.typicode.com/posts/1\", f\"Expected URL, got {result!r}\"\n\ndef test_get_update_url_with_different_id():\n    result = exercise.get_update_url(5)\n    assert result == \"https://jsonplaceholder.typicode.com/posts/5\", f\"Expected URL, got {result!r}\"\n\ndef test_get_update_headers():\n    result = exercise.get_update_headers()\n    assert result[\"Content-Type\"] == \"application/json\", f\"Expected 'application/json', got {result.get('Content-Type')!r}\"\n    assert result[\"Accept\"] == \"application/json\", f\"Expected 'application/json', got {result.get('Accept')!r}\"\n\ndef test_get_update_data():\n    result = exercise.get_update_data()\n    assert result[\"id\"] == 1\n    assert result[\"title\"] == \"Updated\", f\"Expected 'Updated', got {result['title']!r}\"\n    assert result[\"body\"] == \"Updated body\", f\"Expected 'Updated body', got {result['body']!r}\"\n    assert result[\"userId\"] == 1",
+    "solution_code": "def get_update_url(post_id):\n    return f\"https://jsonplaceholder.typicode.com/posts/{post_id}\"\n\ndef get_update_headers():\n    return {\n        \"Content-Type\": \"application/json\",\n        \"Accept\": \"application/json\"\n    }\n\ndef get_update_data():\n    return {\"id\": 1, \"title\": \"Updated\", \"body\": \"Updated body\", \"userId\": 1}",
+    "test_cases": [],
     "order": 8
   }
 ]
