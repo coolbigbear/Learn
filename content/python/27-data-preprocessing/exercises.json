@@ -2,31 +2,21 @@
   {
     "slug": "preproc-fill-nan",
     "title": "Fill missing values with column mean",
-    "instruction": "You have the following dataset with missing values. Fill each NaN with the mean of its column (using np.nanmean), then print the filled array.\n\nData:\n[[ 1.,  2., np.nan],\n [ 4., np.nan,  6.],\n [ 7.,  8.,  9.]]",
-    "starter_code": "import numpy as np\n\ndata = np.array([[ 1.,  2., np.nan],\n                 [ 4., np.nan,  6.],\n                 [ 7.,  8.,  9.]])\n\n# Fill NaN with column means\n",
-    "solution_code": "import numpy as np\n\ndata = np.array([[ 1.,  2., np.nan],\n                 [ 4., np.nan,  6.],\n                 [ 7.,  8.,  9.]])\n\ncol_mean = np.nanmean(data, axis=0)\nfor col in range(data.shape[1]):\n    mask = np.isnan(data[:, col])\n    data[mask, col] = col_mean[col]\n\nprint(data)\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "[[1. 2. 9.]\n [4. 5. 6.]\n [7. 8. 9.]]\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `fill_nan_with_mean(data)` that takes a 2D NumPy array with possible NaN values and **returns** a new array where each NaN is replaced with the **mean of its column** (ignoring NaN when computing the mean).\n\nUse `np.nanmean(data, axis=0)` to compute column means while ignoring NaN values. Do **not** modify the original array \u2014 return a copy.",
+    "starter_code": "import numpy as np\n\ndef fill_nan_with_mean(data):\n    # Return a copy with NaN values filled by column means\n    pass",
+    "solution_code": "import numpy as np\n\ndef fill_nan_with_mean(data):\n    result = data.copy()\n    col_mean = np.nanmean(data, axis=0)\n    for col in range(data.shape[1]):\n        mask = np.isnan(result[:, col])\n        result[mask, col] = col_mean[col]\n    return result",
+    "test_suite": "import numpy as np\n\nSAMPLE_DATA = np.array([\n    [1., 2., np.nan],\n    [4., np.nan, 6.],\n    [7., 8., 9.]\n])\n\ndef test_fills_nan_with_column_mean():\n    result = exercise.fill_nan_with_mean(SAMPLE_DATA)\n    # Column 0: mean of [1, 4, 7] = 4.0, no NaN anyway\n    # Column 1: mean of [2, 8] = 5.0 (ignoring NaN), so NaN at [1, 1] becomes 5.0\n    # Column 2: mean of [6, 9] = 7.5 (ignoring NaN), so NaN at [0, 2] becomes 7.5\n    expected = np.array([\n        [1., 2., 7.5],\n        [4., 5., 6.],\n        [7., 8., 9.]\n    ])\n    assert np.allclose(result, expected), f\"Expected:\\n{expected}\\nGot:\\n{result}\"\n\ndef test_no_nan_input():\n    data = np.array([[1., 2.], [3., 4.]])\n    result = exercise.fill_nan_with_mean(data)\n    assert np.allclose(result, data), f\"Should return copy of original when no NaN, got:\\n{result}\"\n\ndef test_does_not_mutate_original():\n    original = SAMPLE_DATA.copy()\n    _ = exercise.fill_nan_with_mean(SAMPLE_DATA)\n    # Check non-NaN positions are unchanged (NaN != NaN in float comparison)\n    mask = ~np.isnan(SAMPLE_DATA)\n    assert np.allclose(SAMPLE_DATA[mask], original[mask]), \"Function should not modify the original array\"\n    # NaN positions should still be NaN\n    assert np.all(np.isnan(SAMPLE_DATA) == np.isnan(original)), \"NaN positions should remain NaN\"\n\ndef test_all_nan_one_column():\n    data = np.array([[1., np.nan], [3., np.nan]])\n    # Column 1 is all NaN, np.nanmean returns NaN for that column\n    result = exercise.fill_nan_with_mean(data)\n    # The NaN in column 1 stays NaN since the mean is NaN\n    assert np.isnan(result[0, 1]), \"Column with all NaN should remain NaN\"\n    assert np.isnan(result[1, 1]), \"Column with all NaN should remain NaN\"\n\ndef test_returns_ndarray():\n    result = exercise.fill_nan_with_mean(SAMPLE_DATA)\n    assert isinstance(result, np.ndarray), f\"Expected numpy.ndarray, got {type(result)}\"",
+    "test_cases": [],
     "order": 1
   },
   {
     "slug": "preproc-standardize",
     "title": "Standardize a dataset",
-    "instruction": "Standardize the following dataset (center at mean=0, scale to std=1). Print the standardized array and its new mean and standard deviation (rounded to 2 decimal places).\n\nData: [10, 20, 30, 40, 50]",
-    "starter_code": "import numpy as np\n\ndata = np.array([10, 20, 30, 40, 50], dtype=float)\n\n# Standardize the data\n",
-    "solution_code": "import numpy as np\n\ndata = np.array([10, 20, 30, 40, 50], dtype=float)\n\nstandardized = (data - data.mean()) / data.std()\nprint(standardized)\nprint(f\"Mean: {standardized.mean():.2f}, Std: {standardized.std():.2f}\")\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "[-1.41421356 -0.70710678  0.          0.70710678  1.41421356]\nMean: -0.00, Std: 1.00\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `standardize(data)` that takes a 1D NumPy array and **returns** a **standardized** version: each value is centered at mean 0 and scaled to standard deviation 1.\n\nFormula: `(data - mean) / std`\n\nUse `import numpy as np` and return the standardized array (as a NumPy array of floats).",
+    "starter_code": "import numpy as np\n\ndef standardize(data):\n    # Return a standardized copy of the array\n    pass",
+    "solution_code": "import numpy as np\n\ndef standardize(data):\n    return (data - data.mean()) / data.std()",
+    "test_suite": "import numpy as np\n\ndef test_standardize_basic():\n    data = np.array([10, 20, 30, 40, 50], dtype=float)\n    result = exercise.standardize(data)\n    expected = np.array([-1.41421356, -0.70710678, 0., 0.70710678, 1.41421356])\n    assert np.allclose(result, expected, atol=1e-5), f\"Expected approx {expected}, got {result}\"\n\ndef test_mean_is_zero():\n    data = np.array([10, 20, 30, 40, 50], dtype=float)\n    result = exercise.standardize(data)\n    assert abs(result.mean()) < 1e-10, f\"Mean should be ~0, got {result.mean()}\"\n\ndef test_std_is_one():\n    data = np.array([10, 20, 30, 40, 50], dtype=float)\n    result = exercise.standardize(data)\n    assert abs(result.std() - 1.0) < 1e-10, f\"Std should be ~1, got {result.std()}\"\n\ndef test_constant_array():\n    data = np.array([5, 5, 5, 5])\n    result = exercise.standardize(data)\n    # Division by zero: std is 0, should produce NaN or inf\n    assert np.all(np.isnan(result)) or np.all(np.isinf(result)), f\"Constant input should produce NaN or inf, got {result}\"\n\ndef test_negative_values():\n    data = np.array([-5, 0, 5])\n    result = exercise.standardize(data)\n    assert abs(result.mean()) < 1e-10, f\"Mean should be ~0, got {result.mean()}\"\n    assert abs(result.std() - 1.0) < 1e-10, f\"Std should be ~1, got {result.std()}\"\n\ndef test_single_element():\n    data = np.array([42.0])\n    result = exercise.standardize(data)\n    # Single element: std is 0, should produce NaN\n    assert np.all(np.isnan(result)) or np.all(np.isinf(result)), f\"Single element should produce NaN or inf, got {result}\"",
+    "test_cases": [],
     "order": 2
   }
 ]

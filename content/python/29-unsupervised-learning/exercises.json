@@ -1,32 +1,22 @@
 [
   {
     "slug": "unsupervised-kmeans-basic",
-    "title": "K-Means on 2D data",
-    "instruction": "Apply K-Means with k=2 to the following 2D data. Print the cluster labels for each point and the coordinates of the centroids.\n\nData:\n[[1, 2], [1.5, 1.8], [2, 2.5], [5, 6], [5.5, 5.5], [6, 6.2]]",
-    "starter_code": "import numpy as np\nfrom sklearn.cluster import KMeans\n\nX = np.array([[1, 2], [1.5, 1.8], [2, 2.5], [5, 6], [5.5, 5.5], [6, 6.2]])\n\n# Apply K-Means with k=2\n",
-    "solution_code": "import numpy as np\nfrom sklearn.cluster import KMeans\n\nX = np.array([[1, 2], [1.5, 1.8], [2, 2.5], [5, 6], [5.5, 5.5], [6, 6.2]])\n\nkmeans = KMeans(n_clusters=2, random_state=42, n_init=10)\nkmeans.fit(X)\nprint(\"Labels:\", kmeans.labels_)\nprint(\"Centroids:\", kmeans.cluster_centers_)\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Labels: [0 0 0 1 1 1]\nCentroids: [[1.5  2.1 ]\n [5.5  5.9 ]]\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "title": "K-Means clustering on 2D data",
+    "instruction": "Define a function `kmeans_cluster(X, n_clusters=2)` that applies **K-Means** clustering and **returns a tuple** `(labels, centroids)` where:\n- `labels` is a list of cluster labels for each point (as Python ints)\n- `centroids` is a list of centroid coordinates (as lists of floats)\n\nUse `random_state=42` and `n_init=10` for reproducibility.",
+    "starter_code": "import numpy as np\nfrom sklearn.cluster import KMeans\n\ndef kmeans_cluster(X, n_clusters=2):\n    # Apply K-Means and return (labels, centroids)\n    pass",
+    "solution_code": "import numpy as np\nfrom sklearn.cluster import KMeans\n\ndef kmeans_cluster(X, n_clusters=2):\n    kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)\n    kmeans.fit(X)\n    labels = [int(l) for l in kmeans.labels_]\n    centroids = [list(c) for c in kmeans.cluster_centers_]\n    return (labels, centroids)",
+    "test_suite": "import numpy as np\nfrom sklearn.cluster import KMeans\n\ndef test_kmeans_two_clusters():\n    X = np.array([[1, 2], [1.5, 1.8], [2, 2.5], [5, 6], [5.5, 5.5], [6, 6.2]])\n    labels, centroids = exercise.kmeans_cluster(X, n_clusters=2)\n    assert len(labels) == 6, f\"Expected 6 labels, got {len(labels)}\"\n    assert len(set(labels)) == 2, f\"Expected 2 unique cluster labels, got {set(labels)}\"\n    assert len(centroids) == 2, f\"Expected 2 centroids, got {len(centroids)}\"\n    assert all(len(c) == 2 for c in centroids), f\"Each centroid should have 2 coordinates\"\n    assert all(isinstance(l, int) for l in labels), f\"Labels should be ints, got {set(type(l) for l in labels)}\"\n\ndef test_kmeans_three_clusters():\n    X = np.array([[1, 1], [2, 2], [10, 10], [11, 11], [20, 20], [21, 21]])\n    labels, centroids = exercise.kmeans_cluster(X, n_clusters=3)\n    assert len(set(labels)) == 3, f\"Expected 3 clusters, got {set(labels)}\"\n\ndef test_kmeans_single_cluster():\n    X = np.array([[1, 1], [2, 2], [3, 3]])\n    labels, centroids = exercise.kmeans_cluster(X, n_clusters=1)\n    assert len(set(labels)) == 1, f\"Expected 1 cluster, got {set(labels)}\"\n    assert len(centroids) == 1, f\"Expected 1 centroid, got {len(centroids)}\"\n\ndef test_labels_are_integers():\n    X = np.array([[0, 0], [0.5, 0.5], [5, 5], [5.5, 5.5]])\n    labels, centroids = exercise.kmeans_cluster(X, n_clusters=2)\n    for l in labels:\n        assert isinstance(l, int), f\"Label {l} is not an int, it is {type(l)}\"\n\ndef test_default_n_clusters():\n    X = np.array([[1, 1], [2, 2], [10, 10]])\n    labels, centroids = exercise.kmeans_cluster(X)\n    assert len(set(labels)) == 2, f\"Default n_clusters=2 should give 2 clusters, got {set(labels)}\"",
+    "test_cases": [],
     "order": 1
   },
   {
     "slug": "unsupervised-predict-cluster",
     "title": "Predict cluster for a new point",
-    "instruction": "Using the same data and k=2 from the previous exercise, predict which cluster a new point [3, 4] belongs to and print the predicted cluster label.",
-    "starter_code": "import numpy as np\nfrom sklearn.cluster import KMeans\n\nX = np.array([[1, 2], [1.5, 1.8], [2, 2.5], [5, 6], [5.5, 5.5], [6, 6.2]])\nnew_point = np.array([[3, 4]])\n\n# Train K-Means and predict\n",
-    "solution_code": "import numpy as np\nfrom sklearn.cluster import KMeans\n\nX = np.array([[1, 2], [1.5, 1.8], [2, 2.5], [5, 6], [5.5, 5.5], [6, 6.2]])\nnew_point = np.array([[3, 4]])\n\nkmeans = KMeans(n_clusters=2, random_state=42, n_init=10)\nkmeans.fit(X)\npred = kmeans.predict(new_point)\nprint(pred[0])\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "0\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `predict_cluster(X, new_point, n_clusters=2)` that trains a **K-Means** model on data `X` with the given number of clusters and **returns** the predicted cluster label (as an int) for `new_point`. Use `random_state=42` and `n_init=10` for reproducibility.",
+    "starter_code": "import numpy as np\nfrom sklearn.cluster import KMeans\n\ndef predict_cluster(X, new_point, n_clusters=2):\n    # Train K-Means and predict cluster for new_point\n    pass",
+    "solution_code": "import numpy as np\nfrom sklearn.cluster import KMeans\n\ndef predict_cluster(X, new_point, n_clusters=2):\n    kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)\n    kmeans.fit(X)\n    pred = kmeans.predict([new_point])\n    return int(pred[0])",
+    "test_suite": "import numpy as np\nfrom sklearn.cluster import KMeans\n\ndef test_predict_midpoint():\n    X = np.array([[1, 2], [1.5, 1.8], [2, 2.5], [5, 6], [5.5, 5.5], [6, 6.2]])\n    result = exercise.predict_cluster(X, [3, 4])\n    assert isinstance(result, int), f\"Expected int, got {type(result)}\"\n    assert result in (0, 1), f\"Expected 0 or 1, got {result}\"\n\ndef test_predict_near_first_cluster():\n    X = np.array([[1, 2], [1.5, 1.8], [2, 2.5], [5, 6], [5.5, 5.5], [6, 6.2]])\n    result = exercise.predict_cluster(X, [1.8, 2.2])\n    assert isinstance(result, int), f\"Expected int, got {type(result)}\"\n\ndef test_predict_with_three_clusters():\n    X = np.array([[1, 1], [2, 2], [10, 10], [11, 11], [20, 20], [21, 21]])\n    result = exercise.predict_cluster(X, [15, 15], n_clusters=3)\n    assert isinstance(result, int), f\"Expected int, got {type(result)}\"\n    assert result in (0, 1, 2), f\"Expected 0, 1, or 2, got {result}\"\n\ndef test_default_n_clusters():\n    X = np.array([[1, 1], [10, 10]])\n    result = exercise.predict_cluster(X, [5, 5])\n    assert isinstance(result, int), f\"Expected int, got {type(result)}\"\n    assert result in (0, 1), f\"Expected 0 or 1, got {result}\"\n\ndef test_point_on_boundary():\n    X = np.array([[1, 1], [2, 2], [10, 10], [11, 11]])\n    result = exercise.predict_cluster(X, [6, 6])\n    assert isinstance(result, int), f\"Expected int, got {type(result)}\"",
+    "test_cases": [],
     "order": 2
   }
 ]
