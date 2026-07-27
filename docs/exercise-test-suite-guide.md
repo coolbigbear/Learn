@@ -2,6 +2,14 @@
 
 > **Audience:** Content authors writing or migrating exercises for the Python track.
 > **Status:** Living document — update as the system evolves.
+>
+> **⚠️ Backend Status:**
+> The `test_suite` format is the target specification for new-style exercises. The
+> `test_suite` field is stored in the database model, but the backend execution
+> harness is **under development**. Exercises written in this format will seed
+> correctly but will **not** be validated by unit tests until the execution backend
+> is deployed. For now, exercises should use the `test_cases` (output-comparison)
+> model.
 
 ---
 
@@ -61,7 +69,7 @@ A `test_suite` exercise looks like this in the exercises JSON file:
   "title": "Addition function",
   "instruction": "Define a function `add(a, b)` that **returns** the sum of a and b.",
   "starter_code": "def add(a, b):\n    # Return the sum of a and b\n    pass",
-  "test_suite": "def test_adds_two_positive():\n    result = add(7, 12)\n    assert result == 19\n\ndef test_adds_zero():\n    result = add(0, 5)\n    assert result == 5\n\ndef test_adds_negative():\n    result = add(-3, 10)\n    assert result == 7\n\ndef test_both_negative():\n    result = add(-5, -7)\n    assert result == -12",
+  "test_suite": "def test_adds_two_positive():\n    result = exercise.add(7, 12)\n    assert result == 19\n\ndef test_adds_zero():\n    result = exercise.add(0, 5)\n    assert result == 5\n\ndef test_adds_negative():\n    result = exercise.add(-3, 10)\n    assert result == 7\n\ndef test_both_negative():\n    result = exercise.add(-5, -7)\n    assert result == -12",
   "solution_code": "def add(a, b):\n    return a + b",
   "test_cases": [],
   "order": 1
@@ -102,7 +110,7 @@ The string in `test_suite` is passed directly to the Python exec() inside the sa
 **Correct:**
 ```python
 def test_adds_two_positive():
-    result = add(7, 12)
+    result = exercise.add(7, 12)
     assert result == 19
 ```
 
@@ -110,7 +118,7 @@ def test_adds_two_positive():
 ```python
 ```python
 def test_adds_two_positive():
-    result = add(7, 12)
+    result = exercise.add(7, 12)
     assert result == 19
 ```
 ```
