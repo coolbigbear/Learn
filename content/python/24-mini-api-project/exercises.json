@@ -1,60 +1,10 @@
 [
   {
-    "slug": "task-add-list",
-    "title": "Add and list tasks",
-    "instruction": "Write two functions that manage an in-memory task list:\n\n- add_task(title): Creates a new task dict with an auto-incrementing id (starting from 1), the provided title, and completed=False by default. Appends it to the global tasks list and returns the new task.\n- list_tasks(): Returns the full tasks list.\n\nThen call add_task(\"Learn Python\"), add_task(\"Build API\"), and print list_tasks().",
-    "starter_code": "tasks = []\nnext_id = 1\n\ndef add_task(title):\n    global next_id\n    # Your code here\n    pass\n\ndef list_tasks():\n    # Your code here\n    pass\n\nadd_task(\"Learn Python\")\nadd_task(\"Build API\")\nprint(list_tasks())",
-    "solution_code": "tasks = []\nnext_id = 1\n\ndef add_task(title):\n    global next_id\n    task = {\"id\": next_id, \"title\": title, \"completed\": False}\n    tasks.append(task)\n    next_id += 1\n    return task\n\ndef list_tasks():\n    return tasks\n\nadd_task(\"Learn Python\")\nadd_task(\"Build API\")\nprint(list_tasks())",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "[{'id': 1, 'title': 'Learn Python', 'completed': False}, {'id': 2, 'title': 'Build API', 'completed': False}]\n",
-        "comparison_type": "exact"
-      },
-      {
-        "input": "",
-        "expected_output": "global next_id",
-        "comparison_type": "code_contains"
-      }
-    ],
-    "order": 1
-  },
-  {
-    "slug": "task-find-delete",
-    "title": "Find and delete tasks",
-    "instruction": "Write two functions using the global tasks list from the previous exercise:\n\n- find_task(task_id): Returns the task dict with the matching id, or None if not found.\n- delete_task(task_id): Removes the task with the matching id from the list and returns True. If not found, returns False.\n\nThen add two tasks, delete the first one, find the second, and print both results.",
-    "starter_code": "tasks = [{'id': 1, 'title': 'Learn Python', 'completed': False}, {'id': 2, 'title': 'Build API', 'completed': False}]\n\ndef find_task(task_id):\n    # Your code here\n    pass\n\ndef delete_task(task_id):\n    # Your code here\n    pass\n\nprint(delete_task(1))\nprint(find_task(2))",
-    "solution_code": "tasks = [{'id': 1, 'title': 'Learn Python', 'completed': False}, {'id': 2, 'title': 'Build API', 'completed': False}]\n\ndef find_task(task_id):\n    for task in tasks:\n        if task['id'] == task_id:\n            return task\n    return None\n\ndef delete_task(task_id):\n    for i, task in enumerate(tasks):\n        if task['id'] == task_id:\n            tasks.pop(i)\n            return True\n    return False\n\nprint(delete_task(1))\nprint(find_task(2))",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "True\n{'id': 2, 'title': 'Build API', 'completed': False}\n",
-        "comparison_type": "exact"
-      }
-    ],
-    "order": 2
-  },
-  {
-    "slug": "task-update",
-    "title": "Update a task",
-    "instruction": "Write a function update_task(task_id, title=None, completed=None) that updates a task in the global tasks list. Only update fields that are not None. Return the updated task dict, or None if the task id is not found.\n\nCall it to mark task 1 as completed and print the result.",
-    "starter_code": "tasks = [{'id': 1, 'title': 'Learn Python', 'completed': False}, {'id': 2, 'title': 'Build API', 'completed': False}]\n\ndef update_task(task_id, title=None, completed=None):\n    # Your code here\n    pass\n\nprint(update_task(1, completed=True))\nprint(update_task(999, title='Ghost'))",
-    "solution_code": "tasks = [{'id': 1, 'title': 'Learn Python', 'completed': False}, {'id': 2, 'title': 'Build API', 'completed': False}]\n\ndef update_task(task_id, title=None, completed=None):\n    for task in tasks:\n        if task['id'] == task_id:\n            if title is not None:\n                task['title'] = title\n            if completed is not None:\n                task['completed'] = completed\n            return task\n    return None\n\nprint(update_task(1, completed=True))\nprint(update_task(999, title='Ghost'))",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "{'id': 1, 'title': 'Learn Python', 'completed': True}\nNone\n",
-        "comparison_type": "exact"
-      }
-    ],
-    "order": 3
-  },
-  {
-    "slug": "task-crud-endpoints",
-    "title": "Build the full CRUD API endpoints",
-    "instruction": "Create FastAPI endpoints for the task manager:\n- GET /tasks - List all tasks\n- POST /tasks (status_code=201) - Create a task with a title field\n- GET /tasks/{task_id} - Get a single task, 404 if not found\n- PUT /tasks/{task_id} - Update a task's title and completed fields\n- DELETE /tasks/{task_id} (status_code=204) - Delete a task, 404 if not found",
-    "starter_code": "from fastapi import FastAPI, HTTPException\nfrom pydantic import BaseModel\n\napp = FastAPI()\ntasks = []\nnext_id = 1\n\nclass Task(BaseModel):\n    title: str\n    completed: bool = False\n\nclass TaskUpdate(BaseModel):\n    title: str | None = None\n    completed: bool | None = None\n\n# Write all endpoints here",
-    "solution_code": "from fastapi import FastAPI, HTTPException\nfrom pydantic import BaseModel\n\napp = FastAPI()\ntasks = []\nnext_id = 1\n\nclass Task(BaseModel):\n    title: str\n    completed: bool = False\n\nclass TaskUpdate(BaseModel):\n    title: str | None = None\n    completed: bool | None = None\n\n@app.get(\"/tasks\")\nasync def list_tasks():\n    return tasks\n\n@app.post(\"/tasks\", status_code=201)\nasync def create_task(task: Task):\n    global next_id\n    new_task = {\"id\": next_id, \"title\": task.title, \"completed\": task.completed}\n    tasks.append(new_task)\n    next_id += 1\n    return new_task\n\n@app.get(\"/tasks/{task_id}\")\nasync def get_task(task_id: int):\n    for t in tasks:\n        if t[\"id\"] == task_id:\n            return t\n    raise HTTPException(status_code=404, detail=\"Task not found\")\n\n@app.put(\"/tasks/{task_id}\")\nasync def update_task(task_id: int, updated: TaskUpdate):\n    for t in tasks:\n        if t[\"id\"] == task_id:\n            if updated.title is not None:\n                t[\"title\"] = updated.title\n            if updated.completed is not None:\n                t[\"completed\"] = updated.completed\n            return t\n    raise HTTPException(status_code=404, detail=\"Task not found\")\n\n@app.delete(\"/tasks/{task_id}\", status_code=204)\nasync def delete_task(task_id: int):\n    for i, t in enumerate(tasks):\n        if t[\"id\"] == task_id:\n            tasks.pop(i)\n            return\n    raise HTTPException(status_code=404, detail=\"Task not found\")",
+    "slug": "project-create-crud",
+    "title": "Create task list endpoint",
+    "instruction": "Write a FastAPI app with an in-memory list `items` and a GET endpoint at `/items` that returns the list. Start with two initial items: 'Learn Python' and 'Build API'.",
+    "starter_code": "from fastapi import FastAPI\n\napp = FastAPI()\nitems = [\"Learn Python\", \"Build API\"]\n\n# Your code here\n",
+    "solution_code": "from fastapi import FastAPI\n\napp = FastAPI()\nitems = [\"Learn Python\", \"Build API\"]\n\n@app.get(\"/items\")\nasync def list_items():\n    return {\"items\": items}\n",
     "test_cases": [
       {
         "input": "",
@@ -63,35 +13,90 @@
       },
       {
         "input": "",
-        "expected_output": "@app.get(\"/tasks\")",
+        "expected_output": "@app.get(\"/items\")",
         "comparison_type": "code_contains"
       },
       {
         "input": "",
-        "expected_output": "@app.post(\"/tasks\", status_code=201)",
+        "expected_output": "def list_items",
         "comparison_type": "code_contains"
       },
       {
         "input": "",
-        "expected_output": "@app.get(\"/tasks/{task_id}\")",
+        "expected_output": "return {\"items\": items}",
+        "comparison_type": "code_contains"
+      }
+    ],
+    "order": 1
+  },
+  {
+    "slug": "project-add-item",
+    "title": "Add POST to create items",
+    "instruction": "Extend the previous app by adding a POST endpoint at `/items` that accepts a JSON body with an `item` field and appends it to the list. Return the updated list with status 201.",
+    "starter_code": "from fastapi import FastAPI\nfrom pydantic import BaseModel\n\napp = FastAPI()\nitems = [\"Learn Python\", \"Build API\"]\n\nclass NewItem(BaseModel):\n    item: str\n\n# Add POST endpoint here\n",
+    "solution_code": "from fastapi import FastAPI\nfrom pydantic import BaseModel\n\napp = FastAPI()\nitems = [\"Learn Python\", \"Build API\"]\n\nclass NewItem(BaseModel):\n    item: str\n\n@app.post(\"/items\", status_code=201)\nasync def add_item(body: NewItem):\n    items.append(body.item)\n    return {\"items\": items}\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "",
+        "comparison_type": "exact"
+      },
+      {
+        "input": "",
+        "expected_output": "@app.post(\"/items\"",
         "comparison_type": "code_contains"
       },
       {
         "input": "",
-        "expected_output": "@app.put(\"/tasks/{task_id}\")",
+        "expected_output": "def add_item(body: NewItem)",
         "comparison_type": "code_contains"
       },
       {
         "input": "",
-        "expected_output": "@app.delete(\"/tasks/{task_id}\", status_code=204)",
+        "expected_output": "status_code=201",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "items.append(body.item)",
+        "comparison_type": "code_contains"
+      }
+    ],
+    "order": 2
+  },
+  {
+    "slug": "project-delete-item",
+    "title": "Add DELETE endpoint",
+    "instruction": "Extend the app with a DELETE endpoint at `/items/{index}` that removes an item by its list index. Return a 404 if the index is out of range.",
+    "starter_code": "from fastapi import FastAPI, HTTPException\n\napp = FastAPI()\nitems = [\"Learn Python\", \"Build API\", \"Deploy\"]\n\n# Add DELETE endpoint here\n",
+    "solution_code": "from fastapi import FastAPI, HTTPException\n\napp = FastAPI()\nitems = [\"Learn Python\", \"Build API\", \"Deploy\"]\n\n@app.delete(\"/items/{index}\")\nasync def delete_item(index: int):\n    if index < 0 or index >= len(items):\n        raise HTTPException(status_code=404, detail=\"Index out of range\")\n    removed = items.pop(index)\n    return {\"removed\": removed, \"items\": items}\n",
+    "test_cases": [
+      {
+        "input": "",
+        "expected_output": "",
+        "comparison_type": "exact"
+      },
+      {
+        "input": "",
+        "expected_output": "@app.delete(\"/items/{index}\")",
+        "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "def delete_item(index: int)",
         "comparison_type": "code_contains"
       },
       {
         "input": "",
         "expected_output": "HTTPException(status_code=404",
         "comparison_type": "code_contains"
+      },
+      {
+        "input": "",
+        "expected_output": "items.pop(index)",
+        "comparison_type": "code_contains"
       }
     ],
-    "order": 4
+    "order": 3
   }
 ]
