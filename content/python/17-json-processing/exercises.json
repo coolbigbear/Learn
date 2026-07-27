@@ -2,31 +2,21 @@
   {
     "slug": "json-parse-people",
     "title": "Parse JSON data",
-    "instruction": "Write a program that takes the JSON string below, parses it, and prints each person's name and city.\n\nJSON: [{\"name\": \"Alice\", \"city\": \"New York\"}, {\"name\": \"Bob\", \"city\": \"London\"}]",
-    "starter_code": "import json\n\ndata = '[{\"name\": \"Alice\", \"city\": \"New York\"}, {\"name\": \"Bob\", \"city\": \"London\"}]'\n\n# Your code here\n",
-    "solution_code": "import json\n\ndata = '[{\"name\": \"Alice\", \"city\": \"New York\"}, {\"name\": \"Bob\", \"city\": \"London\"}]'\npeople = json.loads(data)\nfor p in people:\n    print(f\"{p['name']} lives in {p['city']}\")\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Alice lives in New York\nBob lives in London\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `parse_people(json_data)` that takes a JSON string (an array of objects with \"name\" and \"city\" keys) and returns a string where each person is formatted as `[name] lives in [city]`, one per line.",
+    "starter_code": "def parse_people(json_data):\n    # Parse the JSON string and format people info\n    pass",
+    "test_suite": "import json\n\ndef test_two_people():\n    data = '[{\"name\": \"Alice\", \"city\": \"New York\"}, {\"name\": \"Bob\", \"city\": \"London\"}]'\n    result = exercise.parse_people(data)\n    assert result == \"Alice lives in New York\\nBob lives in London\", f\"Expected 2 people, got {result!r}\"\n\ndef test_single_person():\n    data = '[{\"name\": \"Charlie\", \"city\": \"Tokyo\"}]'\n    result = exercise.parse_people(data)\n    assert result == \"Charlie lives in Tokyo\", f\"Expected single person, got {result!r}\"\n\ndef test_empty_array():\n    data = '[]'\n    result = exercise.parse_people(data)\n    assert result == \"\", f\"Expected empty string, got {result!r}\"\n\ndef test_three_people():\n    data = '[{\"name\": \"Diana\", \"city\": \"Paris\"}, {\"name\": \"Eve\", \"city\": \"Berlin\"}, {\"name\": \"Frank\", \"city\": \"Sydney\"}]'\n    result = exercise.parse_people(data)\n    assert result == \"Diana lives in Paris\\nEve lives in Berlin\\nFrank lives in Sydney\", f\"Expected 3 people, got {result!r}\"",
+    "solution_code": "import json\n\ndef parse_people(json_data):\n    people = json.loads(json_data)\n    lines = []\n    for p in people:\n        lines.append(f\"{p['name']} lives in {p['city']}\")\n    return \"\\n\".join(lines)",
+    "test_cases": [],
     "order": 1
   },
   {
     "slug": "json-write-friends",
-    "title": "Write JSON to a file",
-    "instruction": "Write a program that creates a list of dictionaries representing three friends (each with 'name' and 'age'), then writes it as JSON to a file called 'friends.json' with indent=2.",
-    "starter_code": "friends = [\n    {\"name\": \"Alice\", \"age\": 25},\n    {\"name\": \"Bob\", \"age\": 30},\n    {\"name\": \"Charlie\", \"age\": 35}\n]\n\n# Write to friends.json\n",
-    "solution_code": "import json\n\nfriends = [\n    {\"name\": \"Alice\", \"age\": 25},\n    {\"name\": \"Bob\", \"age\": 30},\n    {\"name\": \"Charlie\", \"age\": 35}\n]\n\nwith open(\"friends.json\", \"w\") as f:\n    json.dump(friends, f, indent=2)\nprint(\"Saved friends.json\")\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Saved friends.json\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "title": "Write friends list to JSON",
+    "instruction": "Define a function `friends_to_json(friends)` that takes a list of dictionaries (each with \"name\" and \"age\" keys) and returns a pretty-printed JSON string with `indent=2`.",
+    "starter_code": "def friends_to_json(friends):\n    # Convert list of friends to formatted JSON string\n    pass",
+    "test_suite": "import json\n\ndef test_three_friends():\n    friends = [\n        {\"name\": \"Alice\", \"age\": 25},\n        {\"name\": \"Bob\", \"age\": 30},\n        {\"name\": \"Charlie\", \"age\": 35}\n    ]\n    result = exercise.friends_to_json(friends)\n    parsed = json.loads(result)\n    assert len(parsed) == 3, f\"Expected 3 friends, got {len(parsed)}\"\n    assert parsed[0][\"name\"] == \"Alice\", f\"Expected first friend Alice, got {parsed[0]['name']!r}\"\n    assert result.count(\"\\n\") >= 3, f\"Expected pretty-printed JSON (with newlines), got {result!r}\"\n\ndef test_single_friend():\n    friends = [\n        {\"name\": \"Diana\", \"age\": 28}\n    ]\n    result = exercise.friends_to_json(friends)\n    parsed = json.loads(result)\n    assert len(parsed) == 1, f\"Expected 1 friend, got {len(parsed)}\"\n    assert parsed[0][\"name\"] == \"Diana\", f\"Expected name Diana, got {parsed[0]['name']!r}\"\n\ndef test_empty_list():\n    result = exercise.friends_to_json([])\n    parsed = json.loads(result)\n    assert parsed == [], f\"Expected empty list, got {parsed!r}\"",
+    "solution_code": "import json\n\ndef friends_to_json(friends):\n    return json.dumps(friends, indent=2)",
+    "test_cases": [],
     "order": 2
   }
 ]
