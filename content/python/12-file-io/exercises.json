@@ -2,46 +2,31 @@
   {
     "slug": "file-write-foods",
     "title": "Save foods to a file",
-    "instruction": "Write a program that saves the list `[\"Pizza\", \"Tacos\", \"Sushi\"]` to a file called `favorites.txt`, with one food per line.",
-    "starter_code": "foods = [\"Pizza\", \"Tacos\", \"Sushi\"]\n# Your code here\n",
-    "solution_code": "foods = [\"Pizza\", \"Tacos\", \"Sushi\"]\nwith open(\"favorites.txt\", \"w\") as f:\n    for food in foods:\n        f.write(food + \"\\n\")\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "",
-        "comparison_type": "file_contains"
-      }
-    ],
+    "instruction": "Define a function `save_foods(foods, filename)` that takes a list of food strings and a filename, and writes each food on its own line to the file. Use a `with` statement.",
+    "starter_code": "def save_foods(foods, filename):\n    # Write each food on its own line to the file\n    pass",
+    "solution_code": "def save_foods(foods, filename):\n    with open(filename, \"w\") as f:\n        for food in foods:\n            f.write(food + \"\\n\")",
+    "test_suite": "import os\nimport tempfile\n\ndef test_save_three_foods():\n    tmpdir = tempfile.mkdtemp()\n    try:\n        filepath = os.path.join(tmpdir, \"favorites.txt\")\n        exercise.save_foods([\"Pizza\", \"Tacos\", \"Sushi\"], filepath)\n        with open(filepath) as f:\n            content = f.read()\n        assert content == \"Pizza\\nTacos\\nSushi\\n\", f\"Expected each food on its own line, got {content!r}\"\n    finally:\n        for f_name in os.listdir(tmpdir):\n            os.remove(os.path.join(tmpdir, f_name))\n        os.rmdir(tmpdir)\n\ndef test_save_single_food():\n    tmpdir = tempfile.mkdtemp()\n    try:\n        filepath = os.path.join(tmpdir, \"single.txt\")\n        exercise.save_foods([\"Apples\"], filepath)\n        with open(filepath) as f:\n            content = f.read()\n        assert content == \"Apples\\n\", f\"Expected 'Apples\\\\n', got {content!r}\"\n    finally:\n        for f_name in os.listdir(tmpdir):\n            os.remove(os.path.join(tmpdir, f_name))\n        os.rmdir(tmpdir)\n\ndef test_save_empty_list():\n    tmpdir = tempfile.mkdtemp()\n    try:\n        filepath = os.path.join(tmpdir, \"empty.txt\")\n        exercise.save_foods([], filepath)\n        with open(filepath) as f:\n            content = f.read()\n        assert content == \"\", f\"Expected empty file, got {content!r}\"\n    finally:\n        for f_name in os.listdir(tmpdir):\n            os.remove(os.path.join(tmpdir, f_name))\n        os.rmdir(tmpdir)",
+    "test_cases": [],
     "order": 1
   },
   {
     "slug": "file-read-and-number",
     "title": "Read and number lines",
-    "instruction": "Read the file `favorites.txt` (created in the previous exercise) and print each line prefixed with its line number, like `1. Pizza`.",
-    "starter_code": "with open(\"favorites.txt\", \"r\") as f:\n    # Your code here\n    pass\n",
-    "solution_code": "with open(\"favorites.txt\", \"r\") as f:\n    for i, line in enumerate(f, start=1):\n        print(f\"{i}. {line.strip()}\")\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "1. Pizza\n2. Tacos\n3. Sushi\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `read_numbered(filename)` that reads a file and returns a **string** where each line is prefixed with its line number, like `\"1. Pizza\\n2. Tacos\\n3. Sushi\\n\"`.",
+    "starter_code": "def read_numbered(filename):\n    # Read the file and return numbered lines as a string\n    pass",
+    "solution_code": "def read_numbered(filename):\n    result = \"\"\n    with open(filename, \"r\") as f:\n        for i, line in enumerate(f, start=1):\n            result += f\"{i}. {line.strip()}\\n\"\n    return result",
+    "test_suite": "import os\nimport tempfile\n\ndef test_number_three_lines():\n    tmpdir = tempfile.mkdtemp()\n    try:\n        filepath = os.path.join(tmpdir, \"test.txt\")\n        with open(filepath, \"w\") as f:\n            f.write(\"Pizza\\nTacos\\nSushi\\n\")\n        result = exercise.read_numbered(filepath)\n        expected = \"1. Pizza\\n2. Tacos\\n3. Sushi\\n\"\n        assert result == expected, f\"Expected:\\n{expected!r}\\nGot:\\n{result!r}\"\n    finally:\n        os.remove(filepath)\n        os.rmdir(tmpdir)\n\ndef test_number_empty_file():\n    tmpdir = tempfile.mkdtemp()\n    try:\n        filepath = os.path.join(tmpdir, \"empty.txt\")\n        open(filepath, \"w\").close()\n        result = exercise.read_numbered(filepath)\n        assert result == \"\", f\"Expected empty string, got {result!r}\"\n    finally:\n        os.remove(filepath)\n        os.rmdir(tmpdir)\n\ndef test_number_single_line():\n    tmpdir = tempfile.mkdtemp()\n    try:\n        filepath = os.path.join(tmpdir, \"single.txt\")\n        with open(filepath, \"w\") as f:\n            f.write(\"Hello\\n\")\n        result = exercise.read_numbered(filepath)\n        assert result == \"1. Hello\\n\", f\"Expected '1. Hello\\\\n', got {result!r}\"\n    finally:\n        os.remove(filepath)\n        os.rmdir(tmpdir)",
+    "test_cases": [],
     "order": 2
   },
   {
     "slug": "file-append-log",
     "title": "Append to a log file",
-    "instruction": "Write a program that appends the current time (as a string like `\"Checked: 12:30\"`) to a file called `log.txt`. Run it twice — the file should have two lines.",
-    "starter_code": "import datetime\n# Your code here\n",
-    "solution_code": "import datetime\nwith open(\"log.txt\", \"a\") as f:\n    f.write(f\"Checked: {datetime.datetime.now().strftime('%H:%M')}\\n\")\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "",
-        "comparison_type": "file_contains"
-      }
-    ],
+    "instruction": "Define a function `append_to_log(filename, message)` that opens a file in append mode and writes the message followed by a newline.",
+    "starter_code": "def append_to_log(filename, message):\n    # Append the message (with a newline) to the file\n    pass",
+    "solution_code": "def append_to_log(filename, message):\n    with open(filename, \"a\") as f:\n        f.write(message + \"\\n\")",
+    "test_suite": "import os\nimport tempfile\n\ndef test_append_once():\n    tmpdir = tempfile.mkdtemp()\n    try:\n        filepath = os.path.join(tmpdir, \"log.txt\")\n        exercise.append_to_log(filepath, \"Checked: 12:30\")\n        with open(filepath) as f:\n            content = f.read()\n        assert content == \"Checked: 12:30\\n\", f\"Expected single line, got {content!r}\"\n    finally:\n        for f_name in os.listdir(tmpdir):\n            os.remove(os.path.join(tmpdir, f_name))\n        os.rmdir(tmpdir)\n\ndef test_append_twice():\n    tmpdir = tempfile.mkdtemp()\n    try:\n        filepath = os.path.join(tmpdir, \"log.txt\")\n        exercise.append_to_log(filepath, \"First entry\")\n        exercise.append_to_log(filepath, \"Second entry\")\n        with open(filepath) as f:\n            content = f.read()\n        expected = \"First entry\\nSecond entry\\n\"\n        assert content == expected, f\"Expected:\\n{expected!r}\\nGot:\\n{content!r}\"\n    finally:\n        for f_name in os.listdir(tmpdir):\n            os.remove(os.path.join(tmpdir, f_name))\n        os.rmdir(tmpdir)\n\ndef test_append_creates_new_file():\n    tmpdir = tempfile.mkdtemp()\n    try:\n        filepath = os.path.join(tmpdir, \"new_log.txt\")\n        assert not os.path.exists(filepath), \"Test file should not exist yet\"\n        exercise.append_to_log(filepath, \"New file created\")\n        assert os.path.exists(filepath), \"File should have been created\"\n        with open(filepath) as f:\n            content = f.read()\n        assert content == \"New file created\\n\", f\"Expected single line, got {content!r}\"\n    finally:\n        for f_name in os.listdir(tmpdir):\n            os.remove(os.path.join(tmpdir, f_name))\n        os.rmdir(tmpdir)",
+    "test_cases": [],
     "order": 3
   }
 ]

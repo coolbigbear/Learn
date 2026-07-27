@@ -27,16 +27,11 @@
   {
     "slug": "error-raise-custom",
     "title": "Raise a custom exception",
-    "instruction": "Write a function `check_age(age)` that raises a `ValueError` with the message `\"Age must be 0-150\"` if the age is outside that range. Otherwise, print `\"Age is valid\"`.",
-    "starter_code": "def check_age(age):\n    # Your code here\n    pass\n\n# Test it\ntry:\n    check_age(200)\nexcept ValueError as e:\n    print(e)\n",
-    "solution_code": "def check_age(age):\n    if age < 0 or age > 150:\n        raise ValueError(\"Age must be 0-150\")\n    print(\"Age is valid\")\n\ntry:\n    check_age(200)\nexcept ValueError as e:\n    print(e)\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Age must be 0-150\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `check_age(age)` that raises a `ValueError` with the message `\"Age must be 0-150\"` if the age is outside the valid range (0 to 150 inclusive). Otherwise, return `\"Age is valid\"`.",
+    "starter_code": "def check_age(age):\n    # Raise ValueError if age is out of range, otherwise return \"Age is valid\"\n    pass",
+    "solution_code": "def check_age(age):\n    if age < 0 or age > 150:\n        raise ValueError(\"Age must be 0-150\")\n    return \"Age is valid\"",
+    "test_suite": "def test_valid_age():\n    result = exercise.check_age(25)\n    assert result == \"Age is valid\", f\"Expected 'Age is valid', got {result!r}\"\n\ndef test_boundary_low():\n    result = exercise.check_age(0)\n    assert result == \"Age is valid\", f\"Expected 'Age is valid' for 0, got {result!r}\"\n\ndef test_boundary_high():\n    result = exercise.check_age(150)\n    assert result == \"Age is valid\", f\"Expected 'Age is valid' for 150, got {result!r}\"\n\ndef test_raises_for_negative():\n    try:\n        exercise.check_age(-1)\n        assert False, \"Expected ValueError for -1, but no exception was raised\"\n    except ValueError as e:\n        assert \"Age must be 0-150\" in str(e), f\"Expected message 'Age must be 0-150', got {str(e)!r}\"\n\ndef test_raises_for_too_old():\n    try:\n        exercise.check_age(151)\n        assert False, \"Expected ValueError for 151, but no exception was raised\"\n    except ValueError as e:\n        assert \"Age must be 0-150\" in str(e), f\"Expected message 'Age must be 0-150', got {str(e)!r}\"",
+    "test_cases": [],
     "order": 2
   },
   {
