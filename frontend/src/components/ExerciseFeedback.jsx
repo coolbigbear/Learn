@@ -1,7 +1,11 @@
-export default function ExerciseFeedback({ result }) {
+export default function ExerciseFeedback({ result, mode = "test_cases" }) {
   if (!result) return null;
 
   const { passed, errors, test_results, summary, expected_output, actual_output, comparison_type } = result;
+
+  const passedCount = test_results ? test_results.filter((tr) => tr.passed).length : 0;
+  const totalCount = test_results ? test_results.length : 0;
+  const isTestSuite = mode === "test_suite";
 
   return (
     <div
@@ -31,6 +35,11 @@ export default function ExerciseFeedback({ result }) {
         <span className="font-semibold text-sm">
           {passed ? 'All tests passed!' : 'Some tests failed'}
         </span>
+        {isTestSuite && totalCount > 0 && (
+          <span className="text-sm ml-auto">
+            {passedCount}/{totalCount} tests passed
+          </span>
+        )}
       </div>
 
       {/* Summary */}
@@ -66,7 +75,9 @@ export default function ExerciseFeedback({ result }) {
                   </svg>
                 )}
                 <span className={`text-sm font-medium ${tr.passed ? 'text-green-700' : 'text-red-700'}`}>
-                  Test {i + 1}: {tr.name || (tr.passed ? 'Passed' : 'Failed')}
+                  {isTestSuite
+                    ? tr.name || `Test ${i + 1}`
+                    : `Test ${i + 1}: ${tr.name || (tr.passed ? 'Passed' : 'Failed')}`}
                 </span>
               </div>
               {!tr.passed && (
@@ -74,7 +85,8 @@ export default function ExerciseFeedback({ result }) {
                   {tr.message && (
                     <div className="text-gray-600">{tr.message}</div>
                   )}
-                  {tr.comparison_type === "code_contains" ? (
+                  {/* For test_suite mode, no Expected/Got needed */}
+                  {!isTestSuite && tr.comparison_type === "code_contains" ? (
                     /* code_contains: show expected value in code, not program output */
                     <div className="flex gap-4">
                       <div>
@@ -90,10 +102,10 @@ export default function ExerciseFeedback({ result }) {
                         <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-mono text-gray-400 italic">not found</code>
                       </div>
                     </div>
-                  ) : tr.comparison_type === "comment" ? (
+                  ) : !isTestSuite && tr.comparison_type === "comment" ? (
                     /* comment: message field already says enough, no Expected/Got needed */
                     null
-                  ) : tr.comparison_type === "regex" ? (
+                  ) : !isTestSuite && tr.comparison_type === "regex" ? (
                     /* regex: show message (human-readable) and actual output, not raw pattern */
                     <div className="flex gap-4">
                       <div>
@@ -105,8 +117,7 @@ export default function ExerciseFeedback({ result }) {
                         )}
                       </div>
                     </div>
-                  ) : (
-                    /* Standard: Show Expected vs Got for output-based tests */
+                  ) : !isTestSuite ? (
                     <div className="flex gap-4">
                       <div>
                         <span className="text-gray-500">Expected: </span>
@@ -125,7 +136,7 @@ export default function ExerciseFeedback({ result }) {
                         )}
                       </div>
                     </div>
-                  )}
+                  ) : null}
                 </div>
               )}
             </div>
@@ -133,8 +144,8 @@ export default function ExerciseFeedback({ result }) {
         </div>
       )}
 
-      {/* Expected vs Actual display boxes for failed tests */}
-      {!passed && (expected_output !== undefined || actual_output !== undefined) && test_results?.length > 0 && (
+      {/* Expected vs Actual display boxes for failed tests -- hidden in test_suite mode */}
+      {!isTestSuite && !passed && (expected_output !== undefined || actual_output !== undefined) && test_results?.length > 0 && (
         <div className="px-4 py-3 border-t border-gray-100">
           <div className="text-sm font-medium text-gray-700 mb-3">Output Comparison</div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
