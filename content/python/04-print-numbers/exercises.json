@@ -2,76 +2,51 @@
   {
     "slug": "print-whole-number",
     "title": "Print a whole number",
-    "instruction": "Print the number **42** using `print()`. Do NOT use quotes around the number.",
-    "starter_code": "# Print the number 42\n",
+    "instruction": "Print **42** (no quotes).",
+    "starter_code": "# Print 42\n",
     "solution_code": "print(42)",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "42\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "test_suite": "import io, sys\n\ndef test_prints_42():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == '42\\n', f\"Expected 42, got {output!r}\"",
+    "test_cases": [],
     "order": 1
   },
   {
     "slug": "print-decimal-number",
     "title": "Print a decimal number",
-    "instruction": "Print the decimal number **3.14** using `print()`. No quotes needed.",
-    "starter_code": "# Print the number 3.14\n",
+    "instruction": "Print **3.14** (no quotes).",
+    "starter_code": "# Print 3.14\n",
     "solution_code": "print(3.14)",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "3.14\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "test_suite": "import io, sys\n\ndef test_prints_314():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == '3.14\\n', f\"Expected 3.14, got {output!r}\"",
+    "test_cases": [],
     "order": 2
   },
   {
     "slug": "print-your-age-number",
     "title": "Print your age as a number",
-    "instruction": "Print your **age** as a number (without quotes). You can use any age you like — just make sure the output is a number, not a string.",
-    "starter_code": "# Print your age as a number\n",
+    "instruction": "Print your age as a number (no quotes).",
+    "starter_code": "# Print your age\n",
     "solution_code": "print(25)",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "\\d+\\n",
-        "comparison_type": "regex"
-      }
-    ],
+    "test_suite": "import io, sys, re\n\ndef test_prints_age_number():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert re.match('\\\\d+\\n', output), f\"Output should be a number, got {output!r}\"",
+    "test_cases": [],
     "order": 3
   },
   {
     "slug": "print-two-numbers",
     "title": "Print two numbers on one line",
-    "instruction": "Print two numbers — **100** and **200** — on the same line using a single `print()` with a comma between them.",
-    "starter_code": "# Print 100 and 200 on the same line\n",
+    "instruction": "Print **100** and **200** with a comma in print().",
+    "starter_code": "# Print 100 and 200\n",
     "solution_code": "print(100, 200)",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "100 200\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "test_suite": "import io, sys\n\ndef test_prints_100_200():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == '100 200\\n', f\"Expected 100 200, got {output!r}\"",
+    "test_cases": [],
     "order": 4
   },
   {
     "slug": "print-mix-string-and-number",
     "title": "Mix a string and a number",
-    "instruction": "Print the string **My lucky number is** followed by the number **7** (no quotes on the number) — both in one `print()`, separated by a comma.",
+    "instruction": "Print **My lucky number is** followed by **7** (as number).",
     "starter_code": "# Print: My lucky number is 7\n",
     "solution_code": "print(\"My lucky number is\", 7)",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "My lucky number is 7\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "test_suite": "import io, sys\n\ndef test_prints_lucky_number():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == 'My lucky number is 7\\n', f\"Expected My lucky number is 7, got {output!r}\"",
+    "test_cases": [],
     "order": 5
   }
 ]

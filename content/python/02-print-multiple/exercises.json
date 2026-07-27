@@ -2,100 +2,51 @@
   {
     "slug": "print-two-words",
     "title": "Print two words",
-    "instruction": "Use a single `print()` statement to output **Hello Python** with a space between them.",
+    "instruction": "Print **Hello Python** with a single `print()` and two arguments.",
     "starter_code": "# Print Hello Python\n",
     "solution_code": "print(\"Hello\", \"Python\")",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Hello Python\n",
-        "comparison_type": "exact"
-      },
-      {
-        "input": "",
-        "expected_output": "[\"']Hello[\"'],\\s*[\"']Python[\"']",
-        "comparison_type": "code_regex",
-        "name": "Comma-separated arguments",
-        "message": "Use print() with two separate arguments separated by a comma like print(\"Hello\", \"Python\")"
-      }
-    ],
+    "test_suite": "import io, sys\n\ndef test_prints_hello_python():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == 'Hello Python\\n', f\"Expected Hello Python, got {output!r}\"",
+    "test_cases": [],
     "order": 1
   },
   {
     "slug": "print-three-things",
     "title": "Print three things",
-    "instruction": "Use a single `print()` statement to output three items: **I**, **love**, and **coding** — all separated by commas inside the print function.",
-    "starter_code": "# Print three items with commas\n",
+    "instruction": "Print **I love coding** with three arguments in print().",
+    "starter_code": "# Print three items\n",
     "solution_code": "print(\"I\", \"love\", \"coding\")",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "I love coding\n",
-        "comparison_type": "exact"
-      },
-      {
-        "input": "",
-        "expected_output": "[\"']I[\"'],\\s*[\"']love[\"'],\\s*[\"']coding[\"']",
-        "comparison_type": "code_regex",
-        "name": "Comma-separated arguments",
-        "message": "Use print() with three separate arguments separated by commas like print(\"I\", \"love\", \"coding\")"
-      }
-    ],
+    "test_suite": "import io, sys\n\ndef test_prints_i_love_coding():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == 'I love coding\\n', f\"Expected I love coding, got {output!r}\"",
+    "test_cases": [],
     "order": 2
   },
   {
     "slug": "print-favorite-things",
     "title": "Print your favorite things",
-    "instruction": "Print your **favorite food** and your **favorite color** in a single `print()` statement, separated by a comma. You can use any food and any color — your output should have both items separated by a space.",
-    "starter_code": "# Print favorite food and color\n",
+    "instruction": "Print favorite food and color in one print().",
+    "starter_code": "# Print food and color\n",
     "solution_code": "print(\"Pizza\", \"Blue\")",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": ".+ .+\\n",
-        "comparison_type": "regex",
-        "message": "Output should have two words (your favorite food and color) separated by a space."
-      }
-    ],
+    "test_suite": "import io, sys, re\n\ndef test_prints_two_words():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert re.match('.+ .+\\n', output), f\"Output should have two words, got {output!r}\"",
+    "test_cases": [],
     "order": 3
   },
   {
     "slug": "print-first-last",
     "title": "Print first and last name",
-    "instruction": "Print your **first name** and **last name** on the same line using a single `print()` with two items separated by a comma.  The output must have a space between the two names.",
+    "instruction": "Print first and last name on the same line.",
     "starter_code": "# Print first and last name\n",
     "solution_code": "print(\"Ada\", \"Lovelace\")",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": ".+ .+\\n",
-        "comparison_type": "regex",
-        "message": "Output should have two words (your first name and last name) separated by a space."
-      }
-    ],
+    "test_suite": "import io, sys, re\n\ndef test_prints_first_last():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert re.match('.+ .+\\n', output), f\"Output should have two words, got {output!r}\"",
+    "test_cases": [],
     "order": 4
   },
   {
     "slug": "print-mixed-types",
     "title": "Mix text and a number",
-    "instruction": "Use a single `print()` to output: **I am** followed by your age (as a number, no quotes) followed by **years old**.  For example: `I am 30 years old`.",
+    "instruction": "Print **I am** + age (as number) + **years old**.",
     "starter_code": "# Print: I am [age] years old\n",
     "solution_code": "print(\"I am\", 30, \"years old\")",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "I am \\d+ years old\\n",
-        "comparison_type": "regex",
-        "message": "Output should say \"I am\" followed by a number then \"years old\" (e.g., \"I am 30 years old\")."
-      },
-      {
-        "input": "",
-        "expected_output": ",\\s*\\d+,\\s*",
-        "comparison_type": "code_regex",
-        "name": "Number type check",
-        "message": "Your print() must pass a number (not a string) for the age — no quotes around the number."
-      }
-    ],
+    "test_suite": "import io, sys, re\n\ndef test_prints_age_format():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert re.match('I am \\\\d+ years old\\n', output), f\"Expected I am N years old, got {output!r}\"",
+    "test_cases": [],
     "order": 5
   }
 ]

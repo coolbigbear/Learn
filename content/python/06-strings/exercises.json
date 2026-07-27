@@ -2,61 +2,41 @@
   {
     "slug": "str-concat",
     "title": "String concatenation",
-    "instruction": "Create two string variables `first_name` and `last_name`. Concatenate them with a space in between into a new variable `full_name` and print it.",
+    "instruction": "Concatenate first_name + \" \" + last_name, print full_name.",
     "starter_code": "first_name = \"Ada\"\nlast_name = \"Lovelace\"\n# Create full_name and print it\n",
     "solution_code": "first_name = \"Ada\"\nlast_name = \"Lovelace\"\nfull_name = first_name + \" \" + last_name\nprint(full_name)",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Ada Lovelace\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "test_suite": "import io, sys\n\ndef test_prints_full_name():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == 'Ada Lovelace\\n', f\"Expected Ada Lovelace, got {output!r}\"",
+    "test_cases": [],
     "order": 1
   },
   {
     "slug": "str-fstring",
     "title": "Use an f-string",
-    "instruction": "You have variables `city` and `population`. Use an f-string to print: \"{city} has a population of {population}.\"",
+    "instruction": "Use an f-string to print Tokyo population.",
     "starter_code": "city = \"Tokyo\"\npopulation = 37_000_000\n# Print using an f-string\n",
     "solution_code": "city = \"Tokyo\"\npopulation = 37_000_000\nprint(f\"{city} has a population of {population}.\")",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Tokyo has a population of 37000000.\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "test_suite": "import io, sys\n\ndef test_prints_fstring_population():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == 'Tokyo has a population of 37000000.\\n', f\"Expected Tokyo population string, got {output!r}\"",
+    "test_cases": [],
     "order": 2
   },
   {
     "slug": "str-upper-lower",
     "title": "Upper and lower case",
-    "instruction": "Convert the given `text` to uppercase and print it, then convert it to lowercase and print it on a new line.",
-    "starter_code": "text = \"PyThOn Is AwEsOmE\"\n# Convert to uppercase and print, then lowercase and print\n",
+    "instruction": "Convert text to uppercase, then lowercase, print each.",
+    "starter_code": "text = \"PyThOn Is AwEsOmE\"\n# Convert to upper and lower\n",
     "solution_code": "text = \"PyThOn Is AwEsOmE\"\nprint(text.upper())\nprint(text.lower())",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "PYTHON IS AWESOME\npython is awesome\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "test_suite": "import io, sys\n\ndef test_prints_upper_and_lower():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == 'PYTHON IS AWESOME\\npython is awesome\\n', f\"Expected uppercase then lowercase, got {output!r}\"",
+    "test_cases": [],
     "order": 3
   },
   {
     "slug": "str-length",
     "title": "Check string length",
-    "instruction": "Print the length of the string `quote` using `len()`. Then check if the word \"mind\" is in the quote and print the result (True or False).",
+    "instruction": "Print len(quote), then check if \"mind\" is in quote.",
     "starter_code": "quote = \"The mind is everything. What you think you become.\"\n# Print length, then check if \"mind\" is in quote\n",
     "solution_code": "quote = \"The mind is everything. What you think you become.\"\nprint(len(quote))\nprint(\"mind\" in quote)",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "58\nTrue\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "test_suite": "import io, sys\n\ndef test_prints_length_and_contains():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == '50\\nTrue\\n', f\"Expected length 50 then True, got {output!r}\"",
+    "test_cases": [],
     "order": 4
   }
 ]

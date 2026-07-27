@@ -2,61 +2,41 @@
   {
     "slug": "cond-positive-negative",
     "title": "Positive, negative, or zero",
-    "instruction": "Write code that checks the value of `number` and prints \"positive\" if it's greater than 0, \"negative\" if it's less than 0, or \"zero\" if it's exactly 0.",
-    "starter_code": "number = -3\n# Check positive/negative/zero and print\n",
-    "solution_code": "number = -3\nif number > 0:\n    print(\"positive\")\nelse:\n    print(\"negative\")",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "negative\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Check if number is positive, negative, or zero. Print the result.",
+    "starter_code": "number = -3\n# Check number\n",
+    "solution_code": "number = -3\nif number > 0:\n    print(\"positive\")\nelif number < 0:\n    print(\"negative\")\nelse:\n    print(\"zero\")",
+    "test_suite": "import io, sys\n\ndef test_prints_negative():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == 'negative\\n', f\"Expected negative for -3, got {output!r}\"",
+    "test_cases": [],
     "order": 1
   },
   {
     "slug": "cond-driving-age",
     "title": "Can you drive?",
-    "instruction": "Check if `age` is 16 or older. If so, print \"You can drive!\" Otherwise, print \"Wait X more years.\" where X is the number of years until they turn 16.",
+    "instruction": "age = 14. Print \"Wait X more years.\" if under 16.",
     "starter_code": "age = 14\n# Check driving age\n",
     "solution_code": "age = 14\nif age >= 16:\n    print(\"You can drive!\")\nelse:\n    print(f\"Wait {16 - age} more years.\")",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Wait 2 more years.\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "test_suite": "import io, sys\n\ndef test_prints_wait_message():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == 'Wait 2 more years.\\n', f\"Expected Wait 2 more years, got {output!r}\"",
+    "test_cases": [],
     "order": 2
   },
   {
     "slug": "cond-leap-year",
     "title": "Leap year checker",
-    "instruction": "Check if `year` is a leap year. A year is a leap year if it's divisible by 400, OR divisible by 4 but NOT by 100. Print \"Leap year!\" or \"Not a leap year.\"",
-    "starter_code": "year = 2024\n# Check if it's a leap year\n",
+    "instruction": "Check if year 2024 is a leap year.",
+    "starter_code": "year = 2024\n# Check leap year\n",
     "solution_code": "year = 2024\nif (year % 400 == 0) or (year % 4 == 0 and year % 100 != 0):\n    print(\"Leap year!\")\nelse:\n    print(\"Not a leap year.\")",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Leap year!\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "test_suite": "import io, sys\n\ndef test_prints_leap_year():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == 'Leap year!\\n', f\"Expected Leap year! for 2024, got {output!r}\"",
+    "test_cases": [],
     "order": 3
   },
   {
     "slug": "cond-login",
     "title": "Login check",
-    "instruction": "Given `username` and `password` variables, check if username is \"admin\" AND password is \"secret123\". If both match, print \"Welcome, admin!\" otherwise print \"Access denied.\"",
-    "starter_code": "username = \"admin\"\npassword = \"secret123\"\n# Check login credentials\n",
+    "instruction": "Check admin/secret123. Print \"Welcome, admin!\" or \"Access denied.\"",
+    "starter_code": "username = \"admin\"\npassword = \"secret123\"\n# Check credentials\n",
     "solution_code": "username = \"admin\"\npassword = \"secret123\"\nif username == \"admin\" and password == \"secret123\":\n    print(\"Welcome, admin!\")\nelse:\n    print(\"Access denied.\")",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Welcome, admin!\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "test_suite": "import io, sys\n\ndef test_prints_welcome_admin():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == 'Welcome, admin!\\n', f\"Expected Welcome, admin!, got {output!r}\"",
+    "test_cases": [],
     "order": 4
   }
 ]

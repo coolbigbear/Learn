@@ -2,96 +2,51 @@
   {
     "slug": "comment-on-own-line",
     "title": "Add a comment on its own line",
-    "instruction": "Add a comment on the **first line** that says **# This program prints numbers**. The code below should still print 10 and 20 as before.",
+    "instruction": "Add **# This program prints numbers** on line 1.",
     "starter_code": "# Add a comment on this line\nprint(10)\nprint(20)\n",
     "solution_code": "# This program prints numbers\nprint(10)\nprint(20)\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "10\n20\n",
-        "comparison_type": "exact"
-      },
-      {
-        "input": "",
-        "expected_output": "# This program prints numbers",
-        "comparison_type": "comment_contains"
-      }
-    ],
+    "test_suite": "import io, sys\n\ndef test_prints_numbers():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == '10\\n20\\n', f\"Expected 10 then 20, got {output!r}\"\n\ndef test_has_correct_comment():\n    with open(\"exercise.py\") as f:\n        code = f.read()\n    assert '# This program prints numbers' in code",
+    "test_cases": [],
     "order": 1
   },
   {
     "slug": "comment-inline",
     "title": "Add an inline comment",
-    "instruction": "Add an **inline comment** at the end of the print statement. The comment should explain that this prints a greeting.",
+    "instruction": "Add an inline comment after print().",
     "starter_code": "print(\"Hi there!\")\n",
     "solution_code": "print(\"Hi there!\")  # Prints a greeting",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Hi there!\n",
-        "comparison_type": "exact"
-      },
-      {
-        "input": "",
-        "expected_output": "# Prints a greeting",
-        "comparison_type": "comment_contains"
-      }
-    ],
+    "test_suite": "import io, sys\n\ndef test_prints_hi_there():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == 'Hi there!\\n', f\"Expected Hi there!, got {output!r}\"\n\ndef test_has_inline_comment():\n    with open(\"exercise.py\") as f:\n        code = f.read()\n    for line in code.split(\"\\n\"):\n        s = line.strip()\n        if \"#\" in s and not s.startswith(\"#\"):\n            return\n    assert False",
+    "test_cases": [],
     "order": 2
   },
   {
     "slug": "comment-out-a-line",
     "title": "Comment out a line",
-    "instruction": "The code below has two print statements. **Comment out the first one** so only the second line runs.",
+    "instruction": "Comment out the first print() so only the second runs.",
     "starter_code": "print(\"This should not run\")\nprint(\"This should run\")\n",
     "solution_code": "# print(\"This should not run\")\nprint(\"This should run\")\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "This should run\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "test_suite": "import io, sys\n\ndef test_prints_second_line_only():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == 'This should run\\n', f\"Expected This should run, got {output!r}\"\n\ndef test_first_line_commented():\n    with open(\"exercise.py\") as f:\n        code = f.read()\n    first = code.strip().split(\"\\n\")[0].strip()\n    assert first.startswith(\"#\")",
+    "test_cases": [],
     "order": 3
   },
   {
     "slug": "comment-explain-code",
     "title": "Explain your code with a comment",
-    "instruction": "Write a print statement that prints **Learning Python is fun!** and add a comment on the line above that explains the purpose of the code.",
+    "instruction": "Add a comment above print(\"Learning Python is fun!\").",
     "starter_code": "# Write your comment here\n",
     "solution_code": "# Tell the user Python is fun\nprint(\"Learning Python is fun!\")",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Learning Python is fun!\n",
-        "comparison_type": "exact"
-      },
-      {
-        "input": "",
-        "expected_output": "# Tell the user Python is fun",
-        "comparison_type": "comment_contains"
-      }
-    ],
+    "test_suite": "import io, sys\n\ndef test_prints_learning_fun():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == 'Learning Python is fun!\\n', f\"Expected Learning Python is fun!, got {output!r}\"\n\ndef test_has_any_comment():\n    with open(\"exercise.py\") as f:\n        code = f.read()\n    assert '#' in code",
+    "test_cases": [],
     "order": 4
   },
   {
     "slug": "comment-todo-reminder",
     "title": "Add a TODO comment",
-    "instruction": "Write a comment that says **TODO: Add more features later** on a line above a print that says **Hello, world!**.",
+    "instruction": "Add **# TODO: Add more features later** above print().",
     "starter_code": "# Add a TODO comment\n",
     "solution_code": "# TODO: Add more features later\nprint(\"Hello, world!\")",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Hello, world!\n",
-        "comparison_type": "exact"
-      },
-      {
-        "input": "",
-        "expected_output": "# TODO: Add more features later",
-        "comparison_type": "comment_contains"
-      }
-    ],
+    "test_suite": "import io, sys\n\ndef test_prints_hello_world_todo():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == 'Hello, world!\\n', f\"Expected Hello, world!, got {output!r}\"\n\ndef test_has_todo_comment():\n    with open(\"exercise.py\") as f:\n        code = f.read()\n    assert '# TODO: Add more features later' in code",
+    "test_cases": [],
     "order": 5
   }
 ]
