@@ -7,10 +7,6 @@ export default function ExerciseFeedback({ result, mode = "test_cases" }) {
   const totalCount = test_results ? test_results.length : 0;
   const isTestSuite = mode === "test_suite";
 
-  const passedCount = test_results ? test_results.filter((tr) => tr.passed).length : 0;
-  const totalCount = test_results ? test_results.length : 0;
-  const isTestSuite = mode === "test_suite";
-
   return (
     <div
       className={`rounded-lg border overflow-hidden ${
@@ -39,11 +35,6 @@ export default function ExerciseFeedback({ result, mode = "test_cases" }) {
         <span className="font-semibold text-sm">
           {passed ? 'All tests passed!' : 'Some tests failed'}
         </span>
-        {isTestSuite && totalCount > 0 && (
-          <span className="text-sm ml-auto">
-            {passedCount}/{totalCount} tests passed
-          </span>
-        )}
         {isTestSuite && totalCount > 0 && (
           <span className="text-sm ml-auto">
             {passedCount}/{totalCount} tests passed
