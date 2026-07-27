@@ -2,31 +2,21 @@
   {
     "slug": "supervised-linreg",
     "title": "Linear regression prediction",
-    "instruction": "You have data showing years of experience and salary. Train a LinearRegression model, predict the salary for 8 years of experience, and print the prediction rounded to the nearest integer.\n\nYears: [1, 2, 3, 4, 5, 6, 7, 9, 10]\nSalary: [30, 35, 38, 42, 48, 52, 58, 68, 75]",
-    "starter_code": "import numpy as np\nfrom sklearn.linear_model import LinearRegression\n\nX = np.array([1, 2, 3, 4, 5, 6, 7, 9, 10]).reshape(-1, 1)\ny = np.array([30, 35, 38, 42, 48, 52, 58, 68, 75])\n\n# Train model and predict for 8 years\n",
-    "solution_code": "import numpy as np\nfrom sklearn.linear_model import LinearRegression\n\nX = np.array([1, 2, 3, 4, 5, 6, 7, 9, 10]).reshape(-1, 1)\ny = np.array([30, 35, 38, 42, 48, 52, 58, 68, 75])\n\nmodel = LinearRegression()\nmodel.fit(X, y)\npred = model.predict([[8]])\nprint(int(round(pred[0])))\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "63\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "instruction": "Define a function `train_and_predict(X, y, predict_for)` that takes training data and a value to predict for, trains a LinearRegression model, and returns the predicted salary **rounded to the nearest integer**.",
+    "starter_code": "import numpy as np\nfrom sklearn.linear_model import LinearRegression\n\ndef train_and_predict(X, y, predict_for):\n    # Train a LinearRegression model\n    # Predict for the given value and return the rounded integer\n    pass",
+    "test_suite": "import numpy as np\n\ndef test_predict_8_years():\n    X = np.array([1, 2, 3, 4, 5, 6, 7, 9, 10]).reshape(-1, 1)\n    y = np.array([30, 35, 38, 42, 48, 52, 58, 68, 75])\n    result = exercise.train_and_predict(X, y, 8)\n    assert 60 <= result <= 65, f\"Expected around 63 for 8 years, got {result}\"\n\ndef test_predict_3_years():\n    X = np.array([1, 2, 3, 4, 5, 6, 7, 9, 10]).reshape(-1, 1)\n    y = np.array([30, 35, 38, 42, 48, 52, 58, 68, 75])\n    result = exercise.train_and_predict(X, y, 3)\n    assert 37 <= result <= 40, f\"Expected around 38 for 3 years, got {result}\"\n\ndef test_predict_0_years():\n    X = np.array([1, 2, 3, 4, 5]).reshape(-1, 1)\n    y = np.array([40, 45, 50, 55, 60])\n    result = exercise.train_and_predict(X, y, 0)\n    assert 34 <= result <= 37, f\"Expected around 35 for 0 years, got {result}\"\n\ndef test_predict_outside_range():\n    X = np.array([1, 2, 3, 4, 5]).reshape(-1, 1)\n    y = np.array([10, 20, 30, 40, 50])\n    result = exercise.train_and_predict(X, y, 10)\n    assert result >= 90, f\"Extrapolating to 10 years should give >= 90, got {result}\"\n\ndef test_returns_int():\n    X = np.array([1, 2, 3]).reshape(-1, 1)\n    y = np.array([5, 10, 15])\n    result = exercise.train_and_predict(X, y, 4)\n    assert isinstance(result, (int, np.integer)), f\"Expected int return type, got {type(result)}\"",
+    "solution_code": "import numpy as np\nfrom sklearn.linear_model import LinearRegression\n\ndef train_and_predict(X, y, predict_for):\n    model = LinearRegression()\n    model.fit(X, y)\n    pred = model.predict([[predict_for]])\n    return int(round(pred[0]))",
+    "test_cases": [],
     "order": 1
   },
   {
     "slug": "supervised-knn",
-    "title": "k-NN classification on iris-like data",
-    "instruction": "Train a KNeighborsClassifier (k=3) on the following data. Predict the class for a new sample [5.0, 3.5, 1.5, 0.3] and print the predicted class.\n\nFeatures: sepal_length, sepal_width, petal_length, petal_width\nClasses: 0 = setosa, 1 = versicolor, 2 = virginica",
-    "starter_code": "import numpy as np\nfrom sklearn.neighbors import KNeighborsClassifier\n\nX = np.array([\n    [5.1, 3.5, 1.4, 0.2],\n    [4.9, 3.0, 1.4, 0.2],\n    [6.2, 2.9, 4.3, 1.3],\n    [5.5, 2.5, 4.0, 1.3],\n    [6.3, 3.3, 6.0, 2.5],\n    [5.8, 2.7, 5.1, 1.9],\n])\ny = np.array([0, 0, 1, 1, 2, 2])\n\nnew_sample = np.array([[5.0, 3.5, 1.5, 0.3]])\n\n# Train k-NN and predict\n",
-    "solution_code": "import numpy as np\nfrom sklearn.neighbors import KNeighborsClassifier\n\nX = np.array([\n    [5.1, 3.5, 1.4, 0.2],\n    [4.9, 3.0, 1.4, 0.2],\n    [6.2, 2.9, 4.3, 1.3],\n    [5.5, 2.5, 4.0, 1.3],\n    [6.3, 3.3, 6.0, 2.5],\n    [5.8, 2.7, 5.1, 1.9],\n])\ny = np.array([0, 0, 1, 1, 2, 2])\n\nnew_sample = np.array([[5.0, 3.5, 1.5, 0.3]])\n\nknn = KNeighborsClassifier(n_neighbors=3)\nknn.fit(X, y)\npred = knn.predict(new_sample)\nprint(pred[0])\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "0\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "title": "k-NN classification",
+    "instruction": "Define a function `predict_class(X, y, new_sample, k=3)` that trains a KNeighborsClassifier and returns the predicted class as an integer. Classes: 0=setosa, 1=versicolor, 2=virginica",
+    "starter_code": "import numpy as np\nfrom sklearn.neighbors import KNeighborsClassifier\n\ndef predict_class(X, y, new_sample, k=3):\n    # Train k-NN with n_neighbors=k\n    # Predict the class for new_sample\n    # Return the predicted class as integer\n    pass",
+    "test_suite": "import numpy as np\n\ndef make_iris_data():\n    X = np.array([\n        [5.1, 3.5, 1.4, 0.2],\n        [4.9, 3.0, 1.4, 0.2],\n        [6.2, 2.9, 4.3, 1.3],\n        [5.5, 2.5, 4.0, 1.3],\n        [6.3, 3.3, 6.0, 2.5],\n        [5.8, 2.7, 5.1, 1.9],\n    ])\n    y = np.array([0, 0, 1, 1, 2, 2])\n    return X, y\n\ndef test_predict_setosa():\n    X, y = make_iris_data()\n    new_sample = np.array([[5.0, 3.5, 1.5, 0.3]])\n    result = exercise.predict_class(X, y, new_sample)\n    assert result == 0, f\"Expected 0 (setosa), got {result}\"\n\ndef test_predict_versicolor():\n    X, y = make_iris_data()\n    new_sample = np.array([[6.0, 3.0, 4.5, 1.5]])\n    result = exercise.predict_class(X, y, new_sample)\n    assert result == 1, f\"Expected 1 (versicolor), got {result}\"\n\ndef test_predict_virginica():\n    X, y = make_iris_data()\n    new_sample = np.array([[6.5, 3.0, 5.5, 2.0]])\n    result = exercise.predict_class(X, y, new_sample)\n    assert result == 2, f\"Expected 2 (virginica), got {result}\"\n\ndef test_custom_k_value():\n    X, y = make_iris_data()\n    new_sample = np.array([[5.0, 3.5, 1.5, 0.3]])\n    result = exercise.predict_class(X, y, new_sample, k=1)\n    assert result in (0, 1, 2), f\"Expected a valid class (0, 1, or 2), got {result}\"\n\ndef test_returns_int():\n    X, y = make_iris_data()\n    new_sample = np.array([[5.0, 3.5, 1.5, 0.3]])\n    result = exercise.predict_class(X, y, new_sample)\n    assert isinstance(result, (int, np.integer)), f\"Expected int return type, got {type(result)}\"",
+    "solution_code": "import numpy as np\nfrom sklearn.neighbors import KNeighborsClassifier\n\ndef predict_class(X, y, new_sample, k=3):\n    knn = KNeighborsClassifier(n_neighbors=k)\n    knn.fit(X, y)\n    pred = knn.predict(new_sample)\n    return int(pred[0])",
+    "test_cases": [],
     "order": 2
   }
 ]
