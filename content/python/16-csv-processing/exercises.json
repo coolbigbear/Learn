@@ -1,32 +1,22 @@
 [
   {
     "slug": "csv-read-dict",
-    "title": "Read a CSV file with DictReader",
-    "instruction": "Write a program that reads the CSV data below (using io.StringIO to simulate a file) and prints each person's name and age on one line.\n\nCSV data (pretend it's a file):\nname,age\nAlice,25\nBob,30\nCharlie,35",
-    "starter_code": "import csv\nimport io\n\ndata = \"\"\"name,age\nAlice,25\nBob,30\nCharlie,35\"\"\"\n\n# Read CSV and print name and age\n",
-    "solution_code": "import csv\nimport io\n\ndata = \"\"\"name,age\nAlice,25\nBob,30\nCharlie,35\"\"\"\n\nreader = csv.DictReader(io.StringIO(data))\nfor row in reader:\n    print(f\"{row['name']} is {row['age']} years old\")\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Alice is 25 years old\nBob is 30 years old\nCharlie is 35 years old\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "title": "Parse CSV data into a list of dicts",
+    "instruction": "Define a function `parse_csv(csv_data)` that takes a CSV string (with a header row) and returns a **list of dictionaries** where each dictionary corresponds to a row, with header values as keys.\n\nExample:\n```python\nparse_csv(\"name,age\\nAlice,25\\nBob,30\")\n# Returns: [{\"name\": \"Alice\", \"age\": \"25\"}, {\"name\": \"Bob\", \"age\": \"30\"}]\n```\n\nDo **not** convert values to integers \u2014 keep everything as strings (the `csv` module returns strings by default).",
+    "starter_code": "import csv\nimport io\n\ndef parse_csv(csv_data):\n    # Use csv.DictReader with io.StringIO to parse the CSV string\n    # Return a list of dicts\n    pass",
+    "test_suite": "def test_basic_csv():\n    result = exercise.parse_csv(\"name,age\\nAlice,25\\nBob,30\\nCharlie,35\")\n    assert isinstance(result, list), f\"Expected a list, got {type(result)}\"\n    assert len(result) == 3, f\"Expected 3 rows, got {len(result)}\"\n    assert result[0] == {\"name\": \"Alice\", \"age\": \"25\"}, f\"Row 0 mismatch: {result[0]}\"\n    assert result[1] == {\"name\": \"Bob\", \"age\": \"30\"}, f\"Row 1 mismatch: {result[1]}\"\n    assert result[2] == {\"name\": \"Charlie\", \"age\": \"35\"}, f\"Row 2 mismatch: {result[2]}\"\n\ndef test_csv_with_city():\n    result = exercise.parse_csv(\"name,city\\nDiana,London\\nEve,Paris\")\n    assert len(result) == 2, f\"Expected 2 rows, got {len(result)}\"\n    assert result[0] == {\"name\": \"Diana\", \"city\": \"London\"}, f\"Row 0 mismatch: {result[0]}\"\n    assert result[1] == {\"name\": \"Eve\", \"city\": \"Paris\"}, f\"Row 1 mismatch: {result[1]}\"\n\ndef test_single_row():\n    result = exercise.parse_csv(\"product,price\\nWidget,9.99\")\n    assert len(result) == 1, f\"Expected 1 row, got {len(result)}\"\n    assert result[0] == {\"product\": \"Widget\", \"price\": \"9.99\"}, f\"Row 0 mismatch: {result[0]}\"\n\ndef test_header_only_no_data():\n    result = exercise.parse_csv(\"name,age\")\n    assert isinstance(result, list), f\"Expected a list, got {type(result)}\"\n    assert len(result) == 0, f\"Expected 0 rows for header-only CSV, got {len(result)}\"",
+    "solution_code": "import csv\nimport io\n\ndef parse_csv(csv_data):\n    reader = csv.DictReader(io.StringIO(csv_data))\n    return list(reader)",
+    "test_cases": [],
     "order": 1
   },
   {
     "slug": "csv-write-students",
-    "title": "Write student data to CSV",
-    "instruction": "Write a program that creates a list of students (each with 'name', 'grade', and 'subject'), then writes them to a CSV file called 'students.csv' using DictWriter. Print 'Saved students.csv' when done.",
-    "starter_code": "import csv\n\nstudents = [\n    {\"name\": \"Alice\", \"grade\": \"A\", \"subject\": \"Math\"},\n    {\"name\": \"Bob\", \"grade\": \"B\", \"subject\": \"Science\"},\n    {\"name\": \"Charlie\", \"grade\": \"A\", \"subject\": \"History\"}\n]\n\n# Write to students.csv\n",
-    "solution_code": "import csv\n\nstudents = [\n    {\"name\": \"Alice\", \"grade\": \"A\", \"subject\": \"Math\"},\n    {\"name\": \"Bob\", \"grade\": \"B\", \"subject\": \"Science\"},\n    {\"name\": \"Charlie\", \"grade\": \"A\", \"subject\": \"History\"}\n]\n\nfieldnames = [\"name\", \"grade\", \"subject\"]\nwith open(\"students.csv\", \"w\", newline=\"\") as f:\n    writer = csv.DictWriter(f, fieldnames=fieldnames)\n    writer.writeheader()\n    for student in students:\n        writer.writerow(student)\nprint(\"Saved students.csv\")\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Saved students.csv\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "title": "Convert student data to CSV string",
+    "instruction": "Define a function `students_to_csv(students, fieldnames)` that takes a list of dictionaries (`students`) and a list of field name strings (`fieldnames`), and returns the data as a **CSV-formatted string** (including the header row).\n\nUse `csv.DictWriter` with `io.StringIO` to build the CSV string in memory.\n\nExample:\n```python\nstudents = [\n    {\"name\": \"Alice\", \"grade\": \"A\", \"subject\": \"Math\"},\n    {\"name\": \"Bob\", \"grade\": \"B\", \"subject\": \"Science\"}\n]\nfieldnames = [\"name\", \"grade\", \"subject\"]\nresult = students_to_csv(students, fieldnames)\n# result will be:\n# \"name,grade,subject\\nAlice,A,Math\\nBob,B,Science\\n\"\n```",
+    "starter_code": "import csv\nimport io\n\ndef students_to_csv(students, fieldnames):\n    # Use csv.DictWriter with io.StringIO to build the CSV string\n    # Don't forget to write the header and all rows\n    # Return the CSV string\n    pass",
+    "test_suite": "def test_three_students():\n    students = [\n        {\"name\": \"Alice\", \"grade\": \"A\", \"subject\": \"Math\"},\n        {\"name\": \"Bob\", \"grade\": \"B\", \"subject\": \"Science\"},\n        {\"name\": \"Charlie\", \"grade\": \"A\", \"subject\": \"History\"}\n    ]\n    fieldnames = [\"name\", \"grade\", \"subject\"]\n    result = exercise.students_to_csv(students, fieldnames)\n    expected = \"name,grade,subject\\nAlice,A,Math\\nBob,B,Science\\nCharlie,A,History\\n\"\n    assert result == expected, f\"Expected:\\n{expected!r}\\nGot:\\n{result!r}\"\n\ndef test_single_student():\n    students = [{\"name\": \"Diana\", \"grade\": \"A\", \"subject\": \"Art\"}]\n    fieldnames = [\"name\", \"grade\", \"subject\"]\n    result = exercise.students_to_csv(students, fieldnames)\n    expected = \"name,grade,subject\\nDiana,A,Art\\n\"\n    assert result == expected, f\"Expected:\\n{expected!r}\\nGot:\\n{result!r}\"\n\ndef test_different_fieldnames():\n    students = [\n        {\"city\": \"London\", \"population\": \"8.9M\"},\n        {\"city\": \"Paris\", \"population\": \"2.1M\"}\n    ]\n    fieldnames = [\"city\", \"population\"]\n    result = exercise.students_to_csv(students, fieldnames)\n    expected = \"city,population\\nLondon,8.9M\\nParis,2.1M\\n\"\n    assert result == expected, f\"Expected:\\n{expected!r}\\nGot:\\n{result!r}\"\n\ndef test_empty_students():\n    result = exercise.students_to_csv([], [\"name\", \"grade\"])\n    expected = \"name,grade\\n\"\n    assert result == expected, f\"Expected header-only:\\n{expected!r}\\nGot:\\n{result!r}\"",
+    "solution_code": "import csv\nimport io\n\ndef students_to_csv(students, fieldnames):\n    output = io.StringIO()\n    writer = csv.DictWriter(output, fieldnames=fieldnames, lineterminator='\\n')\n    writer.writeheader()\n    writer.writerows(students)\n    return output.getvalue()",
+    "test_cases": [],
     "order": 2
   }
 ]

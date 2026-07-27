@@ -1,32 +1,22 @@
 [
   {
     "slug": "dpl-fetch-repo",
-    "title": "Fetch repo info from GitHub API",
-    "instruction": "Write a program that uses the requests library to fetch data from the GitHub API at https://api.github.com/repos/python/cpython, checks that the status code is 200, and prints the repository name and star count.\n\nFormat: 'Repository: <name>, Stars: <count>'",
-    "starter_code": "import requests\n\n# Your code here\n",
-    "solution_code": "import requests\n\nresponse = requests.get(\"https://api.github.com/repos/python/cpython\")\nif response.status_code == 200:\n    data = response.json()\n    print(f\"Repository: {data['name']}, Stars: {data['stargazers_count']}\")\nelse:\n    print(f\"Request failed: {response.status_code}\")\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Repository: cpython, Stars: ",
-        "comparison_type": "contains"
-      }
-    ],
+    "title": "Format repository info from API data",
+    "instruction": "Define a function `format_repo_info(repo_data)` that takes a dictionary with repository data (containing at least \"name\" and \"stargazers_count\" keys) and returns a formatted string: `Repository: [name], Stars: [count]`.",
+    "starter_code": "def format_repo_info(repo_data):\n    # Extract name and stars from repo_data dict and format\n    pass",
+    "test_suite": "def test_typical_repo():\n    data = {\"name\": \"cpython\", \"stargazers_count\": 60000, \"description\": \"The Python programming language\"}\n    result = exercise.format_repo_info(data)\n    assert result == \"Repository: cpython, Stars: 60000\", f\"Expected formatted string, got {result!r}\"\n\ndef test_zero_stars():\n    data = {\"name\": \"my-new-project\", \"stargazers_count\": 0, \"description\": \"Just started\"}\n    result = exercise.format_repo_info(data)\n    assert result == \"Repository: my-new-project, Stars: 0\", f\"Expected 0 stars, got {result!r}\"\n\ndef test_large_star_count():\n    data = {\"name\": \"tensorflow\", \"stargazers_count\": 185000, \"description\": \"Machine learning\"}\n    result = exercise.format_repo_info(data)\n    assert result == \"Repository: tensorflow, Stars: 185000\", f\"Expected large number, got {result!r}\"",
+    "solution_code": "def format_repo_info(repo_data):\n    return f\"Repository: {repo_data['name']}, Stars: {repo_data['stargazers_count']}\"",
+    "test_cases": [],
     "order": 1
   },
   {
     "slug": "dpl-save-to-json",
-    "title": "Save API data to JSON",
-    "instruction": "Fetch data from https://api.github.com/repos/python/cpython, extract the 'name' and 'description' fields into a dictionary, and save it to 'repo.json' with indent=2 using the json module.",
-    "starter_code": "import requests\nimport json\n\n# Your code here\n",
-    "solution_code": "import requests\nimport json\n\nresponse = requests.get(\"https://api.github.com/repos/python/cpython\")\nif response.status_code == 200:\n    data = response.json()\n    repo_info = {\n        \"name\": data[\"name\"],\n        \"description\": data[\"description\"]\n    }\n    with open(\"repo.json\", \"w\") as f:\n        json.dump(repo_info, f, indent=2)\n    print(\"Saved repo.json\")\nelse:\n    print(f\"Request failed: {response.status_code}\")\n",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Saved repo.json\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "title": "Extract repo info to JSON",
+    "instruction": "Define a function `extract_repo_json(repo_data)` that takes a dictionary with repository data (containing at least \"name\" and \"description\" keys) and returns a pretty-printed JSON string (indent=2) with just the \"name\" and \"description\" fields.",
+    "starter_code": "def extract_repo_json(repo_data):\n    # Extract name and description, return as pretty-printed JSON\n    pass",
+    "test_suite": "import json\n\ndef test_typical_repo():\n    data = {\"name\": \"cpython\", \"description\": \"The Python programming language\", \"stargazers_count\": 60000}\n    result = exercise.extract_repo_json(data)\n    parsed = json.loads(result)\n    assert parsed[\"name\"] == \"cpython\", f\"Expected name 'cpython', got {parsed['name']!r}\"\n    assert parsed[\"description\"] == \"The Python programming language\", f\"Expected description, got {parsed['description']!r}\"\n    assert \"stargazers_count\" not in parsed, f\"Should not include extra fields, got {list(parsed.keys())}\"\n    assert result.count(\"\\n\") >= 2, f\"Expected pretty-printed JSON (newlines), got {result!r}\"\n\ndef test_null_description():\n    data = {\"name\": \"empty-repo\", \"description\": None}\n    result = exercise.extract_repo_json(data)\n    parsed = json.loads(result)\n    assert parsed[\"name\"] == \"empty-repo\", f\"Expected name, got {parsed['name']!r}\"\n    assert parsed[\"description\"] is None, f\"Expected None description, got {parsed['description']!r}\"\n\ndef test_different_repo():\n    data = {\"name\": \"pandas\", \"description\": \"Data analysis library\"}\n    result = exercise.extract_repo_json(data)\n    parsed = json.loads(result)\n    assert parsed[\"name\"] == \"pandas\", f\"Expected name 'pandas', got {parsed['name']!r}\"\n    assert parsed[\"description\"] == \"Data analysis library\", f\"Expected description, got {parsed['description']!r}\"",
+    "solution_code": "import json\n\ndef extract_repo_json(repo_data):\n    info = {\n        \"name\": repo_data[\"name\"],\n        \"description\": repo_data[\"description\"]\n    }\n    return json.dumps(info, indent=2)",
+    "test_cases": [],
     "order": 2
   }
 ]
