@@ -9,7 +9,38 @@ and the tutorial-runner-python:latest image to be built.
 
 import pytest
 
-from app.services.docker_runner import DockerRunner, DockerUnavailableError
+from app.services.docker_runner import (
+    DockerRunner,
+    DockerUnavailableError,
+    _render_harness,
+)
+
+
+class TestRenderHarness:
+    """Unit tests for _render_harness template selection logic."""
+    def test_render_standard_mode(self):
+        user_code = 'print("hello")'
+        test_cases = [{"input": "", "expected_output": "hello\n", "comparison_type": "exact"}]
+        result = _render_harness(user_code, test_cases)
+        assert "{user_code!r}" not in result
+        assert "{test_cases!r}" not in result
+        assert "_run_single" in result
+    def test_render_test_suite_mode(self):
+        user_code = "def add(a, b): return a + b"
+        test_suite = "def test_add():\n    assert exercise.add(1, 2) == 3\n"
+        result = _render_harness(user_code, test_suite=test_suite)
+        assert "{user_code!r}" not in result and "{test_suite!r}" not in result
+        assert "importlib" in result and "exercise.py" in result
+    def test_render_standard_mode_with_none(self):
+        result = _render_harness('print("hello")', None)
+        assert "{test_cases!r}" not in result
+    def test_render_test_suite_user_code_present(self):
+        result = _render_harness('x = 42', test_suite="def test_x(): assert exercise.x == 42")
+        assert "42" in result
+    def test_render_templates_exist(self):
+        from pathlib import Path
+        hd = Path(__file__).resolve().parent.parent / "docker" / "harnesses"
+        assert (hd / "python_harness.py.j2").exists() and (hd / "python_test_suite_harness.py.j2").exists()
 
 
 # Module-level DockerRunner singleton for tests

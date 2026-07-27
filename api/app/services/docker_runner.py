@@ -47,26 +47,65 @@ class LanguageConfigError(Exception):
 
 
 def _render_harness(
-    user_code: str, test_cases: list[dict], test_suite: str | None = None
+    user_code: str,
+    test_cases: list[dict] | None = None,
+    test_suite: str | None = None,
 ) -> str:
-    """Render the harness template with user code and test cases.
+    """Render a harness template with user code, test cases, or test suite.
 
-    Reads the Jinja2-style template from the harness file and substitutes
-    the {user_code!r} and {test_cases!r} placeholders with repr() output
-    so the rendered script is valid Python.
+    Two modes (selected by the presence of *test_suite*):
+
+    1. **Test-suite mode** (test_suite is not None):
+       Reads ``python_test_suite_harness.py.j2`` and substitutes the
+       ``{user_code!r}`` and ``{test_suite!r}`` placeholders with repr()
+       output.  The resulting script writes user code to ``exercise.py``,
+       the test suite to ``test_suite.py``, imports the user module via
+       importlib, and runs all ``test_*`` functions.
+
+    2. **Standard mode** (test_suite is None, the default):
+       Reads ``python_harness.py.j2`` and substitutes the ``{user_code!r}``
+       and ``{test_cases!r}`` placeholders.  The resulting script compares
+       program output against expected values using the configured comparison
+       types.
+
+    Args:
+        user_code: The user's source code as a string.
+        test_cases: List of test case dicts (used in standard mode).
+        test_suite: Python test suite code (used in test-suite mode).
+
+    Returns:
+        The rendered harness script as a string.
+
+    Raises:
+        FileNotFoundError: If the required harness template file does not exist.
     """
-    harness_path = (
-        Path(__file__).resolve().parent.parent.parent
-        / "docker"
-        / "harnesses"
-        / "python_harness.py.j2"
+    harness_dir = (
+        Path(__file__).resolve().parent.parent.parent / "docker" / "harnesses"
     )
-    if not harness_path.exists():
-        raise FileNotFoundError(f"Harness template not found at {harness_path}")
-    template = harness_path.read_text()
-    return template.replace("{user_code!r}", repr(user_code)).replace(
-        "{test_cases!r}", repr(test_cases)
-    )
+
+    if test_suite is not None:
+        # Test-suite mode
+        harness_path = harness_dir / "python_test_suite_harness.py.j2"
+        if not harness_path.exists():
+            raise FileNotFoundError(
+                f"Test-suite harness template not found at {harness_path}"
+            )
+        template = harness_path.read_text()
+        return (
+            template.replace("{user_code!r}", repr(user_code))
+            .replace("{test_suite!r}", repr(test_suite))
+        )
+    else:
+        # Standard mode (backward compatible)
+        harness_path = harness_dir / "python_harness.py.j2"
+        if not harness_path.exists():
+            raise FileNotFoundError(
+                f"Harness template not found at {harness_path}"
+            )
+        template = harness_path.read_text()
+        return template.replace("{user_code!r}", repr(user_code)).replace(
+            "{test_cases!r}", repr(test_cases or [])
+        )
 
 
 def _load_languages_config(config_path: str | Path) -> dict:
@@ -414,8 +453,9 @@ class DockerRunner:
     async def run_code(
         self,
         user_code: str,
-        test_cases: list[dict],
+        test_cases: list[dict] | None = None,
         language: str = "python",
+        test_suite: str | None = None,
     ) -> dict:
         """Run user code inside a Docker container.
 
@@ -423,20 +463,32 @@ class DockerRunner:
         mounts so it works correctly when the API runs inside a Docker
         container (Docker-in-Docker path resolution issue).
 
+        Two execution modes:
+
+        1. **Standard mode** (test_suite is None, the default):
+           Renders the standard harness with test_cases and compares program
+           output against expected values.
+
+        2. **Test-suite mode** (test_suite is provided):
+           Renders the test-suite harness which writes user code to
+           ``exercise.py``, the test suite to ``test_suite.py``, imports
+           the user module via importlib, and runs ``test_*`` functions.
+
         Args:
             user_code: The user's source code as a string.
             test_cases: List of test case dicts with keys: input, expected_output,
-                       comparison_type, name (optional).
+                       comparison_type, name (optional). Ignored in test-suite mode.
             language: Language key from the config (default: "python").
+            test_suite: Python test suite code string (triggers test-suite mode).
 
         Returns:
             Dict with keys: passed, actual_output, expected_output, errors, test_results.
-            Same schema as the current exercise_runner.run_code().
+            Same schema as exercise_runner.run_code().
         """
         cfg = self.get_config(language)
 
         # Render the harness script
-        harness_script = _render_harness(user_code, test_cases)
+        harness_script = _render_harness(user_code, test_cases, test_suite)
 
         try:
             # Run container synchronously in a thread pool.
@@ -680,8 +732,9 @@ def get_runner() -> DockerRunner:
 
 async def run_code_in_docker(
     user_code: str,
-    test_cases: list[dict],
+    test_cases: list[dict] | None = None,
     language: str = "python",
+    test_suite: str | None = None,
 ) -> dict:
     """Convenience async function to run code in Docker.
 
@@ -689,10 +742,15 @@ async def run_code_in_docker(
     exercise_runner.run_code(). Raises DockerUnavailableError if
     Docker is not available.
 
+    Two modes:
+    1. **Standard mode** (test_suite is None): uses test_cases.
+    2. **Test-suite mode** (test_suite is provided): uses test_suite.
+
     Args:
         user_code: The user's source code.
-        test_cases: List of test case dicts.
+        test_cases: List of test case dicts (used in standard mode).
         language: Language key (default: "python").
+        test_suite: Python test suite code string (triggers test-suite mode).
 
     Returns:
         Dict with keys: passed, actual_output, expected_output, errors, test_results.
@@ -702,4 +760,4 @@ async def run_code_in_docker(
         raise DockerUnavailableError(
             "Docker runner is not enabled (DOCKER_ENABLED=False)"
         )
-    return await runner.run_code(user_code, test_cases, language)
+    return await runner.run_code(user_code, test_cases, language, test_suite)

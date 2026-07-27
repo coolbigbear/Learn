@@ -448,15 +448,13 @@ async def run_code_with_docker_fallback(
 
     Returns the same dict schema as run_code().
     """
-    # When test_suite is present, skip Docker and use subprocess test_suite runner
-    if test_suite is not None:
-        return await run_code(user_code, test_cases, test_suite=test_suite)
-
     if DOCKER_ENABLED:
         try:
             from app.services.docker_runner import run_code_in_docker
 
-            return await run_code_in_docker(user_code, test_cases, language)
+            return await run_code_in_docker(
+                user_code, test_cases, language, test_suite
+            )
         except ImportError:
             # docker package not installed — fall through
             pass

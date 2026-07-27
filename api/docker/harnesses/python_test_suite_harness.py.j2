@@ -1,0 +1,23 @@
+import importlib.util, json, sys
+_USER_CODE = {user_code!r}
+with open('exercise.py', 'w') as _f: _f.write(_USER_CODE)
+_TEST_SUITE = {test_suite!r}
+with open('test_suite.py', 'w') as _f: _f.write(_TEST_SUITE)
+_spec = importlib.util.spec_from_file_location('exercise', 'exercise.py')
+if _spec is None or _spec.loader is None:
+    print(json.dumps({'passed':False,'errors':'Failed to import exercise module','test_results':[]})); sys.exit(0)
+_exercise = importlib.util.module_from_spec(_spec)
+try: _spec.loader.exec_module(_exercise)
+except Exception as _e:
+    print(json.dumps({'passed':False,'errors':f'Error: {type(_e).__name__}: {_e}','test_results':[]})); sys.exit(0)
+_test_ns = {'exercise': _exercise}
+exec(open('test_suite.py').read(), _test_ns)
+_test_funcs = sorted([(n,f) for n,f in _test_ns.items() if n.startswith('test_')], key=lambda x:x[0])
+if not _test_funcs:
+    print(json.dumps({'passed':False,'errors':'No test_* functions found','test_results':[]})); sys.exit(0)
+_results = []; _all_passed = True
+for _i,(tn,_fn) in enumerate(_test_funcs):
+    try: _fn(); _results.append({'test_index':_i,'name':tn,'passed':True,'message':None,'actual_output':'','expected_output':'','errors':None,'comparison_type':'exact'})
+    except AssertionError as _e: _all_passed=False; _results.append({'test_index':_i,'name':tn,'passed':False,'message':str(_e) if str(_e) else 'Assertion failed','actual_output':'','expected_output':'','errors':None,'comparison_type':'exact'})
+    except Exception as _e: _all_passed=False; _results.append({'test_index':_i,'name':tn,'passed':False,'message':f'{type(_e).__name__}: {_e}','actual_output':'','expected_output':'','errors':f'{type(_e).__name__}: {_e}','comparison_type':'exact'})
+print(json.dumps({'passed':_all_passed,'actual_output':'','expected_output':'','errors':None,'test_results':_results}))
