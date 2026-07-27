@@ -58,10 +58,8 @@ class TestListLessons:
         body = resp.json()
         assert "lessons" in body
         assert len(body["lessons"]) == 2
-        # First lesson should have exercise_count = 2
         assert body["lessons"][0]["exercise_count"] == 2
         assert body["lessons"][1]["exercise_count"] == 0
-        # Should include path field
         assert body["lessons"][0]["path"] == "core"
 
     async def test_lessons_ordered(self, client: AsyncClient, auth_headers: dict):
@@ -81,9 +79,8 @@ class TestLessonsByPath:
         assert resp.status_code == 200
         body = resp.json()
         assert "paths" in body
-        assert len(body["paths"]) == 4  # core, data-processing, api, machine-learning
+        assert len(body["paths"]) == 4
 
-        # core path should have 2 test lessons
         core_path = body["paths"][0]
         assert core_path["path"] == "core"
         assert core_path["display_name"] == "Python Fundamentals"
@@ -92,17 +89,14 @@ class TestLessonsByPath:
             assert lesson["path"] == "core"
             assert lesson["exercise_count"] is not None
             assert "exercises" in lesson
-            # First lesson has 2 exercises, second has 0
             if lesson["slug"] == "01-test-lesson":
                 assert lesson["exercise_count"] == 2
                 assert len(lesson["exercises"]) == 2
-                # Verify exercise fields
                 ex1 = lesson["exercises"][0]
                 assert "id" in ex1
                 assert ex1["slug"] == "test-ex-1"
                 assert ex1["title"] == "First Exercise"
                 assert ex1["order"] == 1
-                # Must not include sensitive/extra fields
                 assert "instruction" not in ex1
                 assert "starter_code" not in ex1
                 ex2 = lesson["exercises"][1]
@@ -112,7 +106,6 @@ class TestLessonsByPath:
                 assert lesson["exercise_count"] == 0
                 assert lesson["exercises"] == []
 
-        # Other paths should be empty for now
         assert body["paths"][1]["path"] == "data-processing"
         assert body["paths"][1]["lessons"] == []
         assert body["paths"][2]["path"] == "api"
@@ -141,10 +134,24 @@ class TestGetLesson:
         ex = resp.json()["exercises"][0]
         assert "solution_code" not in ex
         assert "test_cases" not in ex
-        assert "starter_code" in ex  # starter code IS public
+        assert "starter_code" in ex
 
     async def test_get_lesson_not_found(self, client: AsyncClient, auth_headers: dict):
         resp = await client.get("/api/lessons/nonexistent", headers=auth_headers)
+        assert resp.status_code == 404
+
+    async def test_get_lesson_by_numeric_id(self, client: AsyncClient, auth_headers: dict):
+        """Looking up a lesson by numeric ID should fall back to ID lookup."""
+        resp = await client.get("/api/lessons/1", headers=auth_headers)
+        assert resp.status_code == 200
+        body = resp.json()
+        assert body["slug"] == "01-test-lesson"
+        assert body["title"] == "Test Lesson One"
+        assert len(body["exercises"]) == 2
+
+    async def test_get_lesson_numeric_not_found(self, client: AsyncClient, auth_headers: dict):
+        """A numeric ID that doesn't exist should return 404, not a wrong lesson."""
+        resp = await client.get("/api/lessons/999", headers=auth_headers)
         assert resp.status_code == 404
 
     async def test_get_lesson_requires_auth(self, client: AsyncClient):
