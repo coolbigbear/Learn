@@ -2,46 +2,31 @@
   {
     "slug": "var-create-and-print",
     "title": "Create and print a variable",
-    "instruction": "Create a variable called `greeting` that holds the string \"Hello, Python!\" and print it.",
+    "instruction": "Create `greeting = \"Hello, Python!\"` and print it.",
     "starter_code": "# Create a greeting variable and print it\n",
     "solution_code": "greeting = \"Hello, Python!\"\nprint(greeting)",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Hello, Python!\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"Hello, Python!\\n\"",
+    "test_cases": [],
     "order": 1
   },
   {
     "slug": "var-swap-values",
     "title": "Swap two variables",
-    "instruction": "You have two variables `x` and `y` with values 5 and 10. Swap their values so `x` becomes 10 and `y` becomes 5. Print both variables after swapping.",
+    "instruction": "Swap `x=5` and `y=10`. Print both after swapping.",
     "starter_code": "x = 5\ny = 10\n# Swap the values here\n",
     "solution_code": "x = 5\ny = 10\nx, y = y, x\nprint(x)\nprint(y)",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "10\n5\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"10\\n5\\n\"",
+    "test_cases": [],
     "order": 2
   },
   {
     "slug": "var-check-types",
     "title": "Check variable types",
-    "instruction": "Create three variables: an integer, a float, and a string. Use `type()` to print the type of each one, each on a separate line.",
+    "instruction": "Create int, float, and str variables. Print their types.",
     "starter_code": "# Create three variables of different types and print their types\n",
     "solution_code": "my_int = 7\nmy_float = 3.14\nmy_str = \"hello\"\nprint(type(my_int))\nprint(type(my_float))\nprint(type(my_str))",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "<class 'int'>\n<class 'float'>\n<class 'str'>\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"<class 'int'>\\n<class 'float'>\\n<class 'str'>\\n\"",
+    "test_cases": [],
     "order": 3
   }
 ]

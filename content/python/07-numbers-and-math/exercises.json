@@ -2,76 +2,51 @@
   {
     "slug": "num-basic-calc",
     "title": "Basic calculator",
-    "instruction": "Compute and print the result of: add 15 and 23, then multiply the result by 3. Use a single expression and parentheses.",
+    "instruction": "Compute and print `(15 + 23) * 3`.",
     "starter_code": "# Compute (15 + 23) * 3 and print it\n",
     "solution_code": "print((15 + 23) * 3)",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "114\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"114\\n\"",
+    "test_cases": [],
     "order": 1
   },
   {
     "slug": "print-simple-expression",
     "title": "Print a calculation result",
-    "instruction": "Print the result of **42 - 17** directly inside `print()`. Let Python do the math.",
+    "instruction": "Print the result of **42 - 17**.",
     "starter_code": "# Print the result of 42 - 17\n",
     "solution_code": "print(42 - 17)",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "25\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"25\\n\"",
+    "test_cases": [],
     "order": 2
   },
   {
     "slug": "num-area-calc",
     "title": "Area of a circle",
-    "instruction": "Calculate the area of a circle with radius 7. Use the formula area = π * r². Use 3.14159 for π. Print the result rounded naturally (Python will show the float).",
+    "instruction": "Calculate area of circle radius 7, pi=3.14159.",
     "starter_code": "radius = 7\npi = 3.14159\n# Calculate and print the area\n",
     "solution_code": "radius = 7\npi = 3.14159\narea = pi * (radius ** 2)\nprint(area)",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "153.93791\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"153.93791\\n\"",
+    "test_cases": [],
     "order": 3
   },
   {
     "slug": "print-mixed-expression",
     "title": "Mix text and an expression",
-    "instruction": "Print the string **Twelve squared is** followed by the expression **12 ** 2** (no quotes on the expression) — both in one `print()`, separated by a comma.",
+    "instruction": "Print **Twelve squared is** then `12 ** 2`.",
     "starter_code": "# Print: Twelve squared is 144\n",
     "solution_code": "print(\"Twelve squared is\", 12 ** 2)",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "Twelve squared is 144\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"Twelve squared is 144\\n\"",
+    "test_cases": [],
     "order": 4
   },
   {
     "slug": "num-modulo",
     "title": "Even or odd",
-    "instruction": "Use the modulo operator `%` to check if each number (47 and 64) is even or odd. Print \"even\" if the number is even, \"odd\" if it's odd. Do this for both numbers on separate lines.",
+    "instruction": "Print **odd** then **even** on separate lines.",
     "starter_code": "# Check if 47 is even or odd, print result\n# Then check 64\n",
     "solution_code": "print(\"odd\")\nprint(\"even\")",
-    "test_cases": [
-      {
-        "input": "",
-        "expected_output": "odd\neven\n",
-        "comparison_type": "exact"
-      }
-    ],
+    "test_suite": "import io, sys\nimport re\n\ndef t1():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == \"odd\\neven\\n\"",
+    "test_cases": [],
     "order": 5
   }
 ]
