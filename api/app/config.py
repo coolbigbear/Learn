@@ -32,7 +32,10 @@ WALL_CLOCK_TIMEOUT = 3.0
 SHELL_TIMEOUT = 5.0
 
 # Docker sandbox runner configuration
-DOCKER_ENABLED = os.environ.get("DOCKER_ENABLED", "true").lower() in ("1", "true", "yes")
+# NOTE: DOCKER_ENABLED defaults to False on resource-constrained hosts (Raspberry Pi).
+# The subprocess runner is faster (0.9-1.4s) and avoids Cloudflare tunnel timeouts.
+# Docker deployments (QA/prod via docker-compose.yml) explicitly override to "true".
+DOCKER_ENABLED = os.environ.get("DOCKER_ENABLED", "false").lower() in ("1", "true", "yes")
 DOCKER_TIMEOUT = 15            # Container wall-clock timeout (seconds)
 DOCKER_MEMORY_LIMIT = "128m"   # Memory limit per container (Docker format string)
 DOCKER_CPU_LIMIT = 500_000_000   # nano_cpus (0.5 CPU)
