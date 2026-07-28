@@ -110,6 +110,7 @@ async def get_lesson(
             "instruction": ex.instruction,
             "starter_code": ex.starter_code,
             "order": ex.order,
+            "has_test_suite": bool(ex.test_suite),
         })
 
     return LessonDetail(
