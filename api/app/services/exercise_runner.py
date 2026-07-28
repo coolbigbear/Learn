@@ -11,12 +11,15 @@ Docker is unavailable.
 """
 
 import json
+import logging
 import os
 import subprocess
 import sys
 import tempfile
 import textwrap
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 from app.config import (
     DOCKER_ENABLED,
@@ -223,6 +226,7 @@ TEST_SUITE_HARNESS_TEMPLATE = """\
 # itself can function.
 
 import importlib.util
+import io
 import json
 import sys
 import traceback
@@ -238,20 +242,67 @@ _TEST_SUITE = {test_suite!r}
 with open('test_suite.py', 'w') as _f:
     _f.write(_TEST_SUITE)
 
-# 3. Import user code as the 'exercise' module via importlib
-_spec = importlib.util.spec_from_file_location('exercise', 'exercise.py')
-_exercise = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(_exercise)
+# 3. Redirect stdout/stderr to capture user module-level output
+_old_stdout = sys.stdout
+_old_stderr = sys.stderr
+sys.stdout = io.StringIO()
+sys.stderr = io.StringIO()
 
-# 4. Execute test suite in a namespace that has 'exercise'
+# 4. Import user code as the 'exercise' module via importlib
+_spec = importlib.util.spec_from_file_location('exercise', 'exercise.py')
+if _spec is None or _spec.loader is None:
+    sys.stdout = _old_stdout
+    sys.stderr = _old_stderr
+    print(json.dumps({{
+        'passed': False,
+        'actual_output': '',
+        'expected_output': '',
+        'errors': 'Failed to import exercise module',
+        'test_results': []
+    }}))
+    sys.exit(0)
+
+_exercise = importlib.util.module_from_spec(_spec)
+try:
+    _spec.loader.exec_module(_exercise)
+except Exception as _e:
+    _captured_out = sys.stdout.getvalue()
+    _captured_err = sys.stderr.getvalue()
+    sys.stdout = _old_stdout
+    sys.stderr = _old_stderr
+    print(json.dumps({{
+        'passed': False,
+        'actual_output': _captured_out,
+        'expected_output': '',
+        'errors': f'{{type(_e).__name__}}: {{_e}}',
+        'test_results': []
+    }}))
+    sys.exit(0)
+
+# 5. Execute test suite in a namespace that has 'exercise'
 _test_ns = {{'exercise': _exercise}}
 exec(open('test_suite.py').read(), _test_ns)
 
-# 5. Discover test_* functions
+# 6. Discover test_* functions
 _test_funcs = [(name, fn) for name, fn in _test_ns.items() if name.startswith('test_')]
 _test_funcs.sort(key=lambda x: x[0])
 
-# 6. Run each test, collect results
+# 7. Check for empty test suite early
+if not _test_funcs:
+    _captured_out = sys.stdout.getvalue()
+    _captured_err = sys.stderr.getvalue()
+    sys.stdout = _old_stdout
+    sys.stderr = _old_stderr
+    print(json.dumps({{
+        'passed': False,
+        'actual_output': _captured_out,
+        'expected_output': '',
+        'errors': 'No test_* functions found',
+        'test_results': []
+    }}))
+    sys.exit(0)
+
+# 8. Run each test, collect results
 _results = []
 _all_passed = True
 for _i, (_name, _fn) in enumerate(_test_funcs):
@@ -292,11 +343,16 @@ for _i, (_name, _fn) in enumerate(_test_funcs):
             'comparison_type': 'exact'
         }})
 
+# 9. Restore stdout/stderr and output JSON with captured output
+_captured_out = sys.stdout.getvalue()
+_captured_err = sys.stderr.getvalue()
+sys.stdout = _old_stdout
+sys.stderr = _old_stderr
 print(json.dumps({{
     'passed': _all_passed,
-    'actual_output': '',
+    'actual_output': _captured_out,
     'expected_output': '',
-    'errors': None,
+    'errors': _captured_err or None,
     'test_results': _results
 }}))
 """
@@ -452,11 +508,20 @@ async def run_code_with_docker_fallback(
         try:
             from app.services.docker_runner import run_code_in_docker
 
-            return await run_code_in_docker(
+            result = await run_code_in_docker(
                 user_code, test_cases, language, test_suite
             )
+            # If Docker returned a timeout result, fall through to the
+            # subprocess runner instead.  The Docker daemon may be slow
+            # or overloaded (common on Raspberry Pi), but the subprocess
+            # runner can still complete the exercise quickly.
+            if result.get("errors") == "Execution timed out":
+                logger.warning(
+                    "Docker sandbox timed out — falling back to subprocess runner"
+                )
+            else:
+                return result
         except ImportError:
-            # docker package not installed — fall through
             pass
         except Exception:
             # Docker unavailable or error — fall through to subprocess

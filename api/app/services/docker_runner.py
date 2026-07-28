@@ -689,33 +689,47 @@ class DockerRunner:
                 "test_results": [],
             }
 
-        first_line = lines[0]
-        try:
-            result = json.loads(first_line)
-            return result
-        except (json.JSONDecodeError, TypeError):
-            # Check for Docker infrastructure failure patterns.
-            # These indicate the sandbox container itself failed to bootstrap
-            # (e.g. harness file not injected, Python not found, missing
-            # dependencies) rather than user code producing bad output.
-            infra_errors = (
-                "can't open file",
-                "No such file or directory",
-                "ModuleNotFoundError",
-                "ImportError",
-            )
-            if any(pattern in first_line for pattern in infra_errors):
+        # Iterate over all lines to find the one containing valid JSON.
+        # The harness prints exactly one JSON line at the end, but numpy
+        # C-level RuntimeWarnings may appear as earlier lines in the Docker
+        # container logs (they bypass Python's sys.stderr redirect).
+        json_line = None
+        non_json_lines = []
+        infra_errors = (
+            "can't open file",
+            "No such file or directory",
+            "ModuleNotFoundError",
+            "ImportError",
+        )
+        for line in lines:
+            # Check for Docker infrastructure failure first.
+            if any(pattern in line for pattern in infra_errors):
                 raise DockerUnavailableError(
-                    f"Docker sandbox infrastructure failure: {first_line}"
+                    f"Docker sandbox infrastructure failure: {line}"
                 )
+            try:
+                json.loads(line)
+                json_line = line
+                break  # Found the JSON payload — use it
+            except (json.JSONDecodeError, TypeError):
+                non_json_lines.append(line)
 
-            return {
-                "passed": False,
-                "actual_output": first_line,
-                "expected_output": "",
-                "errors": "\n".join(lines[1:]) if len(lines) > 1 else "Failed to parse runner output",
-                "test_results": [],
-            }
+        if json_line is not None:
+            result = json.loads(json_line)
+            # If there were warning/error lines before the JSON, attach them
+            # as a note in the errors field so callers can inspect.
+            if non_json_lines and result.get("errors") is None:
+                result["errors"] = "\n".join(non_json_lines)
+            return result
+
+        # No JSON line found — return all lines as raw output.
+        return {
+            "passed": False,
+            "actual_output": non_json_lines[0] if non_json_lines else "",
+            "expected_output": "",
+            "errors": "\n".join(non_json_lines[1:]) if len(non_json_lines) > 1 else "Failed to parse runner output",
+            "test_results": [],
+        }
 
 
 # Module-level singleton — reuse Docker client across requests

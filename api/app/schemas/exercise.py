@@ -36,4 +36,5 @@ class ExerciseDetail(BaseModel):
     language: str = "python"
     order: int
     lesson_id: int
-    test_suite: str | None = None  # Read-only; used by exercise runner
+    has_test_suite: bool = False  # Whether this exercise uses test_suite mode
+    test_cases: list = Field(default_factory=list)  # Test case definitions (read-only)

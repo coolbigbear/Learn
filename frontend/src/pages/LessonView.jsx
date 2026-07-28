@@ -295,7 +295,7 @@ export default function LessonView() {
                   {/* Exercise feedback */}
                   {feedback && (
                     <div className="mt-4">
-                      <ExerciseFeedback result={feedback} />
+                      <ExerciseFeedback result={feedback} mode={activeExercise?.has_test_suite ? "test_suite" : "test_cases"} />
                     </div>
                   )}
                 </div>
@@ -459,7 +459,7 @@ export default function LessonView() {
               {/* Exercise feedback */}
               {feedback && (
                 <div className="mt-4">
-                  <ExerciseFeedback result={feedback} />
+                  <ExerciseFeedback result={feedback} mode={activeExercise?.has_test_suite ? "test_suite" : "test_cases"} />
                 </div>
               )}
             </div>

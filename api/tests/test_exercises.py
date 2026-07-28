@@ -145,10 +145,6 @@ class TestSubmitExercise:
         exercise_progress = [p for p in progress if p["exercise_id"] == pytest.exercise_id]
         assert len(exercise_progress) == 1
         assert exercise_progress[0]["completed"] is True
-        # 2 wrong attempts + 1 correct = 3 attempts (the mark_completed also increments)
-        # Actually: 2 wrong calls increment by 1 each, 1 correct call also increments attempts
-        # Wait, looking at the code: mark_completed does increment_attempts too
-        # So 2 failing + 1 passing = 3 total
         assert exercise_progress[0]["attempts"] >= 3
 
     async def test_submit_requires_auth(self, client: AsyncClient):
@@ -174,8 +170,11 @@ class TestGetExercise:
         assert "starter_code" in body
         assert "lesson_id" in body
         assert body["language"] == "python"
-        # Should NOT leak test cases or solution
-        assert "test_cases" not in body
+        # Should expose test_cases (for student reference) but NOT solution code
+        assert "test_cases" in body
+        assert body["test_cases"] == [
+            {"input": "", "expected_output": "hello\n", "comparison_type": "exact"},
+        ]
         assert "solution_code" not in body
 
     async def test_get_exercise_not_found(self, client: AsyncClient, auth_headers: dict):
