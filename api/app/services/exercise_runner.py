@@ -11,12 +11,15 @@ Docker is unavailable.
 """
 
 import json
+import logging
 import os
 import subprocess
 import sys
 import tempfile
 import textwrap
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 from app.config import (
     DOCKER_ENABLED,
@@ -452,11 +455,20 @@ async def run_code_with_docker_fallback(
         try:
             from app.services.docker_runner import run_code_in_docker
 
-            return await run_code_in_docker(
+            result = await run_code_in_docker(
                 user_code, test_cases, language, test_suite
             )
+            # If Docker returned a timeout result, fall through to the
+            # subprocess runner instead.  The Docker daemon may be slow
+            # or overloaded (common on Raspberry Pi), but the subprocess
+            # runner can still complete the exercise quickly.
+            if result.get("errors") == "Execution timed out":
+                logger.warning(
+                    "Docker sandbox timed out — falling back to subprocess runner"
+                )
+            else:
+                return result
         except ImportError:
-            # docker package not installed — fall through
             pass
         except Exception:
             # Docker unavailable or error — fall through to subprocess

@@ -36,6 +36,7 @@ async def get_exercise(
         order=exercise.order,
         lesson_id=exercise.lesson_id,
         has_test_suite=bool(exercise.test_suite),
+        test_cases=exercise.test_cases or [],
     )
 
 

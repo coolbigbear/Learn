@@ -37,3 +37,4 @@ class ExerciseDetail(BaseModel):
     order: int
     lesson_id: int
     has_test_suite: bool = False  # Whether this exercise uses test_suite mode
+    test_cases: list = Field(default_factory=list)  # Test case definitions (read-only)
