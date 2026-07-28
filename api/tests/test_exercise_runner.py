@@ -412,3 +412,163 @@ class TestFailureMessages:
         ])
         msg = result["test_results"][0]["message"]
         assert msg is None
+
+
+class TestTestSuiteMode:
+    """Tests for the test_suite execution mode (importlib-based harness)."""
+
+    async def test_basic_pass(self):
+        """Simple test_suite that should pass."""
+        result = await run_code(
+            "x = 42",
+            [],
+            test_suite="def test_x_is_42(): assert exercise.x == 42",
+        )
+        assert result["passed"] is True
+        assert len(result["test_results"]) == 1
+        assert result["test_results"][0]["passed"] is True
+        assert result["test_results"][0]["name"] == "test_x_is_42"
+
+    async def test_module_level_print_does_not_pollute_json(self):
+        """CRITICAL BUG REGRESSION: module-level print() must not cause JSON parse failure."""
+        result = await run_code(
+            'print("hello world")',
+            [],
+            test_suite="def test_print_works(): assert True",
+        )
+        assert result["passed"] is True
+        assert len(result["test_results"]) == 1
+        assert result["test_results"][0]["passed"] is True
+        assert "hello world" in result.get("actual_output", "")
+
+    async def test_module_level_multiple_prints(self):
+        """Multiple module-level prints before test_suite should not break JSON."""
+        result = await run_code(
+            'print("line1")\nprint("line2")\nx = 99',
+            [],
+            test_suite="def test_x(): assert exercise.x == 99",
+        )
+        assert result["passed"] is True
+        assert "line1" in result.get("actual_output", "")
+        assert "line2" in result.get("actual_output", "")
+
+    async def test_empty_test_suite_returns_error(self):
+        """Empty test_suite must NOT return passed=True."""
+        result = await run_code("x = 42", [], test_suite="")
+        assert result["passed"] is False
+        assert result.get("errors") is not None
+        assert "No test_* functions found" in result.get("errors", "")
+
+    async def test_no_test_functions_returns_error(self):
+        """Test suite with no test_* functions must not return passed=True."""
+        result = await run_code("x = 42", [], test_suite="def helper(): pass")
+        assert result["passed"] is False
+        assert result.get("errors") is not None
+        assert "No test_* functions found" in result.get("errors", "")
+
+    async def test_invalid_syntax_user_code(self):
+        """Invalid syntax in user code must return clean error, not crash."""
+        result = await run_code(
+            "def foo( bar",
+            [],
+            test_suite="def test_foo(): assert True",
+        )
+        assert result["passed"] is False
+        assert result.get("errors") is not None
+
+    async def test_user_code_runtime_error(self):
+        """Runtime error in user module-level code must return clean error."""
+        result = await run_code(
+            "raise ValueError('boom')",
+            [],
+            test_suite="def test_ok(): assert True",
+        )
+        assert result["passed"] is False
+        assert result.get("errors") is not None
+        assert "ValueError" in result.get("errors", "")
+
+    async def test_assertion_failure_in_test(self):
+        """Test function that fails an assertion."""
+        result = await run_code(
+            "x = 41",
+            [],
+            test_suite="def test_x(): assert exercise.x == 42",
+        )
+        assert result["passed"] is False
+        assert len(result["test_results"]) == 1
+        assert result["test_results"][0]["passed"] is False
+        assert result["test_results"][0]["message"] is not None
+
+    async def test_exception_in_test(self):
+        """Test function that raises an unexpected exception."""
+        result = await run_code(
+            "x = 42",
+            [],
+            test_suite="def test_x(): raise TypeError('unexpected')",
+        )
+        assert result["passed"] is False
+        assert len(result["test_results"]) == 1
+        assert result["test_results"][0]["passed"] is False
+        assert "TypeError" in result["test_results"][0].get("message", "")
+
+    async def test_multiple_test_functions_all_pass(self):
+        """Multiple test_* functions that all pass."""
+        result = await run_code(
+            "x = 42\ny = 'hello'",
+            [],
+            test_suite="def test_x(): assert exercise.x == 42\ndef test_y(): assert exercise.y == 'hello'",
+        )
+        assert result["passed"] is True
+        assert len(result["test_results"]) == 2
+        assert all(tr["passed"] for tr in result["test_results"])
+
+    async def test_multiple_test_functions_some_fail(self):
+        """Multiple test_* functions where one fails."""
+        result = await run_code(
+            "x = 42",
+            [],
+            test_suite="def test_x(): assert exercise.x == 42\ndef test_x_fail(): assert exercise.x == 99",
+        )
+        assert result["passed"] is False
+        assert len(result["test_results"]) == 2
+        assert result["test_results"][0]["passed"] is True
+        assert result["test_results"][1]["passed"] is False
+
+    async def test_import_in_user_code(self):
+        """User code with module-level imports should work."""
+        result = await run_code(
+            "import math\nx = math.pi",
+            [],
+            test_suite="def test_pi(): assert exercise.x > 3.14",
+        )
+        assert result["passed"] is True
+
+    async def test_import_in_test_suite(self):
+        """Test suite with imports should work."""
+        result = await run_code(
+            "x = [1, 2, 3]",
+            [],
+            test_suite="import json\ndef test_x(): assert json.dumps(exercise.x) == '[1, 2, 3]'",
+        )
+        assert result["passed"] is True
+
+    async def test_test_names_not_starting_with_test_ignored(self):
+        """Functions not starting with 'test_' in the suite should be ignored."""
+        result = await run_code(
+            "x = 42",
+            [],
+            test_suite="def helper(): pass\ndef test_x(): assert exercise.x == 42",
+        )
+        assert result["passed"] is True
+        assert len(result["test_results"]) == 1
+        assert result["test_results"][0]["name"] == "test_x"
+
+    async def test_module_level_stderr_does_not_pollute_json(self):
+        """Module-level stderr output should not cause JSON parse failure."""
+        result = await run_code(
+            "import sys; sys.stderr.write('debug info\\n')",
+            [],
+            test_suite="def test_ok(): assert True",
+        )
+        assert result["passed"] is True
+        assert "debug info" in result.get("errors", "")

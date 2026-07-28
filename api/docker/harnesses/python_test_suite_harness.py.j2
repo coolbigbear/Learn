@@ -1,23 +1,143 @@
-import importlib.util, json, sys
+# Harness: wraps user code + test_suite, discovers and runs test_* functions,
+# outputs JSON results.
+# This script runs inside the Docker sandbox container.  It has full stdlib
+# access (no restricted builtins — the container provides isolation instead).
+#
+# Rendered via str.replace() with {user_code!r} and {test_suite!r} before
+# being mounted into the container.
+
+import importlib.util
+import io
+import json
+import sys
+
+# ---- stdout/stderr redirect ------------------------------------------------
+_old_stdout = sys.stdout
+_old_stderr = sys.stderr
+_stdout_capture = io.StringIO()
+_stderr_capture = io.StringIO()
+sys.stdout = _stdout_capture
+sys.stderr = _stderr_capture
+
+
+def _restore_and_emit(payload: dict) -> None:
+    sys.stdout = _old_stdout
+    sys.stderr = _old_stderr
+    print(json.dumps(payload))
+
+
+def _captured_output() -> str:
+    return _stdout_capture.getvalue()
+
+
+def _captured_errors() -> str:
+    return _stderr_capture.getvalue()
+
+
 _USER_CODE = {user_code!r}
-with open('exercise.py', 'w') as _f: _f.write(_USER_CODE)
+with open("exercise.py", "w") as _f:
+    _f.write(_USER_CODE)
+
 _TEST_SUITE = {test_suite!r}
-with open('test_suite.py', 'w') as _f: _f.write(_TEST_SUITE)
-_spec = importlib.util.spec_from_file_location('exercise', 'exercise.py')
+with open("test_suite.py", "w") as _f:
+    _f.write(_TEST_SUITE)
+
+_spec = importlib.util.spec_from_file_location("exercise", "exercise.py")
 if _spec is None or _spec.loader is None:
-    print(json.dumps({'passed':False,'errors':'Failed to import exercise module','test_results':[]})); sys.exit(0)
+    _restore_and_emit({
+        "passed": False,
+        "actual_output": _captured_output(),
+        "expected_output": "",
+        "errors": "Failed to import exercise module",
+        "test_results": [],
+    })
+    sys.exit(0)
+
 _exercise = importlib.util.module_from_spec(_spec)
-try: _spec.loader.exec_module(_exercise)
+try:
+    _spec.loader.exec_module(_exercise)
 except Exception as _e:
-    print(json.dumps({'passed':False,'errors':f'Error: {type(_e).__name__}: {_e}','test_results':[]})); sys.exit(0)
-_test_ns = {'exercise': _exercise}
-exec(open('test_suite.py').read(), _test_ns)
-_test_funcs = sorted([(n,f) for n,f in _test_ns.items() if n.startswith('test_')], key=lambda x:x[0])
+    _restore_and_emit({
+        "passed": False,
+        "actual_output": _captured_output(),
+        "expected_output": "",
+        "errors": f"Error: {type(_e).__name__}: {_e}",
+        "test_results": [],
+    })
+    sys.exit(0)
+
+_test_ns = {"exercise": _exercise}
+try:
+    exec(open("test_suite.py").read(), _test_ns)
+except Exception as _e:
+    _restore_and_emit({
+        "passed": False,
+        "actual_output": _captured_output(),
+        "expected_output": "",
+        "errors": f"Test suite error: {type(_e).__name__}: {_e}",
+        "test_results": [],
+    })
+    sys.exit(0)
+
+_test_funcs = sorted(
+    [(n, f) for n, f in _test_ns.items() if n.startswith("test_")],
+    key=lambda x: x[0],
+)
+
 if not _test_funcs:
-    print(json.dumps({'passed':False,'errors':'No test_* functions found','test_results':[]})); sys.exit(0)
-_results = []; _all_passed = True
-for _i,(tn,_fn) in enumerate(_test_funcs):
-    try: _fn(); _results.append({'test_index':_i,'name':tn,'passed':True,'message':None,'actual_output':'','expected_output':'','errors':None,'comparison_type':'exact'})
-    except AssertionError as _e: _all_passed=False; _results.append({'test_index':_i,'name':tn,'passed':False,'message':str(_e) if str(_e) else 'Assertion failed','actual_output':'','expected_output':'','errors':None,'comparison_type':'exact'})
-    except Exception as _e: _all_passed=False; _results.append({'test_index':_i,'name':tn,'passed':False,'message':f'{type(_e).__name__}: {_e}','actual_output':'','expected_output':'','errors':f'{type(_e).__name__}: {_e}','comparison_type':'exact'})
-print(json.dumps({'passed':_all_passed,'actual_output':'','expected_output':'','errors':None,'test_results':_results}))
+    _restore_and_emit({
+        "passed": False,
+        "actual_output": _captured_output(),
+        "expected_output": "",
+        "errors": "No test_* functions found in test suite",
+        "test_results": [],
+    })
+    sys.exit(0)
+
+_results = []
+_all_passed = True
+for _i, (_name, _fn) in enumerate(_test_funcs):
+    try:
+        _fn()
+        _results.append({
+            "test_index": _i,
+            "name": _name,
+            "passed": True,
+            "message": None,
+            "actual_output": "",
+            "expected_output": "",
+            "errors": None,
+            "comparison_type": "exact",
+        })
+    except AssertionError as _e:
+        _all_passed = False
+        _results.append({
+            "test_index": _i,
+            "name": _name,
+            "passed": False,
+            "message": str(_e) if str(_e) else "Assertion failed",
+            "actual_output": "",
+            "expected_output": "",
+            "errors": None,
+            "comparison_type": "exact",
+        })
+    except Exception as _e:
+        _all_passed = False
+        _results.append({
+            "test_index": _i,
+            "name": _name,
+            "passed": False,
+            "message": f"{type(_e).__name__}: {_e}",
+            "actual_output": "",
+            "expected_output": "",
+            "errors": f"{type(_e).__name__}: {_e}",
+            "comparison_type": "exact",
+        })
+
+_restore_and_emit({
+    "passed": _all_passed,
+    "actual_output": _captured_output(),
+    "expected_output": "",
+    "errors": None,
+    "test_results": _results,
+})
