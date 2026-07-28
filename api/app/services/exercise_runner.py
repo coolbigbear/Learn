@@ -499,8 +499,8 @@ async def run_code_with_docker_fallback(
 
     Tries the Docker sandbox first (when DOCKER_ENABLED is True). If Docker
     is unavailable, falls back gracefully to the subprocess runner.
-    When *test_suite* is provided, the Docker runner is skipped and the
-    subprocess test_suite runner is used directly.
+    When *test_suite* is provided, it is passed through to both runners
+    (test_suite takes priority over test_cases at the harness level).
 
     Returns the same dict schema as run_code().
     """
