@@ -5,7 +5,7 @@
     "instruction": "Write a `print()` statement that outputs **Hello, World!** exactly as shown.",
     "starter_code": "# Print Hello, World!\n",
     "solution_code": "print(\"Hello, World!\")",
-    "test_suite": "import io, sys\n\ndef test_prints_hello_world():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == 'Hello, World!\\n', f\"Expected Hello, World!, got {output!r}\"",
+    "test_suite": "import io, sys\n\ndef test_prints_hello_world():\n    _old = sys.stdout\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = _old\n    output = captured.getvalue()\n    assert output == 'Hello, World!\\n', f\"Expected Hello, World!, got {output!r}\"",
     "test_cases": [],
     "order": 1
   },
@@ -15,7 +15,7 @@
     "instruction": "Write a `print()` statement that outputs **your name** to the screen.",
     "starter_code": "# Print your name\n",
     "solution_code": "print(\"Alex\")",
-    "test_suite": "import io, sys\n\ndef test_prints_name_non_empty():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output.strip(), \"Output should contain your name\"",
+    "test_suite": "import io, sys\n\ndef test_prints_name_non_empty():\n    _old = sys.stdout\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = _old\n    output = captured.getvalue()\n    assert output.strip(), \"Output should contain your name\"",
     "test_cases": [],
     "order": 2
   },
@@ -25,7 +25,7 @@
     "instruction": "Use **single quotes** to print **Greetings, Earthling!**.",
     "starter_code": "# Use single quotes for the string\n",
     "solution_code": "print('Greetings, Earthling!')",
-    "test_suite": "import io, sys\n\ndef test_prints_greeting():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == 'Greetings, Earthling!\\n', f\"Expected Greetings, Earthling!, got {output!r}\"\n\ndef test_uses_single_quotes():\n    with open(\"exercise.py\") as f:\n        code = f.read()\n    assert \"'\" in code",
+    "test_suite": "import io, sys\n\ndef test_prints_greeting():\n    _old = sys.stdout\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = _old\n    output = captured.getvalue()\n    assert output == 'Greetings, Earthling!\\n', f\"Expected Greetings, Earthling!, got {output!r}\"\n\ndef test_uses_single_quotes():\n    with open(\"exercise.py\") as f:\n        code = f.read()\n    assert \"'\" in code",
     "test_cases": [],
     "order": 3
   },
@@ -35,7 +35,7 @@
     "instruction": "Use **two separate `print()` statements** for first name and last name.",
     "starter_code": "# Print first name\n# Print last name\n",
     "solution_code": "print(\"Jane\")\nprint(\"Smith\")",
-    "test_suite": "import io, sys, re\n\ndef test_prints_two_lines():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert re.match('.+\\n.+\\n*', output), f\"Output should have two lines, got {output!r}\"",
+    "test_suite": "import io, sys, re\n\ndef test_prints_two_lines():\n    _old = sys.stdout\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = _old\n    output = captured.getvalue()\n    assert re.match('.+\\n.+\\n*', output), f\"Output should have two lines, got {output!r}\"",
     "test_cases": [],
     "order": 4
   },
@@ -45,7 +45,7 @@
     "instruction": "Print your **favorite color**: Red, Blue, Green, Yellow, Purple, Orange, Pink, Black.",
     "starter_code": "# Pick a color and print it\n",
     "solution_code": "print(\"Purple\")",
-    "test_suite": "import io, sys\n\ndef test_prints_allowed_color():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    allowed = [\"Red\", \"Blue\", \"Green\", \"Yellow\", \"Purple\", \"Orange\", \"Pink\", \"Black\"]\n    assert output.strip() in allowed, f\"Output should be a valid color, got {output!r}\"",
+    "test_suite": "import io, sys\n\ndef test_prints_allowed_color():\n    _old = sys.stdout\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = _old\n    output = captured.getvalue()\n    allowed = [\"Red\", \"Blue\", \"Green\", \"Yellow\", \"Purple\", \"Orange\", \"Pink\", \"Black\"]\n    assert output.strip() in allowed, f\"Output should be a valid color, got {output!r}\"",
     "test_cases": [],
     "order": 5
   }

@@ -5,7 +5,7 @@
     "instruction": "Print **42** (no quotes).",
     "starter_code": "# Print 42\n",
     "solution_code": "print(42)",
-    "test_suite": "import io, sys\n\ndef test_prints_42():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == '42\\n', f\"Expected 42, got {output!r}\"",
+    "test_suite": "import io, sys\n\ndef test_prints_42():\n    _old = sys.stdout\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = _old\n    output = captured.getvalue()\n    assert output == '42\\n', f\"Expected 42, got {output!r}\"",
     "test_cases": [],
     "order": 1
   },
@@ -15,7 +15,7 @@
     "instruction": "Print **3.14** (no quotes).",
     "starter_code": "# Print 3.14\n",
     "solution_code": "print(3.14)",
-    "test_suite": "import io, sys\n\ndef test_prints_314():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == '3.14\\n', f\"Expected 3.14, got {output!r}\"",
+    "test_suite": "import io, sys\n\ndef test_prints_314():\n    _old = sys.stdout\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = _old\n    output = captured.getvalue()\n    assert output == '3.14\\n', f\"Expected 3.14, got {output!r}\"",
     "test_cases": [],
     "order": 2
   },
@@ -25,7 +25,7 @@
     "instruction": "Print your age as a number (no quotes).",
     "starter_code": "# Print your age\n",
     "solution_code": "print(25)",
-    "test_suite": "import io, sys, re\n\ndef test_prints_age_number():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert re.match('\\\\d+\\n', output), f\"Output should be a number, got {output!r}\"",
+    "test_suite": "import io, sys, re\n\ndef test_prints_age_number():\n    _old = sys.stdout\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = _old\n    output = captured.getvalue()\n    assert re.match('\\\\d+\\n', output), f\"Output should be a number, got {output!r}\"",
     "test_cases": [],
     "order": 3
   },
@@ -35,7 +35,7 @@
     "instruction": "Print **100** and **200** with a comma in print().",
     "starter_code": "# Print 100 and 200\n",
     "solution_code": "print(100, 200)",
-    "test_suite": "import io, sys\n\ndef test_prints_100_200():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == '100 200\\n', f\"Expected 100 200, got {output!r}\"",
+    "test_suite": "import io, sys\n\ndef test_prints_100_200():\n    _old = sys.stdout\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = _old\n    output = captured.getvalue()\n    assert output == '100 200\\n', f\"Expected 100 200, got {output!r}\"",
     "test_cases": [],
     "order": 4
   },
@@ -45,7 +45,7 @@
     "instruction": "Print **My lucky number is** followed by **7** (as number).",
     "starter_code": "# Print: My lucky number is 7\n",
     "solution_code": "print(\"My lucky number is\", 7)",
-    "test_suite": "import io, sys\n\ndef test_prints_lucky_number():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == 'My lucky number is 7\\n', f\"Expected My lucky number is 7, got {output!r}\"",
+    "test_suite": "import io, sys\n\ndef test_prints_lucky_number():\n    _old = sys.stdout\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = _old\n    output = captured.getvalue()\n    assert output == 'My lucky number is 7\\n', f\"Expected My lucky number is 7, got {output!r}\"",
     "test_cases": [],
     "order": 5
   }

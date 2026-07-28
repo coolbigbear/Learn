@@ -5,7 +5,7 @@
     "instruction": "Print **Hello Python** with a single `print()` and two arguments.",
     "starter_code": "# Print Hello Python\n",
     "solution_code": "print(\"Hello\", \"Python\")",
-    "test_suite": "import io, sys\n\ndef test_prints_hello_python():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == 'Hello Python\\n', f\"Expected Hello Python, got {output!r}\"",
+    "test_suite": "import io, sys\n\ndef test_prints_hello_python():\n    _old = sys.stdout\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = _old\n    output = captured.getvalue()\n    assert output == 'Hello Python\\n', f\"Expected Hello Python, got {output!r}\"",
     "test_cases": [],
     "order": 1
   },
@@ -15,7 +15,7 @@
     "instruction": "Print **I love coding** with three arguments in print().",
     "starter_code": "# Print three items\n",
     "solution_code": "print(\"I\", \"love\", \"coding\")",
-    "test_suite": "import io, sys\n\ndef test_prints_i_love_coding():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert output == 'I love coding\\n', f\"Expected I love coding, got {output!r}\"",
+    "test_suite": "import io, sys\n\ndef test_prints_i_love_coding():\n    _old = sys.stdout\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = _old\n    output = captured.getvalue()\n    assert output == 'I love coding\\n', f\"Expected I love coding, got {output!r}\"",
     "test_cases": [],
     "order": 2
   },
@@ -25,7 +25,7 @@
     "instruction": "Print favorite food and color in one print().",
     "starter_code": "# Print food and color\n",
     "solution_code": "print(\"Pizza\", \"Blue\")",
-    "test_suite": "import io, sys, re\n\ndef test_prints_two_words():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert re.match('.+ .+\\n', output), f\"Output should have two words, got {output!r}\"",
+    "test_suite": "import io, sys, re\n\ndef test_prints_two_words():\n    _old = sys.stdout\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = _old\n    output = captured.getvalue()\n    assert re.match('.+ .+\\n', output), f\"Output should have two words, got {output!r}\"",
     "test_cases": [],
     "order": 3
   },
@@ -35,7 +35,7 @@
     "instruction": "Print first and last name on the same line.",
     "starter_code": "# Print first and last name\n",
     "solution_code": "print(\"Ada\", \"Lovelace\")",
-    "test_suite": "import io, sys, re\n\ndef test_prints_first_last():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert re.match('.+ .+\\n', output), f\"Output should have two words, got {output!r}\"",
+    "test_suite": "import io, sys, re\n\ndef test_prints_first_last():\n    _old = sys.stdout\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = _old\n    output = captured.getvalue()\n    assert re.match('.+ .+\\n', output), f\"Output should have two words, got {output!r}\"",
     "test_cases": [],
     "order": 4
   },
@@ -45,7 +45,7 @@
     "instruction": "Print **I am** + age (as number) + **years old**.",
     "starter_code": "# Print: I am [age] years old\n",
     "solution_code": "print(\"I am\", 30, \"years old\")",
-    "test_suite": "import io, sys, re\n\ndef test_prints_age_format():\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = sys.__stdout__\n    output = captured.getvalue()\n    assert re.match('I am \\\\d+ years old\\n', output), f\"Expected I am N years old, got {output!r}\"",
+    "test_suite": "import io, sys, re\n\ndef test_prints_age_format():\n    _old = sys.stdout\n    captured = io.StringIO()\n    sys.stdout = captured\n    exec(open(\"exercise.py\").read())\n    sys.stdout = _old\n    output = captured.getvalue()\n    assert re.match('I am \\\\d+ years old\\n', output), f\"Expected I am N years old, got {output!r}\"",
     "test_cases": [],
     "order": 5
   }
