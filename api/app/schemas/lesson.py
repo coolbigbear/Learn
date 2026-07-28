@@ -48,6 +48,7 @@ class ExerciseSummary(BaseModel):
     instruction: str
     starter_code: str
     order: int
+    has_test_suite: bool = False
 
 
 class LessonDetail(BaseModel):
